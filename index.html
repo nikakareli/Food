@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0f766e">
+<meta name="theme-color" content="#2b4a43">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="მაკროები">
 <title>მაკრო სკანერი</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230f766e'/%3E%3Cg fill='white'%3E%3Crect x='22' y='28' width='6' height='44'/%3E%3Crect x='33' y='28' width='3' height='44'/%3E%3Crect x='41' y='28' width='8' height='44'/%3E%3Crect x='54' y='28' width='3' height='44'/%3E%3Crect x='62' y='28' width='6' height='44'/%3E%3Crect x='73' y='28' width='4' height='44'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%232b4a43'/%3E%3Cg fill='white'%3E%3Crect x='22' y='28' width='6' height='44'/%3E%3Crect x='33' y='28' width='3' height='44'/%3E%3Crect x='41' y='28' width='8' height='44'/%3E%3Crect x='54' y='28' width='3' height='44'/%3E%3Crect x='62' y='28' width='6' height='44'/%3E%3Crect x='73' y='28' width='4' height='44'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="apple-touch-icon" id="touchIcon" href="">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
   :root{
     --bg:#f4f6f5; --card:#ffffff; --ink:#14201d; --muted:#6b7a76; --line:#e3e8e6;
     --brand:#0f766e; --brand-ink:#ffffff; --brand-soft:#e0f2ef;
-    --prot:#2563eb; --carb:#d97706; --fat:#db2777; --kcal:#0f766e; --over:#dc2626; --water:#0284c7;
+    --prot:#2563eb; --carb:#d97706; --fat:#db2777; --kcal:#0f766e; --over:#a9473f; --water:#0284c7;
     --radius:18px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -54,7 +54,7 @@
   .water .wlbl{font-size:13px;color:var(--muted);font-weight:600}
   .water .wnum{font-size:28px;font-weight:700;line-height:1.1;margin-top:2px}
   .water .wnum small{font-size:14px;font-weight:500;color:var(--muted)}
-  .water .bar.done i{background:#16a34a!important}
+  .water .bar.done i{background:#3f7d58!important}
   .wbtns{display:grid;grid-template-columns:48px 1fr 1fr 1fr;gap:8px;margin-top:12px}
   .wbtns button{background:#e0f2fe;color:#075985;border-radius:12px;padding:10px 4px;font-size:14px;font-weight:600}
   .wbtns button.minus{background:#eef2f1;color:var(--muted);font-size:20px;padding:6px 0}
@@ -69,7 +69,7 @@
   .tp-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f0f3f2}
   .tp-row:last-child{border-bottom:0}
   .tp-chk{flex:0 0 30px;height:30px;border-radius:9px;border:2px solid #cbd5d1;display:grid;place-items:center;font-weight:700;color:transparent}
-  .tp-row.done .tp-chk{background:#16a34a;border-color:#16a34a;color:#fff}
+  .tp-row.done .tp-chk{background:#3f7d58;border-color:#3f7d58;color:#fff}
   .tp-row .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14.5px}
   .tp-row.done .nm{color:var(--muted);text-decoration:line-through}
   .tp-row .kc{font-size:13px;color:var(--muted);white-space:nowrap}
@@ -102,8 +102,8 @@
   .nrow .nv small{color:var(--muted);font-weight:500}
   .nrow .bar{grid-column:1 / -1;height:5px;margin-top:3px}
   .nrow .bar i{background:#64748b}
-  .nrow.good .bar i{background:#16a34a}
-  .nrow.lim .bar i{background:#d97706}
+  .nrow.good .bar i{background:#3f7d58}
+  .nrow.lim .bar i{background:#b08a45}
   .nrow .part{color:var(--muted);font-size:11.5px;font-weight:500}
   .nnote{font-size:12px;color:var(--muted);line-height:1.5;margin-top:10px}
   details.pnut{margin-top:12px;background:#f6f8f7;border-radius:12px}
@@ -118,7 +118,7 @@
   .sc-list{list-style:none;margin:10px 0 0;padding:0}
   .sc-list li{display:flex;gap:8px;font-size:13.5px;line-height:1.4;padding:4px 0}
   .sc-list li b{flex:0 0 16px;text-align:center}
-  .sc-list li.pro b{color:#16a34a} .sc-list li.con b{color:#dc2626}
+  .sc-list li.pro b{color:#3f7d58} .sc-list li.con b{color:#a9473f}
   .msearch{margin-top:12px;background:#f6f8f7;border-radius:14px;padding:12px}
   .msearch > label{display:block;font-size:13.5px;font-weight:600;margin-bottom:6px}
   .mrow{display:flex;gap:8px}
@@ -241,7 +241,7 @@
   .spc{display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:99px;border:1px solid var(--line);background:#fafbfb;font-size:13px}
   .spc i{width:16px;height:16px;border-radius:5px;border:1.5px solid #cbd5d1;display:grid;place-items:center;font-style:normal;font-size:10px;color:transparent}
   .spc.on{background:#ecfdf3;border-color:#bbe5cb}
-  .spc.on i{background:#16a34a;border-color:#16a34a;color:#fff}
+  .spc.on i{background:#3f7d58;border-color:#3f7d58;color:#fff}
   .sp-empty{font-size:13px;color:var(--muted)}
   .sp-warn{font-size:12.5px;color:#b45309;line-height:1.45}
   .sp-warn:not(:empty){margin-top:8px}
@@ -256,7 +256,7 @@
   .sh-list > .sh-row:first-child{border-top:0}
   .sh-list{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
   .sh-row .tp-chk{flex:0 0 22px;height:22px}
-  .sh-row.done .tp-chk{background:#16a34a;border-color:#16a34a;color:#fff}
+  .sh-row.done .tp-chk{background:#3f7d58;border-color:#3f7d58;color:#fff}
   .sh-row .nm{flex:1;min-width:0;font-size:14px}
   .sh-row.done .nm{color:var(--muted);text-decoration:line-through}
   .sh-row .amt{font-size:13px;color:var(--muted);white-space:nowrap;text-align:right}
@@ -327,7 +327,7 @@
   .planbtn .pb-t b{font-size:14px;font-weight:600}
   .planbtn .pb-t span{font-size:12px;color:var(--muted)}
   .planbtn .pb-prog{flex:0 0 56px;height:6px;border-radius:99px;background:#edf1f0;overflow:hidden}
-  .planbtn .pb-prog i{display:block;height:100%;width:0;background:#16a34a;border-radius:99px}
+  .planbtn .pb-prog i{display:block;height:100%;width:0;background:#3f7d58;border-radius:99px}
   .planbtn .arr{color:var(--muted);font-size:18px}
   #planSheet .pc-head h3{margin:0}
   html,body{font-size:15px}
@@ -395,6 +395,92 @@
   .sc-list li{font-size:13px;padding:3px 0}
   .calc b{font-size:15px}
   .primary{padding:13px;font-size:15px;margin-top:14px}
+  /* ===== solid, compact theme ===== */
+  :root{--bg:#f3f4f2;--card:#fff;--ink:#1c2321;--muted:#717a77;--line:#e3e6e3;--brand:#2b4a43;--brand-soft:#e7eeec;
+    --prot:#4f6f9a;--carb:#b08a45;--fat:#9c6270;--kcal:#2b4a43;--over:#a9473f;--water:#5b8099;--radius:12px}
+  html,body{font-size:14px}
+  .wrap{padding:4px 12px 72px}
+  .topbar{padding:6px 0;margin-bottom:4px}
+  .topbar #pageTitle{font-size:15px;font-weight:600}
+  .iconbtn{width:32px;height:32px;border-radius:8px;font-size:15px}
+  header{margin:0 0 6px}
+  .datebox b{font-size:14.5px;font-weight:600}
+  .datebox span{font-size:11.5px}
+  .card{padding:12px;border-radius:12px;margin-bottom:8px}
+  .kcal-num{font-size:26px;font-weight:600;letter-spacing:-.01em}
+  .kcal-num small{font-size:12px}
+  .kcal-left{font-size:11.5px}
+  .kcal-left b{font-weight:600}
+  .bar{height:5px;margin-top:7px;background:#eceeec}
+  .macros{gap:12px;margin-top:10px}
+  .macro .lbl{font-size:11.5px}
+  .dot{width:6px;height:6px}
+  .macro .val{font-size:14px;font-weight:600}
+  .macro .val small{font-size:11px}
+  .macro .bar{height:3px}
+  details.nutcard.inl{margin:10px -12px -12px}
+  details.nutcard.inl > summary{padding:10px 12px;font-size:12.5px}
+  details.nutcard.inl .nutbody{padding:0 12px 10px}
+  details.nutcard > summary{font-weight:500;font-size:13px}
+  .nrow{font-size:12.5px;padding:4px 0}
+  .nrow .bar{height:3px;margin-top:2px}
+  .nutgrp{font-size:11px;font-weight:600}
+  .nnote{font-size:11.5px}
+  .water .wlbl{font-size:11.5px}
+  .water .wnum{font-size:18px;font-weight:600}
+  .water .wnum small{font-size:12px}
+  .wbtns{grid-template-columns:36px 1fr 1fr 1fr;gap:6px;margin-top:8px}
+  .wbtns button,.wbtns button.minus{background:#f4f5f3;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 2px;font-size:12.5px;font-weight:500}
+  .wbtns button.minus{font-size:15px;padding:4px 0;color:var(--muted)}
+  .actions{gap:6px}
+  .act{padding:9px 4px 7px;border-radius:10px;font-size:11.5px;gap:4px}
+  .act svg{width:18px;height:18px}
+  h2{font-size:12px;margin:12px 2px 5px}
+  .chip{padding:5px 10px;font-size:12px;border-radius:8px}
+  .list{border-radius:12px}
+  .list .item{padding:9px 12px}
+  .list .item .nm{font-size:13.5px}
+  .list .item .sub{font-size:11px}
+  .list .item .kc{font-size:13px;font-weight:600}
+  .item{border-radius:10px}
+  .empty{border-radius:12px;font-size:12.5px}
+  .card.supp{padding:8px 10px 8px 12px}
+  .spc{border-radius:7px}
+  .spc.on{background:#eef3ef;border-color:#cfdcd3}
+  .btn2,.foodbtn{border-radius:10px}
+  .planbtn{border-radius:12px;padding:9px 12px}
+  .sheet{background:rgba(20,26,24,.4)}
+  .sheet-card{border-radius:16px 16px 0 0;padding:16px 14px calc(16px + env(safe-area-inset-bottom))}
+  .sheet h3{font-size:16px;font-weight:600}
+  .muted{font-size:12.5px}
+  .score{border-radius:10px;padding:10px}
+  .sc-badge{min-width:44px;height:44px;font-size:17px;padding-top:11px;border-radius:10px;font-weight:600}
+  .sc-badge small{font-size:10.5px}
+  .sc-label{font-size:14px;font-weight:600}
+  .sc-list li{font-size:12.5px}
+  .per100{border-radius:10px;font-size:12.5px;padding:9px 11px}
+  .grams button{width:44px;height:42px;border-radius:10px;font-size:19px}
+  .grams input{font-size:19px;font-weight:600;padding:8px;border-radius:10px}
+  .quick button{border-radius:8px;padding:6px 10px;font-size:12.5px}
+  .calc{gap:6px}
+  .calc div{border-radius:10px;padding:8px 4px}
+  .calc b{font-size:14px;font-weight:600}
+  details.pnut{border-radius:10px}
+  details.pnut > summary{font-size:13px;font-weight:500}
+  .primary{border-radius:10px;padding:12px;font-size:14.5px}
+  .ghost{font-size:14px;padding:11px}
+  .field input,#foodSearch{border-radius:10px;padding:10px 12px}
+  .fitem{padding:10px 2px}
+  .fitem .nm{font-size:14px;font-weight:500}
+  .fitem .sub{font-size:11.5px}
+  .fitem .kc{font-size:14px;font-weight:600}
+  .drawer button[data-tab]{font-size:14px;padding:10px 12px;border-radius:8px}
+  .tile{border-radius:10px}
+  .tile b{font-size:18px;font-weight:600}
+  .sh-list{border-radius:12px}
+  .tp-chk{border-radius:6px}
+  .updbar,.toast{border-radius:10px}
+  .toast{font-size:13px}
 </style>
 </head>
 <body>
@@ -717,7 +803,7 @@
       <input id="manualCode" inputmode="numeric" placeholder="ან ჩაწერე ბარკოდის ციფრები">
       <button id="manualGo">ძებნა</button>
     </div>
-    <label class="photo-lbl" id="photoLbl">📷 ბარკოდის ფოტოდან ამოცნობა
+    <label class="photo-lbl" id="photoLbl">ბარკოდის ფოტოდან ამოცნობა
       <input type="file" id="photoInput" accept="image/*" capture="environment" hidden>
     </label>
   </div>
@@ -770,11 +856,11 @@
       <div><b id="cF" style="color:var(--fat)">0</b><span>ცხიმი გ</span></div>
     </div>
     <details class="pnut" id="pNut">
-      <summary>🧪 ვიტამინები და მინერალები ამ ულუფაში ›</summary>
+      <summary>ვიტამინები და მინერალები ამ ულუფაში ›</summary>
       <div class="nutbody" id="pNutBody"></div>
     </details>
     <details class="pnut" id="pIngr">
-      <summary>📋 შემადგენლობა და დანამატები ›</summary>
+      <summary>შემადგენლობა და დანამატები ›</summary>
       <div class="nutbody" id="pIngrBody"></div>
     </details>
     <button class="primary" id="pAdd">დამატება</button>
@@ -789,7 +875,7 @@
     <h3 id="mTitle">პროდუქტის დამატება</h3>
     <div class="muted" id="mSub">ჩაწერე მონაცემები ეტიკეტიდან — ერთხელ შეავსებ და შემდეგ ჯერზე თავად იცნობს.</div>
     <div class="msearch" id="mSearchWrap">
-      <label>🔎 მოძებნე მსგავსი პროდუქტი სახელით</label>
+      <label>მოძებნე მსგავსი პროდუქტი სახელით</label>
       <div class="mrow"><input id="mQuery" type="search" placeholder="მაგ. activia strawberry, cannellini, მაწონი" autocomplete="off"><button id="mQueryGo">ძებნა</button></div>
       <div class="muted" id="mSearchMsg" style="font-size:12.5px;margin-top:6px">ამოირჩიე ყველაზე ახლოს მყოფი — მონაცემები ფორმაში ჩაიწერება და ეტიკეტთან შეადარებ.</div>
       <ul class="flist" id="mResults"></ul>
@@ -826,7 +912,7 @@
       <div><h3>დღის გეგმა</h3><div class="muted" id="tpSub"></div></div>
       <button class="link" id="tpAll">ყველა ✓</button>
     </div>
-    <div class="bar" id="tpBar"><i style="background:#16a34a"></i></div>
+    <div class="bar" id="tpBar"><i style="background:#3f7d58"></i></div>
     <div id="tpList"></div>
     <button class="btn2" id="tpEdit" style="width:100%;margin-top:14px">გეგმის შეცვლა</button>
     <button class="ghost" data-close>დახურვა</button>
@@ -932,7 +1018,7 @@
   let water = store.get(K.water, {}); // { 'YYYY-MM-DD': millilitres }
   let plans = store.get('mt_plan_v1', {}); // { 'YYYY-MM-DD': [ planned items ] }
   const savePlans = () => store.set('mt_plan_v1', plans);
-  const MEALS = [['b', '🌅 საუზმე'], ['l', '🍲 სადილი'], ['d', '🌙 ვახშამი'], ['s', '🍎 წახემსება']];
+  const MEALS = [['b', 'საუზმე'], ['l', 'სადილი'], ['d', 'ვახშამი'], ['s', 'წახემსება']];
   let addTarget = 'log';      // where new foods go: 'log' (page 1) or 'plan' (page 2)
   let planDate = new Date();
   let lastMeal = store.get('mt_lastmeal', 'b');
@@ -1303,8 +1389,8 @@ ad_castello_beans|Castello კონსერვის ლობიო|ad|142|9|
 broth_ch|ქათმის ბულიონი (სახლის)|ck|36|2.5|3.5|1.2|250|1 თასი|ბულიონი წვნიანი სუპი
 broth_bf|საქონლის ბულიონი (სახლის)|ck|13|2|1.2|0.1|250|1 თასი|ბულიონი წვნიანი სუპი ძროხა
 ad_vici_mussels|VICI მიდიები ზეთში|ad|182|14.03|0|14|200|1 შეფუთვა|მიდია მიდიები vici ზღვის პროდუქტი
-ad_selfish_tuna|Selfish ტუნას ნაჭრები მარილწყალში|ad|79.1|17.3|0|1.1|185|1 ქილა (185 გ)|ტუნა თევზი კონსერვი selfish tuna
-ad_olympus_feta|Olympus ფეტა ლაქტოზის გარეშე|ad|276|16.5|0.7|23|150|1 შეფუთვა (150 გ)|ფეტა ყველი olympus feta ლაქტოზის გარეშე
+ad_selfish_tuna|Selfish ტუნას ნაჭრები მარილწყალში|ad|79.1|17.3|0|1.1|185|1 ქილა|ტუნა თევზი კონსერვი selfish tuna
+ad_olympus_feta|Olympus ფეტა ლაქტოზის გარეშე|ad|276|16.5|0.7|23|150|1 შეფუთვა|ფეტა ყველი olympus feta ლაქტოზის გარეშე
 egg_boiled|მოხარშული კვერცხი|ck|155|12.6|1.1|10.6|50||კვერცხი
 egg_fried|შემწვარი კვერცხი (ერბოკვერცხი)|ck|196|13.6|0.8|14.8|46||კვერცხი ერბო გლაზუნია
 omelet|ომლეტი (უბრალო)|ck|154|10.6|0.6|11.7|||კვერცხი
@@ -1736,7 +1822,7 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
     const items = (scope === 'plan' ? plans[dk] : log[dk]) || [];
     const isMac = k in BK_MACRO, nut = isMac ? null : NUTS.find(n => n[0] === k);
     if (!isMac && !nut) return;
-    const [label, unit, color] = isMac ? BK_MACRO[k] : [nut[1], nut[2], nut[4] === 'max' ? '#d97706' : '#64748b'];
+    const [label, unit, color] = isMac ? BK_MACRO[k] : [nut[1], nut[2], nut[4] === 'max' ? '#b08a45' : '#64748b'];
     const ref = isMac ? +goals[k] : nut[3];
     const rows = new Map(); let missing = 0;
     items.forEach(i => {
@@ -1857,8 +1943,8 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
     if (meta.alcohol) { sc = Math.min(sc, 2); cons.unshift('ალკოჰოლური სასმელი — კალორია ძირითადად ალკოჰოლიდან მოდის; ჯანმრთელობისთვის უსაფრთხო დოზა არ არსებობს (WHO)'); }
     sc = Math.max(1, Math.min(10, Math.round(sc * 2) / 2));
     if (sc >= 5) pros.push(...minor);
-    const [label, color] = sc >= 8 ? ['შესანიშნავი არჩევანი', '#16a34a'] : sc >= 6.5 ? ['კარგი არჩევანი', '#65a30d']
-      : sc >= 5 ? ['საშუალო — ზომიერად', '#ca8a04'] : sc >= 3 ? ['ცუდი — იშვიათად', '#ea580c'] : ['ჯობია მოერიდო', '#dc2626'];
+    const [label, color] = sc >= 8 ? ['შესანიშნავი არჩევანი', '#3f7d58'] : sc >= 6.5 ? ['კარგი არჩევანი', '#6b8a3e']
+      : sc >= 5 ? ['საშუალო — ზომიერად', '#a7862f'] : sc >= 3 ? ['ცუდი — იშვიათად', '#b06a35'] : ['ჯობია მოერიდო', '#a9473f'];
     return { sc, label, color, pros, cons, notes };
   }
   function scoreHTML(prod) {
@@ -1938,7 +2024,7 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
     $('#wVal').textContent = liters(wml);
     $('#wGoal').textContent = liters(wgoal);
     const wleft = wgoal - wml;
-    $('#wLeft').innerHTML = wgoal <= 0 ? '' : wleft > 0 ? `დარჩა<br><b>${liters(wleft)}</b> ლ` : `<b style="color:#16a34a">მიზანი შესრულდა ✓</b>`;
+    $('#wLeft').innerHTML = wgoal <= 0 ? '' : wleft > 0 ? `დარჩა<br><b>${liters(wleft)}</b> ლ` : `<b style="color:#3f7d58">მიზანი შესრულდა ✓</b>`;
     const wb = $('#wBar'); wb.querySelector('i').style.width = (wgoal > 0 ? Math.min(100, wml / wgoal * 100) : 0) + '%';
     wb.classList.toggle('done', wgoal > 0 && wml >= wgoal);
 
@@ -2075,7 +2161,7 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
       const mk_k = list.reduce((a, i) => a + i.kcal, 0);
       html += `<div class="meal"><div class="meal-h"><b>${ml}</b><span>${list.length ? Math.round(mk_k) + ' კკალ' : ''}</span></div>`;
       html += list.length ? '<ul class="list">' + list.map(i => `<li><button class="item" data-pid="${esc(i.id)}">
-          <div class="main"><div class="nm">${i.done ? '✅ ' : ''}${esc(i.name)}</div>
+          <div class="main"><div class="nm">${esc(i.name)}</div>
           <div class="sub">${r1(i.grams)} გ · ც ${r1(i.p)} · ნ ${r1(i.c)} · ცხ ${r1(i.f)}</div></div>
           <div class="kc">${Math.round(i.kcal)} <small>კკალ</small></div></button></li>`).join('') + '</ul>'
         : `<div class="empty" data-addmeal="${mk}">+ დაამატე ${ml.split(' ')[1]}</div>`;
@@ -2605,7 +2691,7 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
       const done = pItems.filter(i => i.done).length;
       const pDays = stDays.filter(x => x.plan.length);
       $('#stPlan').innerHTML = `<div class="st-row"><span>შესრულებული საჭმელები</span><span class="v">${done} <small>/ ${pItems.length} · ${Math.round(done / pItems.length * 100)}%</small></span>
-        <div class="bar"><i style="background:#16a34a;width:${done / pItems.length * 100}%"></i></div></div>
+        <div class="bar"><i style="background:#3f7d58;width:${done / pItems.length * 100}%"></i></div></div>
         <div class="st-note" style="margin:6px 0 0">დაგეგმილი იყო ${pDays.length} დღე ამ პერიოდში.</div>`;
     }
 
@@ -2616,7 +2702,7 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
     const low = NUTS.filter(nn => nn[3] && nn[4] !== 'max' && nn[5] !== 'main' && mavg[nn[0]] != null)
       .map(nn => [nn[1], mavg[nn[0]] / nn[3], mavg[nn[0]], nn[2]]).sort((a, b) => a[1] - b[1]).slice(0, 5);
     $('#stLow').innerHTML = low.length ? low.map(([l, r, v, u]) => `<div class="st-row"><span>${l}</span><span class="v">${Math.round(r * 100)}% <small>· ${fmtN(v)} ${u}</small></span>
-        <div class="bar"><i style="background:${r >= 1 ? '#16a34a' : '#64748b'};width:${Math.min(100, r * 100)}%"></i></div></div>`).join('')
+        <div class="bar"><i style="background:${r >= 1 ? '#3f7d58' : '#64748b'};width:${Math.min(100, r * 100)}%"></i></div></div>`).join('')
       : '<div class="nnote">ჩაწერილ პროდუქტებზე ვიტამინების მონაცემი არ არის.</div>';
     $('#stNutBody').innerHTML = Object.keys(mavg).length ? nutRowsHTML(mavg, null, true) : '<div class="nnote">მონაცემი არ არის.</div>';
 
@@ -3330,7 +3416,7 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
   showTab(store.get('mt_tab', 'log'));
 
   // ---------- Update check (home-screen apps on iPhone keep the old page cached) ----------
-  const APP_VERSION = '2026.11.16-6';
+  const APP_VERSION = '2026.11.16-7';
   let newVer = null;
   async function checkUpdate() {
     if (!/^https?:/.test(location.protocol)) return;
