@@ -1868,7 +1868,8 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
     const drink = !!meta.drink;
     const pros = [], cons = [], notes = [], minor = [];
     const sug = m.sug, sfa = m.sfa, na = m.na, fib = m.fib;
-    const fatGood = !drink && x.f >= 30 && sfa != null && sfa / x.f <= 0.25;
+    const fatGood = !drink && x.f >= 30 && (x.c || 0) < 35 && sfa != null && sfa / x.f <= 0.25; // oils, nuts, seeds — not chips
+    const isCheese = prod.cat === 'ch' || /ყველ|cheese|feta|ფეტა|სულგუნ|მოცარელ|პარმეზ|ჩედერ|käse|queso|formaggio|сыр/i.test((prod.name || '') + ' ' + (prod.brand || ''));
     let missing = 0;
     // negative points
     let neg = 0;
@@ -1883,10 +1884,12 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
     else missing++;
     // positive points
     let pos = 0;
-    const protP = pts(x.p || 0, [1.6, 3.2, 4.8, 6.4, 8]);
+    const pShare = x.kcal > 0 ? (x.p || 0) * 4 / x.kcal : 0; // share of energy from protein
+    let protP = pts(x.p || 0, [1.6, 3.2, 4.8, 6.4, 8]);
+    if (!drink) protP = pShare >= 0.2 ? protP : pShare >= 0.12 ? Math.ceil(protP / 2) : 0;
     const fibP = fib != null ? pts(fib, [0.9, 1.9, 2.8, 3.7, 4.7]) : 0;
     pos += fibP;
-    if (neg < 11 || drink || prod.cat === 'ch') pos += protP; // cheese: protein always counts (as in Nutri-Score)
+    if (neg < 11 || drink || isCheese) pos += protP; // cheese: protein always counts (as in Nutri-Score)
     const raw = neg - pos;
     let sc;
     if (drink) sc = meta.water || ((x.kcal || 0) <= 1 && (sug || 0) === 0) ? 10 : raw <= 0 ? 9.5 : 9 - raw * 0.6;
@@ -1909,16 +1912,34 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
     if (add.length >= 5) { sc -= 0.5; cons.push(`ბევრი დანამატი (${add.length})`); }
     else if (prod.meta && add.length === 0 && meta.ingr) pros.push('დანამატების (E-ების) გარეშე');
 
-    // nutrient pros / cons
-    if (x.p >= 12) pros.push(`ძალიან ბევრი ცილა (${r1(x.p)} გ/100გ)`);
-    else if (x.p >= 8) pros.push(`ბევრი ცილა (${r1(x.p)} გ/100გ)`);
+    // refined starch: lots of carbs, little fibre, not mainly sugar
+    const ingr = String(meta.ingr || '');
+    let addedSugar = false;
+    const wholeGrain = /ყავისფერ|მთლიანმარცვ|ჭვავ|ქატო|whole|integral|vollkorn|цельнозерн/i.test((prod.name || '') + ' ' + ingr);
+    if (!drink && !wholeGrain && fib != null && x.c >= 20 && fib / x.c < 0.06 && (sug == null || sug < x.c * 0.5)) {
+      sc -= x.c >= 40 ? 2.5 : 2;
+      cons.push(`რაფინირებული ნახშირწყალი: ${Math.round(x.c)} გ ნახშირწყალი და მხოლოდ ${r1(fib)} გ ბოჭკო — სწრაფად შეიწოვება, სისხლში შაქარს მკვეთრად ზრდის და ცუდად აკმაყოფილებს`);
+    }
+    if (/ჰიდროგენ|hydrogen|гидрогенизир|маргарин|margarin/i.test(ingr)) { sc -= 1; cons.push('შეიცავს ჰიდროგენიზებულ ცხიმს / მარგარინს — შეიძლება ტრანს-ცხიმები ჰქონდეს'); }
+    if (/შაქარ|sugar|sucre|zucker|azúcar|zucchero|сахар|cukier|glucose|სიროფ|syrup|сироп/i.test(ingr) && (sug == null || sug > 0.5)) {
+      sc -= 0.3; cons.push('შემადგენლობაში დამატებული შაქარია'); addedSugar = true;
+    }
+    if (!drink && x.kcal > 250 && x.f >= 10 && x.c >= 25 && pShare < 0.1) {
+      sc -= 2; cons.push('ბევრი ცხიმი და ნახშირწყალი ერთად, ცოტა ცილა — ადვილად იჭმება ზედმეტი და ცუდად აკმაყოფილებს');
+    }
+    if (!drink && x.kcal >= 120 && x.c >= 50 && pShare < 0.12 && (fib == null || fib < 6)) notes.push('დაკლებისას: ბევრი კალორია და ნახშირწყალი, ცოტა ცილა — პორცია პატარა იყოს.');
+
+    // nutrient pros / cons (protein judged by amount AND by share of calories)
+    if (x.p >= 12 && pShare >= 0.2) pros.push(`ძალიან ბევრი ცილა (${r1(x.p)} გ/100გ, კალორიის ${Math.round(pShare * 100)}%)`);
+    else if (x.p >= 8 && pShare >= 0.15) pros.push(`ბევრი ცილა (${r1(x.p)} გ/100გ)`);
+    else if (x.p >= 8 && !drink) notes.push(`ცილა ${r1(x.p)} გ, მაგრამ კალორიის მხოლოდ ${Math.round(pShare * 100)}% მოდის ცილიდან — ცილის ძირითად წყაროდ არ გამოდგება.`);
     if (fib != null && fib >= 6) pros.push(`ბევრი ბოჭკო (${r1(fib)} გ)`);
     else if (fib != null && fib >= 3) pros.push(`ბოჭკოს კარგი წყარო (${r1(fib)} გ)`);
     if (fatGood) pros.push('ცხიმი ძირითადად უჯერია (სასარგებლო ცხიმები)');
     if (sug != null) {
       if (drink ? sug > 5 : sug > 22.5) cons.push(`ბევრი შაქარი (${r1(sug)} გ/100${drink ? 'მლ' : 'გ'})`);
       else if (drink ? sug > 2.5 : sug > 10) cons.push(`საკმაოდ ბევრი შაქარი (${r1(sug)} გ)`);
-      else if (drink ? sug <= 2.5 : sug <= 5) minor.push(`ცოტა შაქარი (${r1(sug)} გ)`);
+      else if ((drink ? sug <= 2.5 : sug <= 5) && !addedSugar) minor.push(`ცოტა შაქარი (${r1(sug)} გ)`);
     }
     if (sfa != null && !fatGood) {
       if (sfa > 5) cons.push(`ბევრი ნაჯერი ცხიმი (${r1(sfa)} გ)`);
@@ -3416,7 +3437,7 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
   showTab(store.get('mt_tab', 'log'));
 
   // ---------- Update check (home-screen apps on iPhone keep the old page cached) ----------
-  const APP_VERSION = '2026.11.16-7';
+  const APP_VERSION = '2026.11.16-8';
   let newVer = null;
   async function checkUpdate() {
     if (!/^https?:/.test(location.protocol)) return;
