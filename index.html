@@ -1,0 +1,3029 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="მაკროები">
+<title>მაკრო სკანერი</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230f766e'/%3E%3Cg fill='white'%3E%3Crect x='22' y='28' width='6' height='44'/%3E%3Crect x='33' y='28' width='3' height='44'/%3E%3Crect x='41' y='28' width='8' height='44'/%3E%3Crect x='54' y='28' width='3' height='44'/%3E%3Crect x='62' y='28' width='6' height='44'/%3E%3Crect x='73' y='28' width='4' height='44'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="apple-touch-icon" id="touchIcon" href="">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f5; --card:#ffffff; --ink:#14201d; --muted:#6b7a76; --line:#e3e8e6;
+    --brand:#0f766e; --brand-ink:#ffffff; --brand-soft:#e0f2ef;
+    --prot:#2563eb; --carb:#d97706; --fat:#db2777; --kcal:#0f766e; --over:#dc2626; --water:#0284c7;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Georgian",system-ui,-apple-system,sans-serif;font-size:16px}
+  body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+  .wrap{max-width:520px;margin:0 auto;padding:14px 14px 120px}
+  button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+  input{font:inherit;color:inherit}
+
+  header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 14px}
+  .daynav{display:flex;align-items:center;gap:6px}
+  .iconbtn{width:40px;height:40px;border-radius:12px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-size:18px}
+  .iconbtn:disabled{opacity:.35}
+  .datebox{text-align:center;min-width:120px}
+  .datebox b{display:block;font-size:18px}
+  .datebox span{font-size:13px;color:var(--muted)}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+  .kcal-top{display:flex;align-items:baseline;justify-content:space-between}
+  .kcal-num{font-size:40px;font-weight:700;line-height:1}
+  .kcal-num small{font-size:15px;font-weight:500;color:var(--muted)}
+  .kcal-left{font-size:14px;color:var(--muted);text-align:right}
+  .kcal-left b{color:var(--ink)}
+  .bar{height:10px;border-radius:99px;background:#edf1f0;overflow:hidden;margin-top:10px}
+  .bar i{display:block;height:100%;width:0;border-radius:99px;transition:width .35s ease}
+  .bar.over i{background:var(--over)!important}
+  .macros{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+  .macro .lbl{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .dot{width:8px;height:8px;border-radius:50%}
+  .macro .val{font-size:18px;font-weight:600;margin-top:2px}
+  .macro .val small{font-size:12px;color:var(--muted);font-weight:500}
+  .macro .bar{height:7px;margin-top:6px}
+
+  .water .wlbl{font-size:13px;color:var(--muted);font-weight:600}
+  .water .wnum{font-size:28px;font-weight:700;line-height:1.1;margin-top:2px}
+  .water .wnum small{font-size:14px;font-weight:500;color:var(--muted)}
+  .water .bar.done i{background:#16a34a!important}
+  .wbtns{display:grid;grid-template-columns:48px 1fr 1fr 1fr;gap:8px;margin-top:12px}
+  .wbtns button{background:#e0f2fe;color:#075985;border-radius:12px;padding:10px 4px;font-size:14px;font-weight:600}
+  .wbtns button.minus{background:#eef2f1;color:var(--muted);font-size:20px;padding:6px 0}
+  .scanbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--brand);color:var(--brand-ink);border-radius:var(--radius);padding:18px;font-size:18px;font-weight:600;box-shadow:0 6px 18px rgba(15,118,110,.25)}
+  .tabs{display:flex;gap:8px;align-items:center;margin:2px 0 12px;position:sticky;top:0;z-index:5;background:var(--bg);padding:6px 0}
+  .seg{flex:1;display:grid;grid-template-columns:1fr 1fr;background:#e7ecea;border-radius:14px;padding:4px;gap:4px}
+  .seg button{padding:10px 4px;border-radius:11px;font-size:14px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
+  .seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  .plancard .pc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+  .plancard .bar{margin:10px 0 6px}
+  .tp-meal{font-size:12.5px;color:var(--muted);font-weight:700;margin:10px 0 2px}
+  .tp-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f0f3f2}
+  .tp-row:last-child{border-bottom:0}
+  .tp-chk{flex:0 0 30px;height:30px;border-radius:9px;border:2px solid #cbd5d1;display:grid;place-items:center;font-weight:700;color:transparent}
+  .tp-row.done .tp-chk{background:#16a34a;border-color:#16a34a;color:#fff}
+  .tp-row .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14.5px}
+  .tp-row.done .nm{color:var(--muted);text-decoration:line-through}
+  .tp-row .kc{font-size:13px;color:var(--muted);white-space:nowrap}
+  .meal{margin-top:14px}
+  .meal-h{display:flex;justify-content:space-between;align-items:baseline;margin:0 4px 6px}
+  .meal-h b{font-size:15px}
+  .meal-h span{font-size:13px;color:var(--muted)}
+  .meal .empty{padding:14px 10px}
+  #plActions{margin-top:16px}
+  .quick button.on{background:var(--brand);color:#fff}
+  details.nutcard{padding:0}
+  details.nutcard > summary{list-style:none;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-weight:600}
+  details.nutcard > summary::-webkit-details-marker{display:none}
+  details.nutcard > summary .arr{transition:transform .2s;color:var(--muted)}
+  details.nutcard[open] > summary .arr{transform:rotate(90deg)}
+  .nutbody{padding:0 16px 14px}
+  .nutgrp{font-size:12.5px;color:var(--muted);font-weight:700;margin:12px 0 4px;text-transform:uppercase;letter-spacing:.02em}
+  .nrow{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:6px 0;border-bottom:1px solid #f0f3f2;font-size:14px}
+  .nrow:last-child{border-bottom:0}
+  .nrow .nv{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .nrow .nv small{color:var(--muted);font-weight:500}
+  .nrow .bar{grid-column:1 / -1;height:5px;margin-top:3px}
+  .nrow .bar i{background:#64748b}
+  .nrow.good .bar i{background:#16a34a}
+  .nrow.lim .bar i{background:#d97706}
+  .nrow .part{color:var(--muted);font-size:11.5px;font-weight:500}
+  .nnote{font-size:12px;color:var(--muted);line-height:1.5;margin-top:10px}
+  details.pnut{margin-top:12px;background:#f6f8f7;border-radius:12px}
+  details.pnut > summary{list-style:none;padding:11px 12px;font-size:14px;font-weight:600;cursor:pointer}
+  details.pnut > summary::-webkit-details-marker{display:none}
+  details.pnut .nutbody{padding:0 12px 10px}
+  .score{margin-top:12px;border:1px solid var(--line);border-radius:14px;padding:12px}
+  .sc-top{display:flex;gap:12px;align-items:center}
+  .sc-badge{min-width:62px;height:62px;border-radius:16px;color:#fff;font-size:24px;font-weight:700;display:flex;align-items:baseline;justify-content:center;padding-top:14px}
+  .sc-badge small{font-size:12px;font-weight:600;opacity:.85}
+  .sc-label{font-weight:700;font-size:16px}
+  .sc-list{list-style:none;margin:10px 0 0;padding:0}
+  .sc-list li{display:flex;gap:8px;font-size:13.5px;line-height:1.4;padding:4px 0}
+  .sc-list li b{flex:0 0 16px;text-align:center}
+  .sc-list li.pro b{color:#16a34a} .sc-list li.con b{color:#dc2626}
+  .msearch{margin-top:12px;background:#f6f8f7;border-radius:14px;padding:12px}
+  .msearch > label{display:block;font-size:13.5px;font-weight:600;margin-bottom:6px}
+  .mrow{display:flex;gap:8px}
+  .mrow input{flex:1;min-width:0;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;font-size:16px}
+  .mrow button{background:var(--brand);color:#fff;border-radius:12px;padding:0 14px;font-weight:600}
+  #mResults .fitem{padding:10px 2px}
+  #mResults .src{font-size:11px;color:var(--muted);font-weight:500;margin:0;text-align:left}
+  details.mextra{margin-top:12px}
+  details.mextra > summary{font-size:14px;color:var(--brand);font-weight:600;cursor:pointer}
+  .foodbtn{width:100%;margin-top:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;font-size:15.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
+  .food-card{padding-top:0}
+  .fs-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .fs-head h3{margin:0}
+  .food-top{position:sticky;top:0;background:var(--card);padding:18px 0 6px;z-index:2}
+  #foodSearch{width:100%;margin-top:10px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fafbfb;font-size:16px}
+  #foodSearch:focus{outline:2px solid var(--brand-soft);border-color:var(--brand)}
+  .cats{margin-top:10px}
+  .cats .chip.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .flist{list-style:none;margin:6px 0 0;padding:0}
+  .fitem{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:left;padding:12px 4px;border-bottom:1px solid var(--line)}
+  .fitem .nm{font-weight:600;font-size:15px}
+  .fitem .sub{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .fitem .kc{font-weight:700;white-space:nowrap;font-size:15px}
+  .fitem .kc small{font-weight:500;color:var(--muted);font-size:11.5px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 16px}
+  .btn2{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;font-size:14px;font-weight:500}
+
+  h2{font-size:15px;color:var(--muted);font-weight:600;margin:18px 4px 8px}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;max-width:180px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:8px 14px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  .list{list-style:none;margin:0;padding:0}
+  .item{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px;width:100%;text-align:left}
+  .item .main{flex:1;min-width:0}
+  .item .nm{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .item .sub{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .item .kc{font-weight:700;white-space:nowrap}
+  .item .kc small{font-weight:500;color:var(--muted);font-size:12px}
+  .empty{text-align:center;color:var(--muted);padding:26px 10px;font-size:14px;border:1px dashed var(--line);border-radius:14px}
+
+  /* sheets */
+  .sheet{position:fixed;inset:0;background:rgba(10,20,18,.45);display:none;align-items:flex-end;justify-content:center;z-index:20}
+  .sheet.open{display:flex}
+  .sheet-card{background:var(--card);width:100%;max-width:520px;max-height:92vh;overflow:auto;border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));animation:up .22s ease}
+  @keyframes up{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}
+  .sheet h3{margin:0 0 4px;font-size:19px}
+  .muted{color:var(--muted);font-size:13.5px}
+  .field{margin-top:12px}
+  .field label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
+  .field input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fafbfb;font-size:16px}
+  .field input:focus{outline:2px solid var(--brand-soft);border-color:var(--brand)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .primary{width:100%;background:var(--brand);color:#fff;border-radius:14px;padding:15px;font-size:16px;font-weight:600;margin-top:16px}
+  .ghost{width:100%;padding:13px;color:var(--muted);margin-top:6px;font-size:15px}
+  .danger{color:var(--over)}
+  .link{color:var(--brand);font-size:13.5px;font-weight:600;padding:4px}
+
+  .phead{display:flex;gap:12px;align-items:center}
+  .phead img{width:62px;height:62px;object-fit:contain;border-radius:12px;background:#f2f4f3;border:1px solid var(--line)}
+  .phead img[src=""]{display:none}
+  .code{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;margin-top:2px}
+  .per100{display:flex;justify-content:space-between;align-items:center;background:#f6f8f7;border-radius:12px;padding:10px 12px;margin-top:12px;font-size:13.5px}
+  .grams{display:flex;gap:8px;align-items:center}
+  .grams button{width:52px;height:50px;border-radius:12px;background:#eef2f1;font-size:22px;font-weight:600}
+  .grams input{flex:1;text-align:center;font-size:22px;font-weight:700;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fafbfb}
+  .quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .quick button{padding:7px 12px;border-radius:99px;background:#eef2f1;font-size:13.5px}
+  .calc{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+  .calc div{background:#f6f8f7;border-radius:12px;padding:10px 6px;text-align:center}
+  .calc b{display:block;font-size:17px}
+  .calc span{font-size:11.5px;color:var(--muted)}
+
+  /* scanner */
+  #scanSheet{background:#0b1211;align-items:stretch}
+  #scanSheet .scan-inner{width:100%;max-width:520px;margin:0 auto;display:flex;flex-direction:column;padding:calc(12px + env(safe-area-inset-top)) 14px calc(16px + env(safe-area-inset-bottom));color:#fff}
+  .scan-top{display:flex;justify-content:space-between;align-items:center}
+  .scan-top button{color:#fff;font-size:15px;padding:8px 4px}
+  #camWrap{position:relative;width:100%;border-radius:18px;overflow:hidden;margin-top:12px;background:#000;min-height:220px}
+  #video{display:block;width:100%;height:auto}
+  .aim{position:absolute;left:10%;right:10%;top:30%;bottom:30%;border:3px solid rgba(255,255,255,.95);border-radius:14px;box-shadow:0 0 0 2000px rgba(0,0,0,.35)}
+  .aim i{position:absolute;left:6%;right:6%;top:50%;height:2px;background:#ef4444;box-shadow:0 0 8px #ef4444;animation:scanl 1.6s ease-in-out infinite}
+  @keyframes scanl{0%,100%{transform:translateY(-18px)}50%{transform:translateY(18px)}}
+  #scanMsg{text-align:center;color:#cfe3df;font-size:14px;margin:12px 0}
+  .scan-manual{display:flex;gap:8px;margin-top:auto}
+  .scan-manual input{flex:1;padding:13px 14px;border-radius:12px;border:1px solid #2a3633;background:#16201e;color:#fff;font-size:16px}
+  .scan-manual button{background:var(--brand);color:#fff;border-radius:12px;padding:0 16px;font-weight:600}
+  .photo-lbl{display:block;text-align:center;margin-top:10px;padding:13px;border-radius:12px;border:1px solid #2a3633;color:#cfe3df;font-size:15px}
+
+  .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:#14201d;color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;max-width:90vw;opacity:0;pointer-events:none;transition:.25s;z-index:50;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .loading{position:fixed;inset:0;background:rgba(255,255,255,.75);display:none;place-items:center;z-index:40;font-weight:600}
+  .loading.show{display:grid}
+  .spin{width:34px;height:34px;border:4px solid var(--brand-soft);border-top-color:var(--brand);border-radius:50%;animation:sp 0.8s linear infinite;margin:0 auto 10px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .hint{font-size:13px;color:var(--muted);line-height:1.5;background:#f6f8f7;border-radius:12px;padding:10px 12px;margin-top:14px}
+  .src{font-size:11.5px;color:var(--muted);text-align:center;margin-top:24px}
+  .src a{color:var(--muted)}
+
+  /* ===== compact, calmer layout ===== */
+  .card.supp{padding:9px 10px 9px 14px}
+  .sp-line{display:flex;align-items:center;gap:10px}
+  .sp-line > b{font-size:13px;font-weight:600;flex:0 0 auto}
+  .supp .sp-chips{flex:1;min-width:0;display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0;padding:1px 0}
+  .supp .sp-chips::-webkit-scrollbar{display:none}
+  .supp .spc{flex:0 0 auto;padding:4px 9px 4px 6px;gap:5px;font-size:12.5px;white-space:nowrap}
+  .supp .spc i{width:14px;height:14px;border-radius:4px;font-size:9px}
+  .supp .sp-empty{font-size:12.5px}
+  .sp-more{flex:0 0 30px;height:30px;border-radius:9px;color:var(--muted);font-size:18px;line-height:1}
+  .supp .sp-warn{font-size:12px}
+  .supp .sp-warn:not(:empty){margin-top:6px}
+  .topbar{position:sticky;top:0;z-index:15;display:flex;align-items:center;gap:10px;background:var(--bg);padding:8px 0;margin-bottom:6px}
+  .topbar #pageTitle{flex:1;font-size:16px;font-weight:700}
+  .supp .sp-head{display:flex;justify-content:space-between;align-items:center}
+  .supp .sp-head b{font-size:14px;font-weight:600}
+  .sp-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .spc{display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:99px;border:1px solid var(--line);background:#fafbfb;font-size:13px}
+  .spc i{width:16px;height:16px;border-radius:5px;border:1.5px solid #cbd5d1;display:grid;place-items:center;font-style:normal;font-size:10px;color:transparent}
+  .spc.on{background:#ecfdf3;border-color:#bbe5cb}
+  .spc.on i{background:#16a34a;border-color:#16a34a;color:#fff}
+  .sp-empty{font-size:13px;color:var(--muted)}
+  .sp-warn{font-size:12.5px;color:#b45309;line-height:1.45}
+  .sp-warn:not(:empty){margin-top:8px}
+  .se-row{display:grid;grid-template-columns:1fr 92px 44px 28px;gap:6px;align-items:center;margin-bottom:6px}
+  .se-row select,.se-row input{padding:10px 8px;border:1px solid var(--line);border-radius:10px;background:#fafbfb;font-size:15px;min-width:0}
+  .se-row span{font-size:12px;color:var(--muted)}
+  .se-row button{color:var(--muted);font-size:16px}
+  .sh-sub{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin:0 2px 10px}
+  .sh-today{display:flex;align-items:center;gap:6px;white-space:nowrap}
+  .sh-grp{font-size:12.5px;font-weight:600;color:var(--muted);margin:14px 2px 6px}
+  .sh-row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 14px;border-top:1px solid var(--line);background:none}
+  .sh-list > .sh-row:first-child{border-top:0}
+  .sh-list{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .sh-row .tp-chk{flex:0 0 22px;height:22px}
+  .sh-row.done .tp-chk{background:#16a34a;border-color:#16a34a;color:#fff}
+  .sh-row .nm{flex:1;min-width:0;font-size:14px}
+  .sh-row.done .nm{color:var(--muted);text-decoration:line-through}
+  .sh-row .amt{font-size:13px;color:var(--muted);white-space:nowrap;text-align:right}
+  .sh-add{margin-top:12px}
+  .sh-add input,.wt-in input{flex:1;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:16px}
+  .wt-in{margin-top:10px}
+  .wt-in input[type=date]{flex:0 0 132px;font-size:14px}
+  .wt-in button,.sh-add button{background:var(--brand);color:#fff;border-radius:12px;padding:0 14px;font-weight:600}
+  .wt-top{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px}
+  .wt-top b{font-size:24px;font-weight:700;display:block;line-height:1.1}
+  .wt-top small{font-size:12px;color:var(--muted)}
+  .wt-chg{font-size:13px;text-align:right;color:var(--muted)}
+  .wt-chg b{font-size:15px;color:var(--ink);display:inline}
+  .wt-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f0f3f2;font-size:13.5px}
+  .wt-row button{color:var(--muted);padding:2px 6px}
+  .drawer-bg{position:fixed;inset:0;background:rgba(15,25,22,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
+  .drawer-bg.open{opacity:1;pointer-events:auto}
+  .drawer{position:fixed;top:0;bottom:0;left:0;width:min(250px,72vw);background:var(--card);border-right:1px solid var(--line);z-index:41;transform:translateX(-102%);transition:transform .22s ease;display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top)) 10px 16px}
+  .drawer.open{transform:none;box-shadow:8px 0 30px rgba(15,25,22,.12)}
+  @media (prefers-reduced-motion: reduce){.drawer,.drawer-bg{transition:none}}
+  .dr-head{display:flex;justify-content:space-between;align-items:center;padding:0 4px 8px 8px}
+  .dr-head b{font-size:16px}
+  .dr-group{font-size:12px;color:var(--muted);font-weight:600;padding:14px 10px 6px}
+  .drawer button[data-tab]{display:block;width:100%;text-align:left;padding:11px 12px;border-radius:10px;font-size:15px;color:var(--ink)}
+  .drawer button[data-tab].on{background:var(--brand-soft);color:var(--brand);font-weight:600}
+  .st-period{grid-template-columns:repeat(3,1fr);margin-bottom:10px}
+  .st-tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 12px;display:flex;flex-direction:column;gap:2px}
+  .tile span{font-size:12px;color:var(--muted)}
+  .tile b{font-size:21px;font-weight:700;line-height:1.2}
+  .tile small{font-size:11.5px;color:var(--muted)}
+  .st-h{font-size:14px;font-weight:600;margin-bottom:8px}
+  .st-sub{font-size:12px;color:var(--muted);margin:12px 0 6px}
+  .st-note{font-size:12px;color:var(--muted);margin:-4px 0 6px}
+  .st-chart{position:relative;width:100%;height:170px}
+  .st-chart svg{display:block;width:100%;height:100%}
+  .st-tip{font-size:12.5px;color:var(--muted);margin-top:6px;min-height:18px}
+  .st-tip b{color:var(--ink);font-weight:600}
+  .st-stack{display:flex;height:12px;border-radius:6px;overflow:hidden;gap:2px;background:var(--card)}
+  .st-stack i{display:block;height:100%}
+  .st-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:12.5px}
+  .st-legend span{display:flex;align-items:center;gap:6px}
+  .st-legend .dot{width:9px;height:9px}
+  .st-row{display:grid;grid-template-columns:1fr auto;gap:3px 10px;padding:6px 0;font-size:13.5px}
+  .st-row .v{font-weight:600;font-variant-numeric:tabular-nums}
+  .st-row .v small{color:var(--muted);font-weight:500}
+  .st-row .bar{grid-column:1 / -1;height:5px;margin-top:2px}
+  .st-top{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .st-top:last-child{border-bottom:0}
+  .st-top span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .st-top span:last-child{color:var(--muted);white-space:nowrap}
+  .menu{position:absolute;top:calc(100% - 2px);left:0;min-width:230px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(20,32,29,.14);padding:6px;z-index:20}
+  .menu[hidden]{display:none}
+  .menu button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:11px 12px;border-radius:10px;font-size:14.5px}
+  .menu button span{width:22px;text-align:center}
+  .menu button.on{background:var(--brand-soft);color:var(--brand);font-weight:600}
+  .rc-head{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+  .rc-head input{flex:1;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:16px;font-weight:600}
+  .rc-lines{margin-top:12px;border-top:1px solid var(--line);padding-top:8px}
+  .rc-lines div{display:flex;flex-direction:column;gap:1px;font-size:13px;padding:4px 0}
+  .rc-lines span{color:var(--muted);font-size:12px}
+  .rc-lines b{font-weight:600}
+  .rc-w{margin-top:12px}
+  .rc-w .field label{font-size:12.5px}
+  .planbtn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-bottom:10px}
+  .planbtn[hidden]{display:none}
+  .planbtn .pb-t{flex:1;min-width:0;display:flex;flex-direction:column}
+  .planbtn .pb-t b{font-size:14px;font-weight:600}
+  .planbtn .pb-t span{font-size:12px;color:var(--muted)}
+  .planbtn .pb-prog{flex:0 0 56px;height:6px;border-radius:99px;background:#edf1f0;overflow:hidden}
+  .planbtn .pb-prog i{display:block;height:100%;width:0;background:#16a34a;border-radius:99px}
+  .planbtn .arr{color:var(--muted);font-size:18px}
+  #planSheet .pc-head h3{margin:0}
+  html,body{font-size:15px}
+  .wrap{padding:6px 14px 80px}
+  .tabs{margin:0 0 8px;padding:6px 0}
+  .seg{border-radius:12px;padding:3px;gap:3px}
+  .seg button{padding:8px 4px;font-size:13.5px;border-radius:9px}
+  .iconbtn{width:34px;height:34px;border-radius:10px;font-size:16px}
+  header{margin:0 0 8px}
+  .datebox{min-width:110px}
+  .datebox b{font-size:15.5px}
+  .datebox span{font-size:12px}
+  .card{padding:14px;border-radius:16px;margin-bottom:10px}
+  .kcal-num{font-size:30px}
+  .kcal-num small{font-size:13px}
+  .kcal-left{font-size:12px;line-height:1.35}
+  .bar{height:7px;margin-top:8px}
+  .macros{gap:12px;margin-top:12px}
+  .macro .lbl{font-size:12px}
+  .macro .val{font-size:15px}
+  .macro .bar{height:4px;margin-top:5px}
+  details.nutcard.inl{border-top:1px solid var(--line);margin:12px -14px -14px;padding:0;background:none;border-radius:0}
+  details.nutcard.inl > summary{padding:11px 14px;font-size:13px;font-weight:500;color:var(--muted)}
+  details.nutcard.inl .nutbody{padding:0 14px 12px}
+  .nrow{font-size:13px;padding:5px 0}
+  .nutgrp{font-size:11.5px;text-transform:none;letter-spacing:0;margin:10px 0 2px}
+  .water .wlbl{font-size:12px;font-weight:500}
+  .water .wnum{font-size:20px}
+  .wbtns{grid-template-columns:40px 1fr 1fr 1fr;gap:6px;margin-top:10px}
+  .wbtns button{padding:7px 2px;font-size:13px;border-radius:10px}
+  .actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:2px 0 4px}
+  .act{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:11px 4px 9px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-size:12px;font-weight:500;color:var(--ink)}
+  .act svg{width:21px;height:21px}
+  .act.main{background:var(--brand);border-color:var(--brand);color:#fff}
+  h2{font-size:12.5px;font-weight:600;margin:14px 2px 6px}
+  .chips{gap:6px;padding-bottom:2px}
+  .chip{padding:6px 11px;font-size:12.5px;max-width:160px}
+  .list{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .list li + li .item{border-top:1px solid var(--line)}
+  .list .item{border:0;border-radius:0;margin:0;padding:10px 14px;background:transparent;gap:10px}
+  .list .item .nm{font-size:14px;font-weight:500}
+  .list .item .sub{font-size:11.5px}
+  .list .item .kc{font-size:14px;font-weight:600}
+  .list .empty{border:0;border-radius:0}
+  .empty{padding:16px 10px;font-size:13px}
+  .plancard .pc-head b{font-size:14px}
+  .plancard .muted{font-size:12px}
+  .tp-row{padding:6px 0;gap:9px}
+  .tp-chk{flex:0 0 24px;height:24px;border-radius:7px;font-size:12px;border-width:1.5px}
+  .tp-row .nm{font-size:13.5px}
+  .tp-row .kc{font-size:12px}
+  .tp-meal{font-size:11.5px;margin:8px 0 0}
+  .meal{margin-top:12px}
+  .meal-h{margin:0 2px 5px}
+  .meal-h b{font-size:13px;font-weight:600}
+  .meal-h span{font-size:12px}
+  .meal .empty{padding:10px;font-size:12.5px;cursor:pointer}
+  .btn2{padding:10px;font-size:13px;border-radius:12px}
+  #plActions{margin-top:14px}
+  .src{margin-top:16px;font-size:11px}
+  .sheet h3{font-size:17px}
+  .phead img{width:52px;height:52px}
+  .sc-badge{min-width:54px;height:54px;font-size:21px;padding-top:12px;border-radius:14px}
+  .sc-label{font-size:15px}
+  .sc-list li{font-size:13px;padding:3px 0}
+  .calc b{font-size:15px}
+  .primary{padding:13px;font-size:15px;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="topbar">
+    <button class="iconbtn" id="menuBtn" aria-label="გვერდები" aria-expanded="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <b id="pageTitle">დღის კონტროლი</b>
+    <button class="iconbtn" id="openSettings" aria-label="პარამეტრები">⚙︎</button>
+  </nav>
+  <div class="drawer-bg" id="drawerBg"></div>
+  <aside class="drawer" id="menu" aria-hidden="true" aria-label="გვერდები">
+    <div class="dr-head"><b>მენიუ</b><button class="iconbtn" id="drawerClose" aria-label="დახურვა">✕</button></div>
+    <div class="dr-group">კვება</div>
+    <button data-tab="log">დღის კონტროლი</button>
+    <button data-tab="plan">კვების ცხრილი</button>
+    <button data-tab="recipes">რეცეპტები</button>
+    <button data-tab="shop">სავაჭრო სია</button>
+    <button data-tab="stats">სტატისტიკა</button>
+  </aside>
+
+  <div id="pageLog">
+  <header>
+    <div class="daynav">
+      <button class="iconbtn" id="prevDay" aria-label="წინა დღე">‹</button>
+      <div class="datebox"><b id="dateLabel">დღეს</b><span id="dateSub"></span></div>
+      <button class="iconbtn" id="nextDay" aria-label="შემდეგი დღე">›</button>
+    </div>
+  </header>
+
+  <section class="card">
+    <div class="kcal-top">
+      <div class="kcal-num"><span id="kcalVal">0</span> <small>/ <span id="kcalGoal">0</span> კკალ</small></div>
+      <div class="kcal-left" id="kcalLeft"></div>
+    </div>
+    <div class="bar" id="kcalBar"><i style="background:var(--kcal)"></i></div>
+    <div class="macros">
+      <div class="macro"><div class="lbl"><span class="dot" style="background:var(--prot)"></span>ცილა</div>
+        <div class="val"><span id="pVal">0</span><small> / <span id="pGoal">0</span> გ</small></div>
+        <div class="bar" id="pBar"><i style="background:var(--prot)"></i></div></div>
+      <div class="macro"><div class="lbl"><span class="dot" style="background:var(--carb)"></span>ნახშირწყ.</div>
+        <div class="val"><span id="cVal">0</span><small> / <span id="cGoal">0</span> გ</small></div>
+        <div class="bar" id="cBar"><i style="background:var(--carb)"></i></div></div>
+      <div class="macro"><div class="lbl"><span class="dot" style="background:var(--fat)"></span>ცხიმი</div>
+        <div class="val"><span id="fVal">0</span><small> / <span id="fGoal">0</span> გ</small></div>
+        <div class="bar" id="fBar"><i style="background:var(--fat)"></i></div></div>
+    </div>
+    <details class="nutcard inl" id="nutCard">
+      <summary><span>ვიტამინები, მინერალები, ბოჭკო, მარილი</span><span class="arr">›</span></summary>
+      <div class="nutbody" id="nutBody"></div>
+    </details>
+  </section>
+
+  <button class="planbtn" id="todayPlan" hidden>
+    <span class="pb-t"><b>დღის გეგმა</b><span id="tpBtnSub"></span></span>
+    <span class="pb-prog"><i id="tpBtnBar"></i></span>
+    <span class="arr">›</span>
+  </button>
+
+  <section class="card supp" id="suppCard">
+    <div class="sp-line">
+      <b>დანამატები</b>
+      <div class="sp-chips" id="suppChips"></div>
+      <button class="sp-more" id="suppManage" aria-label="დანამატების მართვა">⋯</button>
+    </div>
+    <div class="sp-warn" id="suppWarn"></div>
+  </section>
+
+  <section class="card water">
+    <div class="kcal-top">
+      <div><div class="wlbl">წყალი</div>
+        <div class="wnum"><span id="wVal">0</span> <small>/ <span id="wGoal">2.5</span> ლ</small></div></div>
+      <div class="kcal-left" id="wLeft"></div>
+    </div>
+    <div class="bar" id="wBar"><i style="background:var(--water)"></i></div>
+    <div class="wbtns" id="wBtns">
+      <button class="minus" data-w="-250" aria-label="0.25 ლიტრის მოკლება">−</button>
+      <button data-w="250">+ 0.25 ლ</button>
+      <button data-w="500">+ 0.5 ლ</button>
+      <button data-w="1000">+ 1 ლ</button>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button class="act main" id="openScan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 8v8M10 8v8M13 8v8M16 8v8"/></svg><span>სკანირება</span></button>
+    <button class="act" id="openFoods"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg><span>მზა სია</span></button>
+    <button class="act" id="openCode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10"/></svg><span>კოდი</span></button>
+    <button class="act" id="openCustom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span>ხელით</span></button>
+  </div>
+
+  <div id="recentWrap">
+    <h2>ბოლოს მიღებული</h2>
+    <div class="chips" id="recent"></div>
+  </div>
+
+  <h2 id="listTitle">დღის ჩანაწერები</h2>
+  <ul class="list" id="entries"></ul>
+  </div><!-- /pageLog -->
+
+  <div id="pagePlan" hidden>
+    <header>
+      <div class="daynav">
+        <button class="iconbtn" id="plPrev" aria-label="წინა დღე">‹</button>
+        <div class="datebox"><b id="plDateLabel">დღეს</b><span id="plDateSub"></span></div>
+        <button class="iconbtn" id="plNext" aria-label="შემდეგი დღე">›</button>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="muted" style="margin-bottom:4px;font-size:12.5px">დაგეგმილი</div>
+      <div class="kcal-top">
+        <div class="kcal-num"><span id="plKcalVal">0</span> <small>/ <span id="plKcalGoal">0</span> კკალ</small></div>
+        <div class="kcal-left" id="plKcalLeft"></div>
+      </div>
+      <div class="bar" id="plKcalBar"><i style="background:var(--kcal)"></i></div>
+      <div class="macros">
+        <div class="macro"><div class="lbl"><span class="dot" style="background:var(--prot)"></span>ცილა</div>
+          <div class="val"><span id="plPVal">0</span><small> / <span id="plPGoal">0</span> გ</small></div>
+          <div class="bar" id="plPBar"><i style="background:var(--prot)"></i></div></div>
+        <div class="macro"><div class="lbl"><span class="dot" style="background:var(--carb)"></span>ნახშირწყ.</div>
+          <div class="val"><span id="plCVal">0</span><small> / <span id="plCGoal">0</span> გ</small></div>
+          <div class="bar" id="plCBar"><i style="background:var(--carb)"></i></div></div>
+        <div class="macro"><div class="lbl"><span class="dot" style="background:var(--fat)"></span>ცხიმი</div>
+          <div class="val"><span id="plFVal">0</span><small> / <span id="plFGoal">0</span> გ</small></div>
+          <div class="bar" id="plFBar"><i style="background:var(--fat)"></i></div></div>
+      </div>
+      <details class="nutcard inl" id="plNutCard">
+        <summary><span>ვიტამინები, მინერალები, ბოჭკო, მარილი</span><span class="arr">›</span></summary>
+        <div class="nutbody" id="plNutBody"></div>
+      </details>
+    </section>
+
+  <div class="actions">
+    <button class="act main" id="plScan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 8v8M10 8v8M13 8v8M16 8v8"/></svg><span>სკანირება</span></button>
+    <button class="act" id="plFoods"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg><span>მზა სია</span></button>
+    <button class="act" id="plCode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10"/></svg><span>კოდი</span></button>
+    <button class="act" id="plCustom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span>ხელით</span></button>
+  </div>
+
+    <div id="plRecentWrap">
+      <h2>ბოლოს გამოყენებული</h2>
+      <div class="chips" id="plRecent"></div>
+    </div>
+
+    <div id="plMeals"></div>
+
+    <div class="row2" id="plActions">
+      <button class="btn2" id="plCopy">სხვა დღეზე კოპირება</button>
+      <button class="btn2 danger" id="plClear">გეგმის წაშლა</button>
+    </div>
+  </div><!-- /pagePlan -->
+
+  <div id="pageRecipes" hidden>
+    <div id="rcList">
+      <button class="primary" id="rcNew" style="margin-top:0">+ ახალი რეცეპტი</button>
+      <h2>ჩემი რეცეპტები</h2>
+      <ul class="list" id="rcItems"></ul>
+      <div class="nnote">შენახული რეცეპტი ერთ პროდუქტად ემატება „დღის კონტროლსა“ და „კვების ცხრილში“. მას ასევე იპოვი „მზა სიაში“ (ჩემი რეცეპტები) და „ბოლოს გამოყენებულში“.</div>
+    </div>
+
+    <div id="rcEdit" hidden>
+      <div class="rc-head">
+        <button class="iconbtn" id="rcBack" aria-label="უკან">‹</button>
+        <input id="rcName" placeholder="კერძის სახელი, მაგ. ქათმის წვნიანი" autocomplete="off">
+      </div>
+
+      <section class="card">
+        <div class="muted" style="font-size:12.5px">100 გ მზა კერძში</div>
+        <div class="kcal-top"><div class="kcal-num"><span id="rcK">0</span> <small>კკალ</small></div></div>
+        <div class="macros">
+          <div class="macro"><div class="lbl"><span class="dot" style="background:var(--prot)"></span>ცილა</div><div class="val"><span id="rcP">0</span><small> გ</small></div></div>
+          <div class="macro"><div class="lbl"><span class="dot" style="background:var(--carb)"></span>ნახშირწყ.</div><div class="val"><span id="rcC">0</span><small> გ</small></div></div>
+          <div class="macro"><div class="lbl"><span class="dot" style="background:var(--fat)"></span>ცხიმი</div><div class="val"><span id="rcF">0</span><small> გ</small></div></div>
+        </div>
+        <div class="rc-lines">
+          <div><span>1 პორცია</span><b id="rcPortion">—</b></div>
+          <div><span>მთლიანი კერძი</span><b id="rcWhole">—</b></div>
+        </div>
+        <details class="nutcard inl" id="rcNutCard">
+          <summary><span>ვიტამინები, მინერალები, ბოჭკო, მარილი (100 გ-ში)</span><span class="arr">›</span></summary>
+          <div class="nutbody" id="rcNutBody"></div>
+        </details>
+      </section>
+
+      <div class="actions">
+        <button class="act main" id="rcScan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 8v8M10 8v8M13 8v8M16 8v8"/></svg><span>სკანირება</span></button>
+        <button class="act" id="rcFoods"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg><span>მზა სია</span></button>
+        <button class="act" id="rcCode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10"/></svg><span>კოდი</span></button>
+        <button class="act" id="rcCustom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span>ხელით</span></button>
+      </div>
+      <div id="rcRecentWrap">
+        <h2>ბოლოს გამოყენებული</h2>
+        <div class="chips" id="rcRecent"></div>
+      </div>
+
+      <h2 id="rcIngTitle">ინგრედიენტები</h2>
+      <ul class="list" id="rcIng"></ul>
+
+      <section class="card rc-w">
+        <div class="grid2">
+          <div class="field" style="margin-top:0"><label>მზა კერძის წონა (გ)</label><input id="rcCooked" type="number" inputmode="decimal" min="0"></div>
+          <div class="field" style="margin-top:0"><label>პორციების რაოდენობა</label><input id="rcPortions" type="number" inputmode="numeric" min="1" step="1" value="1"></div>
+        </div>
+        <div class="nnote" id="rcWeightNote">მოხარშვისას წყალი ორთქლდება ან ემატება. ზუსტი შედეგისთვის აწონე მზა კერძი ქვაბის გარეშე; თუ არ იცი, დატოვე ცარიელი და ჩაითვლება ინგრედიენტების ჯამური წონა.</div>
+      </section>
+
+      <button class="primary" id="rcSave">რეცეპტის შენახვა</button>
+      <div class="row2" id="rcAfter" hidden>
+        <button class="btn2" id="rcToLog">დღეს დამატება</button>
+        <button class="btn2" id="rcToPlan">გეგმაში დამატება</button>
+      </div>
+      <button class="ghost danger" id="rcDelete" hidden>რეცეპტის წაშლა</button>
+    </div>
+  </div><!-- /pageRecipes -->
+
+  <div id="pageShop" hidden>
+    <div class="seg st-period" id="shRange">
+      <button data-r="1">ხვალ</button>
+      <button data-r="3">3 დღე</button>
+      <button data-r="7" class="on">7 დღე</button>
+    </div>
+    <div class="sh-sub">
+      <span id="shSub"></span>
+      <label class="sh-today"><input type="checkbox" id="shIncToday"> დღევანდელიც</label>
+    </div>
+    <div id="shList"></div>
+    <div class="mrow sh-add">
+      <input id="shAdd" placeholder="დაამატე ხელით, მაგ. ნიორი, პური" autocomplete="off">
+      <button id="shAddGo">დამატება</button>
+    </div>
+    <div class="row2" style="margin-top:12px">
+      <button class="btn2" id="shCopy">ტექსტად კოპირება</button>
+      <button class="btn2" id="shClearDone">ნაყიდების გასუფთავება</button>
+    </div>
+    <div class="nnote">რაოდენობა ითვლება „კვების ცხრილიდან“. მოხარშული ბურღულეული და მომზადებული ხორცი გადაყვანილია მშრალ ან უმ წონაზე, რეცეპტები კი დაშლილია ინგრედიენტებად.</div>
+  </div><!-- /pageShop -->
+
+  <div id="pageStats" hidden>
+    <div class="seg st-period" id="stPeriod">
+      <button data-n="7" class="on">7 დღე</button>
+      <button data-n="30">30 დღე</button>
+      <button data-n="90">90 დღე</button>
+    </div>
+    <section class="card st-card" id="wtCard">
+      <div class="st-h">წონა</div>
+      <div class="wt-top">
+        <div><b id="wtLast">—</b><small id="wtLastSub"></small></div>
+        <div class="wt-chg" id="wtChange"></div>
+      </div>
+      <div class="st-chart" id="wtChart" style="height:140px"></div>
+      <div class="st-tip" id="wtTip"></div>
+      <div class="mrow wt-in">
+        <input id="wtVal" type="number" inputmode="decimal" step="0.1" min="20" max="400" placeholder="წონა, კგ">
+        <input id="wtDate" type="date">
+        <button id="wtSave">შენახვა</button>
+      </div>
+      <details class="nutcard inl">
+        <summary><span>ყველა აწონვა</span><span class="arr">›</span></summary>
+        <div class="nutbody" id="wtList"></div>
+      </details>
+    </section>
+
+    <div id="stEmpty" class="empty" hidden>ამ პერიოდში ჩანაწერი ჯერ არ არის. სტატისტიკა „დღის კონტროლის“ ჩანაწერებიდან ითვლება.</div>
+    <div id="stBody">
+      <div class="st-tiles">
+        <div class="tile"><span>კალორია, საშუალოდ</span><b id="stKcal">—</b><small id="stKcalSub"></small></div>
+        <div class="tile"><span>ცილა, საშუალოდ</span><b id="stProt">—</b><small id="stProtSub"></small></div>
+        <div class="tile"><span>ჩაწერილი დღეები</span><b id="stDays">—</b><small id="stDaysSub"></small></div>
+        <div class="tile"><span>წყალი, საშუალოდ</span><b id="stWater">—</b><small id="stWaterSub"></small></div>
+      </div>
+
+      <section class="card st-card">
+        <div class="st-h">კალორია დღეების მიხედვით</div>
+        <div class="st-chart" id="stChart"></div>
+        <div class="st-tip" id="stTip">შეეხე სვეტს დეტალებისთვის</div>
+      </section>
+
+      <section class="card st-card">
+        <div class="st-h">მაკროები, დღიური საშუალო</div>
+        <div id="stMacros"></div>
+        <div class="st-sub">კალორიის წყარო</div>
+        <div class="st-stack" id="stStack"></div>
+        <div class="st-legend" id="stLegend"></div>
+      </section>
+
+      <section class="card st-card" id="stPlanCard">
+        <div class="st-h">გეგმის შესრულება</div>
+        <div id="stPlan"></div>
+      </section>
+
+      <section class="card st-card">
+        <div class="st-h">რისი ნაკლებობაა</div>
+        <div class="st-note">ვიტამინები და მინერალები, დღიური საშუალო დღიურ ნორმასთან</div>
+        <div id="stLow"></div>
+        <details class="nutcard inl">
+          <summary><span>ყველა ნუტრიენტი, დღიური საშუალო</span><span class="arr">›</span></summary>
+          <div class="nutbody" id="stNutBody"></div>
+        </details>
+      </section>
+
+      <section class="card st-card">
+        <div class="st-h">ყველაზე მეტი კალორია ამ პროდუქტებიდან</div>
+        <div id="stTop"></div>
+      </section>
+      <div class="nnote">საშუალოები ითვლება მხოლოდ იმ დღეებზე, როცა რამე ჩაწერე. ვიტამინების მონაცემი ზოგ პროდუქტზე არ არის, ამიტომ რეალური მიღება შეიძლება ცოტა მეტი იყოს.</div>
+    </div>
+  </div><!-- /pageStats -->
+
+  <div class="src">პროდუქტების მონაცემები: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a></div>
+</div>
+
+<!-- Scanner -->
+<div class="sheet" id="scanSheet">
+  <div class="scan-inner">
+    <div class="scan-top"><b>სკანირება</b><button id="closeScan">დახურვა ✕</button></div>
+    <div id="camWrap"><video id="video" playsinline muted autoplay></video><div class="aim"><i></i></div></div>
+    <div id="scanMsg">კამერა ირთვება…</div>
+    <div class="scan-manual">
+      <input id="manualCode" inputmode="numeric" placeholder="ან ჩაწერე ბარკოდის ციფრები">
+      <button id="manualGo">ძებნა</button>
+    </div>
+    <label class="photo-lbl" id="photoLbl">📷 ბარკოდის ფოტოდან ამოცნობა
+      <input type="file" id="photoInput" accept="image/*" capture="environment" hidden>
+    </label>
+  </div>
+</div>
+
+<!-- Built-in foods -->
+<div class="sheet" id="foodSheet">
+  <div class="sheet-card food-card">
+    <div class="food-top">
+      <div class="fs-head"><h3>პროდუქტები</h3><button class="link" id="foodNew">+ ახალი პროდუქტი</button></div>
+      <div class="muted">მნიშვნელობები 100 გრამზე. „მშრალი“ = მოხარშვამდე წონა.</div>
+      <input id="foodSearch" type="search" placeholder="ძებნა: პომიდორი, წიწიბურა, ქათამი…" autocomplete="off">
+      <div class="chips cats" id="foodCats"></div>
+    </div>
+    <ul class="flist" id="foodList"></ul>
+    <button class="ghost" data-close>დახურვა</button>
+  </div>
+</div>
+
+<!-- Product -->
+<div class="sheet" id="prodSheet">
+  <div class="sheet-card">
+    <div class="phead">
+      <img id="pImg" src="" alt="">
+      <div style="min-width:0">
+        <h3 id="pName"></h3>
+        <div class="muted" id="pBrand"></div>
+        <div class="code" id="pCode"></div>
+      </div>
+    </div>
+    <div class="score" id="pScore"></div>
+    <div class="per100"><span id="p100"></span><button class="link" id="pEdit">შესწორება</button></div>
+    <div class="field">
+      <label>რამდენი მიირთვი (გრამი / მლ)</label>
+      <div class="grams">
+        <button data-d="-10" aria-label="მოკლება">−</button>
+        <input id="pGrams" type="number" inputmode="decimal" min="0" step="1">
+        <button data-d="10" aria-label="მომატება">+</button>
+      </div>
+      <div class="quick" id="pQuick"></div>
+    </div>
+    <div class="field" id="pMealWrap" hidden>
+      <label>რომელ კვებაზე</label>
+      <div class="quick" id="pMeal"></div>
+    </div>
+    <div class="calc">
+      <div><b id="cK">0</b><span>კკალ</span></div>
+      <div><b id="cP" style="color:var(--prot)">0</b><span>ცილა გ</span></div>
+      <div><b id="cC" style="color:var(--carb)">0</b><span>ნახშ. გ</span></div>
+      <div><b id="cF" style="color:var(--fat)">0</b><span>ცხიმი გ</span></div>
+    </div>
+    <details class="pnut" id="pNut">
+      <summary>🧪 ვიტამინები და მინერალები ამ ულუფაში ›</summary>
+      <div class="nutbody" id="pNutBody"></div>
+    </details>
+    <details class="pnut" id="pIngr">
+      <summary>📋 შემადგენლობა და დანამატები ›</summary>
+      <div class="nutbody" id="pIngrBody"></div>
+    </details>
+    <button class="primary" id="pAdd">დამატება</button>
+    <button class="ghost danger" id="pDelete" hidden>ჩანაწერის წაშლა</button>
+    <button class="ghost" data-close>გაუქმება</button>
+  </div>
+</div>
+
+<!-- Manual product -->
+<div class="sheet" id="manSheet">
+  <div class="sheet-card">
+    <h3 id="mTitle">პროდუქტის დამატება</h3>
+    <div class="muted" id="mSub">ჩაწერე მონაცემები ეტიკეტიდან — ერთხელ შეავსებ და შემდეგ ჯერზე თავად იცნობს.</div>
+    <div class="msearch" id="mSearchWrap">
+      <label>🔎 მოძებნე მსგავსი პროდუქტი სახელით</label>
+      <div class="mrow"><input id="mQuery" type="search" placeholder="მაგ. activia strawberry, cannellini, მაწონი" autocomplete="off"><button id="mQueryGo">ძებნა</button></div>
+      <div class="muted" id="mSearchMsg" style="font-size:12.5px;margin-top:6px">ამოირჩიე ყველაზე ახლოს მყოფი — მონაცემები ფორმაში ჩაიწერება და ეტიკეტთან შეადარებ.</div>
+      <ul class="flist" id="mResults"></ul>
+    </div>
+    <div class="field"><label>დასახელება</label><input id="mName" placeholder="მაგ. მაწონი 3.2%"></div>
+    <div class="field"><label>მონაცემები მითითებულია (გრამზე / მლ-ზე)</label><input id="mBase" type="number" inputmode="decimal" value="100"></div>
+    <div class="grid2">
+      <div class="field"><label>კალორია (კკალ)</label><input id="mK" type="number" inputmode="decimal"></div>
+      <div class="field"><label>ცილა (გ)</label><input id="mP" type="number" inputmode="decimal"></div>
+      <div class="field"><label>ნახშირწყალი (გ)</label><input id="mC" type="number" inputmode="decimal"></div>
+      <div class="field"><label>ცხიმი (გ)</label><input id="mF" type="number" inputmode="decimal"></div>
+    </div>
+    <div class="field"><label>ერთი პორცია / შეფუთვა (გ) — სურვილისამებრ</label><input id="mServ" type="number" inputmode="decimal"></div>
+    <details class="mextra" id="mExtra">
+      <summary>+ დამატებითი ეტიკეტიდან (სურვილისამებრ)</summary>
+      <div class="grid2">
+        <div class="field"><label>ბოჭკო (გ)</label><input id="mFib" type="number" inputmode="decimal"></div>
+        <div class="field"><label>მათ შორის შაქრები (გ)</label><input id="mSug" type="number" inputmode="decimal"></div>
+        <div class="field"><label>მათ შორის ნაჯერი ცხიმი (გ)</label><input id="mSfa" type="number" inputmode="decimal"></div>
+        <div class="field"><label>მარილი (გ)</label><input id="mSalt" type="number" inputmode="decimal"></div>
+        <div class="field"><label>ქოლესტერინი (მგ)</label><input id="mChol" type="number" inputmode="decimal"></div>
+      </div>
+    </details>
+    <button class="primary" id="mSave">შენახვა</button>
+    <button class="ghost danger" id="mDelete" hidden>პროდუქტის წაშლა სიიდან</button>
+    <button class="ghost" data-close>გაუქმება</button>
+  </div>
+</div>
+
+<!-- Today's plan (checklist) -->
+<div class="sheet" id="planSheet">
+  <div class="sheet-card plancard">
+    <div class="pc-head">
+      <div><h3>დღის გეგმა</h3><div class="muted" id="tpSub"></div></div>
+      <button class="link" id="tpAll">ყველა ✓</button>
+    </div>
+    <div class="bar" id="tpBar"><i style="background:#16a34a"></i></div>
+    <div id="tpList"></div>
+    <button class="btn2" id="tpEdit" style="width:100%;margin-top:14px">გეგმის შეცვლა</button>
+    <button class="ghost" data-close>დახურვა</button>
+  </div>
+</div>
+
+<!-- Supplements: manage -->
+<div class="sheet" id="suppSheet">
+  <div class="sheet-card">
+    <h3>დანამატები</h3>
+    <div class="muted">რასაც რეგულარულად იღებ. მონიშნულის ვიტამინები და მინერალები დღის ჯამში ჩაითვლება.</div>
+    <ul class="list" id="suppList" style="margin-top:12px"></ul>
+    <button class="btn2" id="suppNew" style="width:100%;margin-top:10px">+ ახალი დანამატი</button>
+    <div class="st-sub">სწრაფი დამატება</div>
+    <div class="quick" id="suppPresets"></div>
+    <button class="ghost" data-close>დახურვა</button>
+  </div>
+</div>
+
+<!-- Supplements: edit -->
+<div class="sheet" id="suppEditSheet">
+  <div class="sheet-card">
+    <h3 id="seTitle">დანამატი</h3>
+    <div class="field"><label>სახელი</label><input id="seName" placeholder="მაგ. ვიტამინი D3"></div>
+    <div class="field"><label>დოზა (როგორ იღებ)</label><input id="seDose" placeholder="მაგ. 1 კაფსულა, 2000 IU"></div>
+    <div class="st-sub">შემადგენლობა ერთ დოზაში (ეტიკეტიდან)</div>
+    <div id="seRows"></div>
+    <button class="link" id="seAddRow">+ ნუტრიენტის დამატება</button>
+    <button class="primary" id="seSave">შენახვა</button>
+    <button class="ghost danger" id="seDelete">წაშლა</button>
+    <button class="ghost" data-close>გაუქმება</button>
+  </div>
+</div>
+
+<!-- Copy plan -->
+<div class="sheet" id="copySheet">
+  <div class="sheet-card">
+    <h3>გეგმის კოპირება</h3>
+    <div class="muted" id="copySub"></div>
+    <div class="field"><label>რომელ დღეზე</label><input id="copyDate" type="date"></div>
+    <button class="primary" id="copyGo">კოპირება ამ დღეზე</button>
+    <button class="btn2" id="copyWeek" style="width:100%;margin-top:10px">შემდეგ 6 დღეზე (მთელი კვირა)</button>
+    <div class="nnote">კოპირებული საჭმელები ემატება იმ დღის არსებულ გეგმას.</div>
+    <button class="ghost" data-close>გაუქმება</button>
+  </div>
+</div>
+
+<!-- Settings -->
+<div class="sheet" id="setSheet">
+  <div class="sheet-card">
+    <h3>დღიური მიზნები</h3>
+    <div class="grid2">
+      <div class="field"><label>კალორია (კკალ)</label><input id="gK" type="number" inputmode="numeric"></div>
+      <div class="field"><label>ცილა (გ)</label><input id="gP" type="number" inputmode="numeric"></div>
+      <div class="field"><label>ნახშირწყალი (გ)</label><input id="gC" type="number" inputmode="numeric"></div>
+      <div class="field"><label>ცხიმი (გ)</label><input id="gF" type="number" inputmode="numeric"></div>
+    </div>
+    <div class="field"><label>წყალი (ლიტრი)</label><input id="gW" type="number" inputmode="decimal" step="0.1"></div>
+    <button class="primary" id="gSave">შენახვა</button>
+
+    <h3 style="margin-top:22px">მონაცემების სარეზერვო ასლი</h3>
+    <div class="muted">ყველაფერი ამ ტელეფონის ბრაუზერში ინახება. ტელეფონის შეცვლამდე ჩამოტვირთე ასლი.</div>
+    <div class="row2" style="margin-bottom:0">
+      <button class="btn2" id="exportBtn">⬇︎ ჩამოტვირთვა</button>
+      <label class="btn2" style="text-align:center">⬆︎ აღდგენა<input type="file" id="importInput" accept="application/json,.json" hidden></label>
+    </div>
+
+    <div class="hint"><b>აპად დაყენება:</b><br>
+      Android (Chrome): ⋮ მენიუ → „მთავარ ეკრანზე დამატება“.<br>
+      iPhone (Safari): გაზიარების ღილაკი → „Add to Home Screen“.</div>
+    <button class="ghost" data-close>დახურვა</button>
+  </div>
+</div>
+
+<div class="loading" id="loading"><div><div class="spin"></div>ვეძებ პროდუქტს…</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = s => document.querySelector(s);
+  const K = { log: 'mt_log_v1', prod: 'mt_products_v1', goals: 'mt_goals_v1', water: 'mt_water_v1' };
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { toast('შენახვა ვერ მოხერხდა'); } }
+  };
+
+  let log = store.get(K.log, {});
+  let products = store.get(K.prod, {});
+  let goals = Object.assign({ kcal: 2000, p: 150, c: 220, f: 70, water: 2.5 }, store.get(K.goals, {}));
+  let water = store.get(K.water, {}); // { 'YYYY-MM-DD': millilitres }
+  let plans = store.get('mt_plan_v1', {}); // { 'YYYY-MM-DD': [ planned items ] }
+  const savePlans = () => store.set('mt_plan_v1', plans);
+  const MEALS = [['b', '🌅 საუზმე'], ['l', '🍲 სადილი'], ['d', '🌙 ვახშამი'], ['s', '🍎 წახემსება']];
+  let addTarget = 'log';      // where new foods go: 'log' (page 1) or 'plan' (page 2)
+  let planDate = new Date();
+  let lastMeal = store.get('mt_lastmeal', 'b');
+  let recipes = store.get('mt_recipes_v1', {});   // { id: {id, name, items:[{id,code,name,grams,per100}], cooked, portions, updated} }
+  let rcDraft = store.get('mt_recipe_draft', null);
+  let rcDirty = false;
+  const saveRecipes = () => store.set('mt_recipes_v1', recipes);
+  let supps = store.get('mt_supps_v1', []);          // [{id, name, dose, m:{d:25,...}}]
+  let suppTaken = store.get('mt_supptaken_v1', {});  // { 'YYYY-MM-DD': [suppId, ...] }
+  let weights = store.get('mt_weights_v1', {});      // { 'YYYY-MM-DD': kg }
+  let shopDone = store.get('mt_shopdone_v1', {});    // { itemKey: true }
+  let shopExtra = store.get('mt_shopextra_v1', []);  // [{id, name, done}]
+  let shopRange = store.get('mt_shoprange', 7), shopIncToday = store.get('mt_shoptoday', false);
+  const saveSupps = () => { store.set('mt_supps_v1', supps); store.set('mt_supptaken_v1', suppTaken); };
+  supps.forEach(x => { if (/ომეგა/.test(x.name) && (!x.m || !Object.keys(x.m).length)) { x.m = { o3: 300 }; store.set('mt_supps_v1', supps); } });
+  function suppMicro(key) {
+    const ids = suppTaken[key] || [], m = {};
+    supps.filter(x => ids.includes(x.id)).forEach(x => Object.keys(x.m || {}).forEach(k => { m[k] = (m[k] || 0) + (+x.m[k] || 0); }));
+    return m;
+  }
+  const saveDraft = () => store.set('mt_recipe_draft', rcDraft);
+  const liters = ml => String(Math.round(ml / 10) / 100);
+  let current = new Date();
+  let pending = null; // { code, product, entryId? }
+
+  const r1 = n => Math.round((+n || 0) * 10) / 10;
+  const num = v => { const x = parseFloat(String(v ?? '').replace(',', '.')); return isFinite(x) ? x : null; };
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+  const pad = n => String(n).padStart(2, '0');
+  const dayKey = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const isToday = d => dayKey(d) === dayKey(new Date());
+  const saveAll = () => { store.set(K.log, log); store.set(K.prod, products); };
+  const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+  function dayLabel(d) {
+    const diff = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - new Date(new Date().setHours(0, 0, 0, 0))) / 864e5);
+    return diff === 0 ? 'დღეს' : diff === 1 ? 'ხვალ' : diff === -1 ? 'გუშინ' : null;
+  }
+  function sumItems(items) {
+    const tot = { kcal: 0, p: 0, c: 0, f: 0 }, sums = {}, cnt = {};
+    items.forEach(i => {
+      tot.kcal += i.kcal; tot.p += i.p; tot.c += i.c; tot.f += i.f;
+      if (i.m) Object.keys(i.m).forEach(k => { sums[k] = (sums[k] || 0) + i.m[k]; cnt[k] = (cnt[k] || 0) + 1; });
+    });
+    const partial = {};
+    Object.keys(sums).forEach(k => { if (cnt[k] < items.length) partial[k] = `(${cnt[k]}/${items.length})`; });
+    return { tot, sums, partial };
+  }
+
+  // ---------- Built-in foods (per 100 g, average values) ----------
+  // id|name|category|kcal|protein|carbs|fat|portion g|portion label|search aliases
+  const FOOD_CATS = [['ad', 'დამატებული პროდუქტები'], ['ge', 'ქართული კერძები'], ['ck', 'მომზადებული'], ['fr', 'ხილი'], ['vg', 'ბოსტნეული'], ['gr', 'ბურღულეული და პური'], ['lg', 'პარკოსნები'], ['mt', 'ხორცი და თევზი'], ['ch', 'ყველი'], ['dy', 'რძის ნაწარმი და კვერცხი'], ['nt', 'თხილეული'], ['dr', 'სასმელები'], ['sw', 'ტკბილეული და სნეკები'], ['pr', 'ძეხვეული და ფასტფუდი'], ['ot', 'სხვა']];
+  const FOOD_DATA = `
+apple|ვაშლი|fr|52|0.3|13.8|0.2|180||
+banana|ბანანი|fr|89|1.1|22.8|0.3|120||
+orange|ფორთოხალი|fr|47|0.9|11.8|0.1|150||
+mandarin|მანდარინი|fr|53|0.8|13.3|0.3|80||
+lemon|ლიმონი|fr|29|1.1|9.3|0.3|||
+grapefruit|გრეიფრუტი|fr|42|0.8|10.7|0.1|||
+pear|მსხალი|fr|57|0.4|15.2|0.1|170||
+peach|ატამი|fr|39|0.9|9.5|0.3|150||
+apricot|გარგარი|fr|48|1.4|11.1|0.4|35||
+plum|ქლიავი|fr|46|0.7|11.4|0.3|30||ტყემალი
+sourcherry|ალუბალი|fr|50|1.0|12.2|0.3|||
+cherry|ბალი|fr|63|1.1|16|0.2|||
+grape|ყურძენი|fr|69|0.7|18.1|0.2|||
+watermelon|საზამთრო|fr|30|0.6|7.6|0.2|||
+melon|ნესვი|fr|34|0.8|8.2|0.2|||
+strawberry|მარწყვი|fr|32|0.7|7.7|0.3|||
+raspberry|ჟოლო|fr|52|1.2|11.9|0.7|||
+blueberry|მოცვი|fr|57|0.7|14.5|0.3|||
+kiwi|კივი|fr|61|1.1|14.7|0.5|75||
+pineapple|ანანასი|fr|50|0.5|13.1|0.1|||
+mango|მანგო|fr|60|0.8|15|0.4|||
+pomegranate|ბროწეული|fr|83|1.7|18.7|1.2|||
+persimmon|ხურმა|fr|70|0.6|18.6|0.2|170||
+fig|ლეღვი|fr|74|0.8|19.2|0.3|50||
+feijoa|ფეიხოა|fr|55|1.0|12.9|0.6|50||ფეიჰოა
+quince|კომში|fr|57|0.4|15.3|0.1|||
+avocado|ავოკადო|fr|160|2|8.5|14.7|||
+raisin|ქიშმიში|fr|299|3.1|79.2|0.5|||
+dapricot|გარგრის ჩირი|fr|241|3.4|62.6|0.5|||ჩირი კურაგა
+dates|ფინიკი|fr|277|1.8|75|0.2|||
+tomato|პომიდორი|vg|18|0.9|3.9|0.2|120||პამიდორი
+cucumber|კიტრი|vg|15|0.7|3.6|0.1|120||
+potato|კარტოფილი (უმი)|vg|77|2.0|17.5|0.1|||
+potatob|კარტოფილი (მოხარშული)|vg|87|1.9|20.1|0.1|||
+fries|კარტოფილი ფრი|vg|312|3.4|41.4|14.7|||შემწვარი კარტოფილი
+carrot|სტაფილო|vg|41|0.9|9.6|0.2|70||
+onion|ხახვი|vg|40|1.1|9.3|0.1|110||
+garlic|ნიორი|vg|149|6.4|33.1|0.5|5|1 კბილი|
+cabbage|კომბოსტო (თეთრი)|vg|25|1.3|5.8|0.1|||
+cauliflower|ყვავილოვანი კომბოსტო|vg|25|1.9|5|0.3|||
+broccoli|ბროკოლი|vg|34|2.8|6.6|0.4|||
+eggplant|ბადრიჯანი|vg|25|1.0|5.9|0.2|||
+bellpepper|ტკბილი წიწაკა|vg|31|1.0|6.0|0.3|150||ბულგარული წიწაკა
+chili|ცხარე წიწაკა|vg|40|1.9|8.8|0.4|||
+zucchini|ყაბაყი|vg|17|1.2|3.1|0.3|||ცუკინი
+pumpkin|გოგრა|vg|26|1.0|6.5|0.1|||
+beet|ჭარხალი|vg|43|1.6|9.6|0.2|||
+spinach|ისპანახი|vg|23|2.9|3.6|0.4|||
+lettuce|სალათის ფოთოლი|vg|15|1.4|2.9|0.2|||სალათა
+radish|ბოლოკი|vg|16|0.7|3.4|0.1|||
+mushroom|სოკო (შამპინიონი)|vg|22|3.1|3.3|0.3|||
+corn|სიმინდი (ტკბილი, ტაროს)|vg|86|3.3|18.7|1.4|||
+peas|მწვანე ბარდა|vg|81|5.4|14.5|0.4|||
+greenbean|მწვანე ლობიო|vg|31|1.8|7|0.2|||
+parsley|ოხრახუში|vg|36|3.0|6.3|0.8|||მწვანილი
+cilantro|ქინძი|vg|23|2.1|3.7|0.5|||მწვანილი
+olive|ზეთისხილი|vg|115|0.8|6.3|10.7|||ოლივა
+buckwheat|წიწიბურა (მშრალი)|gr|343|13.3|71.5|3.4|||
+buckwheatc|წიწიბურა (მოხარშული)|gr|92|3.4|19.9|0.6|||
+rice|ბრინჯი (მშრალი)|gr|365|7.1|80|0.7|||
+ricec|ბრინჯი (მოხარშული)|gr|130|2.7|28.2|0.3|||
+oats|შვრია / ჰერკულესი (მშრალი)|gr|379|13.2|67.7|6.5|||ფაფა
+oatmeal|შვრიის ფაფა წყალზე (მზა)|gr|71|2.5|12|1.5|||ჰერკულესი
+pasta|მაკარონი (მშრალი)|gr|371|13|74.7|1.5|||სპაგეტი
+pastac|მაკარონი (მოხარშული)|gr|158|5.8|30.9|0.9|||სპაგეტი
+bulgur|ბულგური (მშრალი)|gr|342|12.3|75.9|1.3|||
+bulgurc|ბულგური (მოხარშული)|gr|83|3.1|18.6|0.2|||
+quinoa|ქინოა (მშრალი)|gr|368|14.1|64.2|6.1|||
+quinoac|ქინოა (მოხარშული)|gr|120|4.4|21.3|1.9|||
+cornmeal|სიმინდის ფქვილი|gr|362|8.1|76.9|3.6|||ღომი მჭადი
+flour|ხორბლის ფქვილი|gr|364|10.3|76.3|1.0|||
+semolina|მანანის ბურღული (მშრალი)|gr|360|12.7|72.8|1.1|||მანანი
+barley|ქერი (მშრალი)|gr|352|9.9|77.7|1.2|||
+millet|ფეტვი (მშრალი)|gr|378|11|72.9|4.2|||
+bread|თეთრი პური|gr|265|9|49|3.2|30|1 ნაჭერი|შოთი თონის პური
+ryebread|ჭვავის პური|gr|259|8.5|48.3|3.3|30|1 ნაჭერი|შავი პური
+wholebread|მთლიანმარცვლოვანი პური|gr|252|12.4|42.7|3.5|30|1 ნაჭერი|
+lavash|ლავაში|gr|275|9|56|1.2|||
+beans|ლობიო (მშრალი)|lg|333|23.6|60|0.8|||
+beansc|ლობიო (მოხარშული)|lg|127|8.7|22.8|0.5|||
+lentil|ოსპი (მშრალი)|lg|352|24.6|63.4|1.1|||
+lentilc|ოსპი (მოხარშული)|lg|116|9|20.1|0.4|||
+chickpea|მუხუდო (მშრალი)|lg|378|20.5|63|6.0|||ნუტი
+chickpeac|მუხუდო (მოხარშული)|lg|164|8.9|27.4|2.6|||ნუტი
+chbreast|ქათმის მკერდი (უმი)|mt|120|22.5|0|2.6|||ფილე ქათამი
+chbreastc|ქათმის მკერდი (მომზადებული)|mt|165|31|0|3.6|||ფილე ქათამი
+chthigh|ქათმის ბარკალი ტყავით (უმი)|mt|221|15.5|0|17|||ქათამი
+turkey|ინდაურის მკერდი (უმი)|mt|114|23.7|0|1.5|||ინდაური
+beef|საქონლის ხორცი, უცხიმო (უმი)|mt|137|21.4|0|5|||ძროხა
+beefmince|საქონლის ფარში 20% (უმი)|mt|254|17.2|0|20|||ფარში
+pork|ღორის ხორცი (უმი)|mt|216|19|0|15|||
+lamb|ცხვრის ხორცი (უმი)|mt|282|16.6|0|23.4|||
+chliver|ქათმის ღვიძლი (უმი)|mt|119|16.9|0.7|4.8|||
+salmon|ორაგული (უმი)|mt|208|20.4|0|13.4|||სალმონი თევზი
+trout|კალმახი (უმი)|mt|141|19.9|0|6.2|||თევზი
+tuna|ტუნა (კონსერვი წყალში)|mt|116|25.5|0|0.8|||თევზი
+shrimp|კრევეტი (უმი)|mt|85|20.1|0|0.5|||
+egg|კვერცხი|dy|143|12.6|0.7|9.5|50||
+eggwhite|კვერცხის ცილა|dy|52|10.9|0.7|0.2|33||
+milk32|რძე 3.2%|dy|61|3.2|4.8|3.3|||
+milk2|რძე 2%|dy|50|3.3|4.8|2.0|||
+matsoni|მაწონი|dy|61|3.5|4.7|3.2|||იოგურტი
+kefir|კეფირი 2.5%|dy|53|2.9|4|2.5|||
+greekyog|ბერძნული იოგურტი (უცხიმო)|dy|59|10.2|3.6|0.4|||
+cottage5|ხაჭო 5%|dy|121|17.2|1.8|5|||
+cottage9|ხაჭო 9%|dy|159|16.7|2|9|||
+imeruli|იმერული ყველი|ch|240|18|0.5|18|||ყველი
+sulguni|სულგუნი|ch|286|20|0.4|22|||ყველი
+hardcheese|მყარი ყველი (ჰოლანდიური)|ch|352|26|0|26.8|||ყველი
+sourcream|არაჟანი 20%|dy|206|2.8|3.2|20|||
+butter|კარაქი|dy|717|0.9|0.1|81.1|10|1 ნაჭერი|
+walnut|ნიგოზი|nt|654|15.2|13.7|65.2|||კაკალი
+hazelnut|თხილი|nt|628|15|16.7|60.8|||
+almond|ნუში|nt|579|21.2|21.6|49.9|||
+peanut|არაქისი|nt|567|25.8|16.1|49.2|||
+sunseed|მზესუმზირა (გარჩეული)|nt|584|20.8|20|51.5|||
+pumpseed|გოგრის თესლი|nt|559|30.2|10.7|49|||
+pistachio|ფისტა|nt|560|20.2|27.2|45.3|||
+cashew|კეშიუ|nt|553|18.2|30.2|43.9|||
+pbutter|არაქისის კარაქი|nt|588|25|20|50|16|1 ს/კ|
+sunoil|მზესუმზირის ზეთი|ot|884|0|0|100|14|1 ს/კ|ზეთი
+oliveoil|ზეითუნის ზეთი|ot|884|0|0|100|14|1 ს/კ|ზეთი
+sugar|შაქარი|ot|387|0|100|0|5|1 ჩ/კ|
+honey|თაფლი|ot|304|0.3|82.4|0|21|1 ს/კ|
+jam|მურაბა / ჯემი|ot|278|0.4|68.9|0.1|20|1 ს/კ|
+darkchoc|შავი შოკოლადი 70%|ot|598|7.8|45.9|42.6|||
+milkchoc|რძიანი შოკოლადი|ot|535|7.7|59.4|29.7|||
+tomatopaste|ტომატის პასტა|ot|82|4.3|18.9|0.5|||
+mayo|მაიონეზი|ot|680|1|0.6|75|14|1 ს/კ|
+ketchup|კეჩუპი|ot|101|1|27.4|0.1|||
+feta|ფეტა|ch|265|14.2|4.1|21.3|||ყველი
+brynza|ბრინზა|ch|260|17.9|0.5|20.1|||ყველი
+mozzarella|მოცარელა|ch|300|22.2|2.2|22.4|||ყველი
+cheddar|ჩედერი|ch|403|24.9|1.3|33.1|20|1 ნაჭერი|ყველი
+parmesan|პარმეზანი|ch|392|35.8|3.2|25.8|||ყველი
+brie|ბრი|ch|334|20.8|0.5|27.7|||ყველი
+ricotta|რიკოტა|ch|174|11.3|3|13|||ყველი ნადუღი
+cottagecheese|კოტეჯი (მარცვლოვანი ხაჭო 4%)|ch|98|11.1|3.4|4.3|||ხაჭო ყველი
+creamcheese|კრემ-ყველი|ch|342|6|5.5|34|||ფილადელფია ყველი
+mascarpone|მასკარპონე|ch|429|4.6|4.1|44|||ყველი
+pkhali_sp|ფხალი ისპანახის|ge|140|5|6|12|50|1 ბურთულა|ფხალი
+pkhali_bt|ფხალი ჭარხლის|ge|150|4|10|12|50|1 ბურთულა|ფხალი
+pkhali_gb|ფხალი მწვანე ლობიოს|ge|145|4|8|12|50|1 ბურთულა|ფხალი
+lobio_ge|ლობიო (ქართული, ზეთით)|ge|150|7.4|20|4.5|||ლობიო
+lobiani|ლობიანი|ge|240|8.5|38|5.5|||
+khach_im|ხაჭაპური იმერული|ge|280|11|28|13.5|70|1 ნაჭერი|ხაჭაპური
+khach_me|ხაჭაპური მეგრული|ge|300|13|25|16|70|1 ნაჭერი|ხაჭაპური
+khach_aj|ხაჭაპური აჭარული|ge|310|12.5|27|17|||ხაჭაპური
+khinkali|ხინკალი (ხორცის)|ge|225|11|24|9.5|60|1 ცალი|
+mtsvadi_p|მწვადი ღორის|ge|300|24|0|22.5|||მწვადი შაშლიკი
+mtsvadi_c|მწვადი ქათმის|ge|190|26|0|9.5|||მწვადი შაშლიკი
+kababi|ქაბაბი|ge|280|18|4|21|||
+chakhokhbili|ჩახოხბილი|ge|140|13|5|8|||
+chakapuli|ჩაქაფული|ge|150|12|3|10|||
+ostri|ოსტრი|ge|160|14|5|9|||
+satsivi|საცივი (ქათმის)|ge|250|16|5|19|||
+ajapsandali|აჯაფსანდალი|ge|90|1.5|8|6|||
+badrijani_n|ბადრიჯანი ნიგვზით|ge|260|4.5|9|23|||
+chikhirtma|ჩიხირთმა|ge|70|6|3|4|||სუპი
+kharcho|ხარჩო|ge|90|6|6|5|||სუპი
+mchadi|მჭადი|ge|226|5.1|48|2.2|80|1 ცალი|
+ghomi|ღომი|ge|80|1.8|17|0.8|||
+churchkhela|ჩურჩხელა (ნიგვზის)|ge|405|5.5|55|19|80|1 ცალი|
+gozinaki|გოზინაყი|ge|520|10|40|38|20|1 ნაჭერი|
+tkemali|ტყემალი (სოუსი)|ge|45|0.5|10|0.3|15|1 ს/კ|
+ojuice|ფორთოხლის წვენი|dr|45|0.7|10.4|0.2|200|1 ჭიქა|წვენი
+ajuice|ვაშლის წვენი|dr|46|0.1|11.3|0.1|200|1 ჭიქა|წვენი
+cola|კოკა-კოლა / გაზიანი სასმელი|dr|42|0|10.6|0|330|1 ქილა|კოლა
+lemonade|ლიმონათი|dr|45|0|11|0|500|1 ბოთლი|ლაღიძე
+coffee|ყავა (შავი)|dr|1|0.1|0|0|200|1 ფინჯანი|ესპრესო
+cappuccino|კაპუჩინო (უშაქრო)|dr|31|1.7|2.5|1.6|180|1 ფინჯანი|ყავა რძით
+tea|ჩაი (უშაქრო)|dr|1|0|0.3|0|250|1 ჭიქა|
+beer|ლუდი|dr|43|0.5|3.6|0|500|1 ბოთლი|
+wine_r|ღვინო წითელი (მშრალი)|dr|85|0.1|2.6|0|150|1 ბოკალი|ღვინო
+wine_w|ღვინო თეთრი (მშრალი)|dr|82|0.1|2.6|0|150|1 ბოკალი|ღვინო
+chacha|ჭაჭა / არაყი (40%)|dr|231|0|0|0|50|1 სირჩა|არაყი
+sausage|სოსისი|pr|290|10.3|4.2|25.8|50|1 ცალი|ძეხვი
+ham|ლორი (დაჭრილი)|pr|163|16.6|3.8|8.6|20|1 ნაჭერი|ძეხვი
+salami|სალიამი|pr|407|22.6|1.6|33.7|10|1 ნაჭერი|ძეხვი
+pizza|პიცა (ყველის)|pr|266|11.4|33|10.4|110|1 ნაჭერი|მარგარიტა
+shawarma|შაურმა (ქათმის)|pr|215|11|20|10|||დონერი
+burger|ბურგერი|pr|250|13|27|10|120|1 ცალი|ჰამბურგერი
+icecream|ნაყინი (ვანილის)|sw|207|3.5|23.6|11|70|1 ცალი|
+maria|ორცხობილა (მარია ტიპის)|sw|440|7|75|12|6|1 ცალი|ფეჩენია
+chips|ჩიფსი (კარტოფილის)|sw|536|7|53|34.6|30|1 პატარა პაკეტი|
+halva|ჰალვა (მზესუმზირის)|sw|516|11.6|54|29.7|||
+cornflakes|სიმინდის ფანტელები|gr|357|7.5|84|0.4|30|1 პორცია|კორნფლექსი
+muesli|მიუსლი|gr|367|9.7|66|5.9|50|1 პორცია|გრანოლა
+tofu|ტოფუ|lg|76|8.1|1.9|4.8|||
+mackerel|სკუმბრია (უმი)|mt|205|18.6|0|13.9|||თევზი
+ad_agro_satsebeli|საწებელი მეგრული ცხარე · აგროჰაბი|ad|25.36|0.75|5.53|0.1|15|1 ს/კ|საწებელი მეგრული ცხარე სოუსი აგროჰაბი agrohub
+ad_agro_tkemali|ტყემალი მწვანე · აგროჰაბი|ad|48.78|0.4|10.19|0.02|15|1 ს/კ|ტყემალი მწვანე სოუსი აგროჰაბი agrohub
+ad_castello_beans|Castello კონსერვის ლობიო|ad|142|9|26|1|240|1 ქილა (გადაწურული)|კანელინი cannellini ლობიო კონსერვი castello
+egg_boiled|მოხარშული კვერცხი|ck|155|12.6|1.1|10.6|50||კვერცხი
+egg_fried|შემწვარი კვერცხი (ერბოკვერცხი)|ck|196|13.6|0.8|14.8|46||კვერცხი ერბო გლაზუნია
+omelet|ომლეტი (უბრალო)|ck|154|10.6|0.6|11.7|||კვერცხი
+scrambled|არეული კვერცხი (რძით)|ck|149|10|1.6|11|||კვერცხი
+chliverf|ქათმის ღვიძლი (შემწვარი)|ck|172|25.8|1.1|6.4|||ღვიძლი
+chliverb|ქათმის ღვიძლი (მოხარშული)|ck|167|24.5|0.9|6.5|||ღვიძლი
+bliverf|საქონლის ღვიძლი (შემწვარი)|ck|175|26.5|5.2|4.7|||ღვიძლი ძროხა
+chdrum|ქათმის წვივი ტყავით (ღუმელში)|ck|216|27|0|11.2|||ქათამი დრამსტიკი
+chthighr|ქათმის ბარკალი ტყავით (ღუმელში)|ck|229|23.3|0|14.7|||ქათამი
+beefpatty|საქონლის ფარში 20% (შემწვარი)|ck|271|25.8|0|17.8|||ფარში ძროხა
+salmonb|ორაგული (ღუმელში / გრილზე)|ck|206|22.1|0|12.4|||სალმონი თევზი
+troutb|კალმახი (ღუმელში / გრილზე)|ck|168|23.8|0|7.4|||თევზი
+mashed|კარტოფილის პიურე (რძით და კარაქით)|ck|113|1.9|16.8|4.2|||კარტოფილი
+bakedpot|გამომცხვარი კარტოფილი (ქერქით)|ck|93|2.5|21.2|0.1|||კარტოფილი
+broccolib|ბროკოლი (მოხარშული)|ck|35|2.4|7.2|0.4|||
+carrotb|სტაფილო (მოხარშული)|ck|35|0.8|8.2|0.2|||
+beetb|ჭარხალი (მოხარშული)|ck|44|1.7|10|0.2|||
+spinachb|ისპანახი (მოხარშული)|ck|23|3|3.8|0.3|||`;
+  const FOODS = {};
+  FOOD_DATA.trim().split('\n').forEach(line => {
+    const [id, name, cat, kcal, p, c, f, piece, pieceLabel, aliases] = line.split('|');
+    FOODS[id] = { id, name, cat, per100: { kcal: +kcal, p: +p, c: +c, f: +f }, piece: +piece || null, pieceLabel: pieceLabel || '1 ცალი', aliases: aliases || '' };
+  });
+  // ---------- Micronutrients ----------
+  // key, label, unit, daily reference (adult, general), kind: max = upper limit
+  const NUTS = [
+    ['fib', 'ბოჭკო', 'გ', 30, 'min', 'main'],
+    ['sug', 'შაქრები', 'გ', 50, 'max', 'main'],
+    ['sfa', 'ნაჯერი ცხიმი', 'გ', 20, 'max', 'main'],
+    ['chol', 'ქოლესტერინი', 'მგ', 300, 'max', 'main'],
+    ['na', 'ნატრიუმი', 'მგ', 2000, 'max', 'main'],
+    ['o3', 'ომეგა-3 (EPA+DHA)', 'მგ', 250, '', 'fa'],
+    ['ala', 'ომეგა-3 ALA (მცენარეული)', 'გ', 1.1, '', 'fa'],
+    ['k', 'კალიუმი', 'მგ', 3500, '', 'min'],
+    ['mg', 'მაგნიუმი', 'მგ', 375, '', 'min'],
+    ['ca', 'კალციუმი', 'მგ', 1000, '', 'min'],
+    ['fe', 'რკინა', 'მგ', 14, '', 'min'],
+    ['zn', 'თუთია', 'მგ', 10, '', 'min'],
+    ['a', 'ვიტამინი A', 'მკგ', 800, '', 'vit'],
+    ['b1', 'B1 (თიამინი)', 'მგ', 1.1, '', 'vit'],
+    ['b2', 'B2 (რიბოფლავინი)', 'მგ', 1.4, '', 'vit'],
+    ['b3', 'B3 (ნიაცინი)', 'მგ', 16, '', 'vit'],
+    ['b5', 'B5 (პანტოთენის მჟავა)', 'მგ', 6, '', 'vit'],
+    ['b6', 'B6 (პირიდოქსინი)', 'მგ', 1.4, '', 'vit'],
+    ['b7', 'B7 (ბიოტინი)', 'მკგ', 50, '', 'vit'],
+    ['b9', 'B9 (ფოლატი)', 'მკგ', 400, '', 'vit'],
+    ['b12', 'B12 (კობალამინი)', 'მკგ', 2.4, '', 'vit'],
+    ['c', 'ვიტამინი C', 'მგ', 80, '', 'vit'],
+    ['d', 'ვიტამინი D', 'მკგ', 15, '', 'vit'],
+    ['e', 'ვიტამინი E', 'მგ', 12, '', 'vit'],
+    ['k1', 'ვიტამინი K1', 'მკგ', 75, '', 'vit'],
+    ['k2', 'ვიტამინი K2', 'მკგ', null, '', 'vit']
+  ];
+  const NUT_GROUPS = [['main', 'ძირითადი'], ['fa', 'ომეგა-3 ცხიმოვანი მჟავები'], ['min', 'მინერალები'], ['vit', 'ვიტამინები']];
+  // Approximate USDA-based averages per 100 g. Order:
+  // fib,sug,sfa,na,ca,fe,mg,k,zn,a,b1,b2,b3,b5,b6,b9,b12,c,d,e,k1,k2,chol  (blank = unknown)
+  const MICRO_ORDER = ['fib','sug','sfa','na','ca','fe','mg','k','zn','a','b1','b2','b3','b5','b6','b9','b12','c','d','e','k1','k2','chol'];
+  const MICRO_DATA = `
+apple:2.4,10.4,0.03,1,6,0.12,5,107,0.04,3,0.017,0.026,0.091,0.061,0.041,3,0,4.6,0,0.18,2.2,0,0
+banana:2.6,12.2,0.11,1,5,0.26,27,358,0.15,3,0.031,0.073,0.665,0.334,0.367,20,0,8.7,0,0.1,0.5,0,0
+orange:2.4,9.4,0.02,0,40,0.1,10,181,0.07,11,0.087,0.04,0.282,0.25,0.06,30,0,53.2,0,0.18,0,0,0
+mandarin:1.8,10.6,0.04,2,37,0.15,12,166,0.07,34,0.058,0.036,0.376,0.216,0.078,16,0,26.7,0,0.2,0,0,0
+lemon:2.8,2.5,0.04,2,26,0.6,8,138,0.06,1,0.04,0.02,0.1,0.19,0.08,11,0,53,0,0.15,0,0,0
+grapefruit:1.6,6.9,0.02,0,22,0.08,9,135,0.07,58,0.043,0.031,0.204,0.262,0.053,13,0,31.2,0,0.13,0,0,0
+pear:3.1,9.8,0.02,1,9,0.18,7,116,0.1,1,0.012,0.026,0.161,0.049,0.029,7,0,4.3,0,0.12,4.4,0,0
+peach:1.5,8.4,0.02,0,6,0.25,9,190,0.17,16,0.024,0.031,0.806,0.153,0.025,4,0,6.6,0,0.73,2.6,0,0
+apricot:2,9.2,0.03,1,13,0.39,10,259,0.2,96,0.03,0.04,0.6,0.24,0.054,9,0,10,0,0.89,3.3,0,0
+plum:1.4,9.9,0.02,0,6,0.17,7,157,0.1,17,0.028,0.026,0.417,0.135,0.029,5,0,9.5,0,0.26,6.4,0,0
+sourcherry:1.6,8.5,0.07,3,16,0.32,9,173,0.1,64,0.03,0.04,0.4,0.143,0.044,8,0,10,0,0.07,2.1,0,0
+cherry:2.1,12.8,0.04,0,13,0.36,11,222,0.07,3,0.027,0.033,0.154,0.199,0.049,4,0,7,0,0.07,2.1,0,0
+grape:0.9,15.5,0.05,2,10,0.36,7,191,0.07,3,0.069,0.07,0.188,0.05,0.086,2,0,3.2,0,0.19,14.6,0,0
+watermelon:0.4,6.2,0.02,1,7,0.24,10,112,0.1,28,0.033,0.021,0.178,0.221,0.045,3,0,8.1,0,0.05,0.1,0,0
+melon:0.8,8.1,0.04,18,6,0.17,10,228,0.09,3,0.038,0.012,0.418,0.155,0.088,19,0,18,0,0.02,2.9,0,0
+strawberry:2,4.9,0.02,1,16,0.41,13,153,0.14,1,0.024,0.022,0.386,0.125,0.047,24,0,58.8,0,0.29,2.2,0,0
+raspberry:6.5,4.4,0.02,1,25,0.69,22,151,0.42,2,0.032,0.038,0.598,0.329,0.055,21,0,26.2,0,0.87,7.8,0,0
+blueberry:2.4,10,0.03,1,6,0.28,6,77,0.16,3,0.037,0.041,0.418,0.124,0.052,6,0,9.7,0,0.57,19.3,0,0
+kiwi:3,9,0.03,3,34,0.31,17,312,0.14,4,0.027,0.025,0.341,0.183,0.063,25,0,92.7,0,1.46,40.3,0,0
+pineapple:1.4,9.9,0.01,1,13,0.29,12,109,0.12,3,0.079,0.032,0.5,0.213,0.112,18,0,47.8,0,0.02,0.7,0,0
+mango:1.6,13.7,0.09,1,11,0.16,10,168,0.09,54,0.028,0.038,0.669,0.197,0.119,43,0,36.4,0,0.9,4.2,0,0
+pomegranate:4,13.7,0.12,3,10,0.3,12,236,0.35,0,0.067,0.053,0.293,0.377,0.075,38,0,10.2,0,0.6,16.4,0,0
+persimmon:3.6,12.5,0.02,1,8,0.15,9,161,0.11,81,0.03,0.02,0.1,,0.1,8,0,7.5,0,0.73,2.6,0,0
+fig:2.9,16.3,0.06,1,35,0.37,17,232,0.15,7,0.06,0.05,0.4,0.3,0.113,6,0,2,0,0.11,4.7,0,0
+feijoa:6.4,8.2,0.1,3,17,0.14,9,172,0.06,0,0.006,0.018,0.295,0.233,0.067,23,0,32.9,0,0.16,3.5,0,0
+quince:1.9,,0.01,4,11,0.7,8,197,0.04,2,0.02,0.03,0.2,0.081,0.04,3,0,15,0,,,0,0
+avocado:6.7,0.7,2.13,7,12,0.55,29,485,0.64,7,0.067,0.13,1.738,1.389,0.257,81,0,10,0,2.07,21,0,0
+raisin:3.7,59.2,0.06,11,50,1.88,32,749,0.22,0,0.106,0.125,0.766,0.095,0.174,5,0,2.3,0,0.12,3.5,0,0
+dapricot:7.3,53.4,0.02,10,55,2.66,32,1162,0.39,180,0.015,0.074,2.589,0.516,0.143,10,0,1,0,4.33,3.1,0,0
+dates:6.7,66.5,0,1,64,0.9,54,696,0.44,7,0.05,0.06,1.61,0.805,0.249,15,0,0,0,,2.7,0,0
+tomato:1.2,2.6,0.03,5,10,0.27,11,237,0.17,42,0.037,0.019,0.594,0.089,0.08,15,0,13.7,0,0.54,7.9,0,0
+cucumber:0.5,1.7,0.04,2,16,0.28,13,147,0.2,5,0.027,0.033,0.098,0.259,0.04,7,0,2.8,0,0.03,16.4,0,0
+potato:2.1,0.8,0.03,6,12,0.81,23,425,0.3,0,0.081,0.032,1.061,0.295,0.298,15,0,19.7,0,0.01,2,0,0
+potatob:2,0.9,0.03,5,8,0.31,20,328,0.27,0,0.098,0.019,1.312,0.509,0.269,10,0,7.4,0,0.01,2.1,0,0
+fries:3.8,0.3,2.3,210,18,0.81,37,579,0.5,0,0.1,0.05,2.9,0.5,0.37,30,0,4.7,0,1.5,15,0,0
+carrot:2.8,4.7,0.04,69,33,0.3,12,320,0.24,835,0.066,0.058,0.983,0.273,0.138,19,0,5.9,0,0.66,13.2,0,0
+onion:1.7,4.2,0.04,4,23,0.21,10,146,0.17,0,0.046,0.027,0.116,0.123,0.12,19,0,7.4,0,0.02,0.4,0,0
+garlic:2.1,1,0.09,17,181,1.7,25,401,1.16,0,0.2,0.11,0.7,0.596,1.235,3,0,31.2,0,0.08,1.7,0,0
+cabbage:2.5,3.2,0.03,18,40,0.47,12,170,0.18,5,0.061,0.04,0.234,0.212,0.124,43,0,36.6,0,0.15,76,0,0
+cauliflower:2,1.9,0.13,30,22,0.42,15,299,0.27,0,0.05,0.06,0.507,0.667,0.184,57,0,48.2,0,0.08,15.5,0,0
+broccoli:2.6,1.7,0.04,33,47,0.73,21,316,0.41,31,0.071,0.117,0.639,0.573,0.175,63,0,89.2,0,0.78,101.6,0,0
+eggplant:3,3.5,0.03,2,9,0.23,14,229,0.16,1,0.039,0.037,0.649,0.281,0.084,22,0,2.2,0,0.3,3.5,0,0
+bellpepper:2.1,4.2,0.03,4,7,0.43,12,211,0.25,157,0.054,0.085,0.979,0.317,0.291,46,0,127.7,0,1.58,4.9,0,0
+chili:1.5,5.3,0.04,9,14,1.03,23,322,0.26,48,0.072,0.086,1.244,0.201,0.506,23,0,143.7,0,0.69,14,0,0
+zucchini:1,2.5,0.08,8,16,0.37,18,261,0.32,10,0.045,0.094,0.451,0.204,0.163,24,0,17.9,0,0.12,4.3,0,0
+pumpkin:0.5,2.8,0.05,1,21,0.8,12,340,0.32,426,0.05,0.11,0.6,0.298,0.061,16,0,9,0,1.06,1.1,0,0
+beet:2.8,6.8,0.03,78,16,0.8,23,325,0.35,2,0.031,0.04,0.334,0.155,0.067,109,0,4.9,0,0.04,0.2,0,0
+spinach:2.2,0.4,0.06,79,99,2.71,79,558,0.53,469,0.078,0.189,0.724,0.065,0.195,194,0,28.1,0,2.03,482.9,0,0
+lettuce:1.3,0.8,0.02,28,36,0.86,13,194,0.18,370,0.07,0.08,0.375,0.134,0.09,38,0,9.2,0,0.22,126.3,0,0
+radish:1.6,1.9,0.01,39,25,0.34,10,233,0.28,0,0.012,0.039,0.254,0.165,0.071,25,0,14.8,0,0,1.3,0,0
+mushroom:1,2,0.05,5,3,0.5,9,318,0.52,0,0.081,0.402,3.607,1.497,0.104,17,0.04,2.1,0.2,0.01,0,0,0
+corn:2,6.3,0.33,15,2,0.52,37,270,0.46,9,0.155,0.055,1.77,0.717,0.093,42,0,6.8,0,0.07,0.3,0,0
+peas:5.1,5.7,0.07,5,25,1.47,33,244,1.24,38,0.266,0.132,2.09,0.104,0.169,65,0,40,0,0.13,24.8,0,0
+greenbean:2.7,3.3,0.05,6,37,1.03,25,211,0.24,35,0.082,0.104,0.734,0.225,0.141,33,0,12.2,0,0.41,43,0,0
+parsley:3.3,0.9,0.13,56,138,6.2,50,554,1.07,421,0.086,0.098,1.313,0.4,0.09,152,0,133,0,0.75,1640,0,0
+cilantro:2.8,0.9,0.01,46,67,1.77,26,521,0.5,337,0.067,0.162,1.114,0.57,0.149,62,0,27,0,2.5,310,0,0
+olive:3.2,0,1.42,735,88,3.3,4,8,0.22,20,0.003,0,0.037,0.015,0.009,0,0,0.9,0,1.65,1.4,0,0
+buckwheat:10,,0.74,1,18,2.2,231,460,2.4,0,0.101,0.425,7.02,1.233,0.21,30,0,0,0,0.32,,0,0
+buckwheatc:2.7,0.9,0.13,4,7,0.8,51,88,0.61,0,0.04,0.039,0.94,0.359,0.077,14,0,0,0,0.09,1.9,0,0
+rice:1.3,0.1,0.18,5,28,0.8,25,115,1.09,0,0.07,0.049,1.6,1.014,0.164,8,0,0,0,0.11,0.1,0,0
+ricec:0.4,0.1,0.08,1,10,0.2,12,35,0.49,0,0.02,0.013,0.4,0.39,0.093,3,0,0,0,0.04,0,0,0
+oats:10.6,1,1.11,2,54,4.72,177,429,3.97,0,0.763,0.139,0.961,1.349,0.119,56,0,0,0,0.42,2,0,0
+oatmeal:1.7,0.3,0.31,4,9,0.9,27,70,1,0,0.08,0.02,0.23,0.2,0.01,6,0,0,0,0.08,0.3,0,0
+pasta:3.2,2.7,0.28,6,21,1.3,53,223,1.41,0,0.09,0.06,1.7,0.43,0.142,18,0,0,0,0.11,0.1,0,0
+pastac:1.8,0.6,0.18,1,7,0.5,18,44,0.51,0,0.02,0.02,0.4,0.112,0.049,7,0,0,0,0.06,0.1,0,0
+bulgur:12.5,0.4,0.23,17,35,2.46,164,410,1.93,1,0.232,0.115,5.114,1.045,0.342,27,0,0,0,0.06,1.9,0,0
+bulgurc:4.5,0.1,0.04,5,10,0.96,32,68,0.57,0,0.057,0.028,1,0.344,0.083,18,0,0,0,0.01,0.5,0,0
+quinoa:7,,0.71,5,47,4.57,197,563,3.1,1,0.36,0.318,1.52,0.772,0.487,184,0,0,0,2.44,,0,0
+quinoac:2.8,0.9,0.23,7,17,1.49,64,172,1.09,0,0.107,0.11,0.412,,0.123,42,0,0,0,0.63,,0,0
+cornmeal:7.3,0.6,0.51,35,6,3.45,127,287,1.82,11,0.385,0.201,3.632,0.425,0.304,25,0,0,0,0.42,0.3,0,0
+flour:2.7,0.3,0.16,2,15,1.17,22,107,0.7,0,0.12,0.04,1.25,0.438,0.044,26,0,0,0,0.06,0.3,0,0
+semolina:3.9,,0.15,1,17,1.23,47,186,1.05,0,0.28,0.08,3.31,0.58,0.103,72,0,0,0,0.26,,0,0
+barley:15.6,0.8,0.24,9,29,2.5,79,280,2.13,1,0.191,0.114,4.604,0.282,0.26,23,0,0,0,0.02,2.2,0,0
+millet:8.5,,0.72,5,8,3.01,114,195,1.68,0,0.421,0.29,4.72,0.848,0.384,85,0,0,0,0.05,0.9,0,0
+bread:2.4,3,0.6,480,25,1.2,25,120,0.8,0,0.12,0.07,1.5,0.4,0.07,30,0,0,0,0.2,0.3,0,0
+ryebread:5.8,3.9,0.63,600,73,1.6,40,166,1.14,1,0.2,0.1,1.5,0.44,0.075,50,0,0.4,0,0.33,1.2,0,0
+wholebread:6,4.4,0.7,450,100,2.5,75,250,1.8,0,0.4,0.16,4.4,0.6,0.2,42,0,0,0,0.35,7.8,0,0
+lavash:2.4,2,0.3,450,25,1.2,25,120,0.8,0,0.12,0.07,1.5,0.4,0.07,30,0,0,0,0.2,0.3,0,0
+beans:15.2,2.2,0.12,12,83,6.69,138,1359,2.79,0,0.529,0.219,2.06,0.78,0.397,394,0,4.5,0,0.21,19,0,0
+beansc:6.4,0.3,0.07,1,35,2.94,45,405,1,0,0.16,0.058,0.578,0.22,0.12,130,0,1.2,0,0.03,8.4,0,0
+lentil:10.7,2,0.15,6,35,6.51,47,677,3.27,2,0.873,0.211,2.605,2.14,0.54,479,0,4.5,0,0.49,5,0,0
+lentilc:7.9,1.8,0.05,2,19,3.33,36,369,1.27,0,0.169,0.073,1.06,0.638,0.178,181,0,1.5,0,0.11,1.7,0,0
+chickpea:12.2,10.7,0.6,24,105,6.24,115,875,2.76,3,0.477,0.212,1.541,1.588,0.535,557,0,4,0,0.82,9,0,0
+chickpeac:7.6,4.8,0.27,7,49,2.89,48,291,1.53,1,0.116,0.063,0.526,0.286,0.139,172,0,1.3,0,0.35,4,0,0
+chbreast:0,0,0.56,45,5,0.37,28,334,0.68,9,0.094,0.177,10.43,1.5,0.811,4,0.21,0,0.1,0.56,0,9,73
+chbreastc:0,0,1.01,74,15,1.04,29,256,1,6,0.07,0.114,13.71,0.97,0.6,4,0.34,0,0.1,0.27,0.3,10,85
+chthigh:0,0,4.8,84,9,0.73,20,215,1.44,48,0.07,0.15,5.06,1.04,0.33,7,0.31,0,0.2,0.27,2.6,9,95
+turkey:0,0,0.4,50,11,0.7,32,293,1.3,0,0.06,0.12,10.2,0.68,0.8,7,0.4,0,0.2,0.09,0,,60
+beef:0,0,2.3,66,6,2.3,21,341,4.8,0,0.04,0.18,5.9,0.6,0.5,7,2.2,0,0.1,0.2,1,1,62
+beefmince:0,0,7.6,66,18,1.94,17,270,4.18,0,0.044,0.152,4.2,0.6,0.3,7,2.14,0,0.1,0.18,1.8,1,71
+pork:0,0,5.2,62,15,0.8,21,330,2,2,0.7,0.24,4.8,0.8,0.45,4,0.6,0.6,0.5,0.2,0,2,70
+lamb:0,0,10.2,59,16,1.55,21,222,3.4,0,0.11,0.21,5.96,0.65,0.13,18,2.31,0,0.1,0.2,3.6,,73
+chliver:0,0,1.56,71,8,8.99,19,230,2.67,3296,0.305,1.778,9.728,6.233,0.853,588,16.58,17.9,0,0.7,0,14,345
+salmon:0,0,3.05,59,9,0.34,27,363,0.36,58,0.34,0.13,8.67,1.55,0.64,26,3.23,3.9,11,3.55,0.1,,55
+trout:0,0,1.81,51,67,0.3,31,450,0.5,73,0.12,0.1,4.5,1.1,0.4,13,4.2,2.9,15.9,2.3,,,59
+tuna:0,0,0.23,247,11,1.6,27,237,0.77,17,0.032,0.074,13.28,0.214,0.35,4,2.99,0,1.7,0.33,0,,36
+shrimp:0,0,0.1,119,64,0.21,22,113,0.97,0,0.02,0.015,1.778,0.36,0.161,19,1.11,0,0,1.32,0,,161
+egg:0,0.4,3.13,142,56,1.75,12,138,1.29,160,0.04,0.457,0.075,1.533,0.17,47,0.89,0,2,1.05,0.3,5.6,372
+eggwhite:0,0.7,0,166,7,0.08,11,163,0.03,0,0.004,0.439,0.105,0.19,0.005,4,0.09,0,0,0,0,0,0
+milk32:0,5.1,1.87,43,113,0.03,10,132,0.37,46,0.046,0.169,0.089,0.373,0.036,5,0.45,0,0.1,0.07,0.3,0.8,10
+milk2:0,5,1.26,44,120,0.03,11,140,0.48,28,0.04,0.18,0.09,0.36,0.04,5,0.47,0.2,0.1,0.03,0.2,0.5,8
+matsoni:0,4.7,2.1,46,121,0.05,12,155,0.59,27,0.029,0.142,0.075,0.389,0.032,7,0.37,0.5,0.1,0.06,0.2,1,13
+kefir:0,4,1.6,40,120,0.1,12,150,0.4,22,0.03,0.17,0.15,0.3,0.05,8,0.4,0.7,0.1,0.06,0.2,1,8
+greekyog:0,3.2,0.12,36,110,0.07,11,141,0.52,1,0.023,0.278,0.208,0.331,0.063,7,0.75,0,0,0.01,0,,5
+cottage5:0,1.8,3.2,41,164,0.4,23,112,0.4,40,0.04,0.27,0.3,0.28,0.11,35,1.2,0.5,0.1,0.1,,,15
+cottage9:0,2,5.5,41,164,0.4,23,112,0.4,60,0.04,0.27,0.4,0.28,0.11,35,1.32,0.5,0.1,0.2,,,32
+imeruli:0,0.5,12,700,400,0.3,20,100,2.5,170,0.04,0.3,0.1,0.4,0.1,30,1.2,0,0.3,0.3,1.5,,60
+sulguni:0,0.4,14,1000,500,0.4,20,80,2.8,180,0.03,0.28,0.1,0.14,0.04,7,2.3,0,0.4,0.2,2.3,,80
+hardcheese:0,2.2,17.6,819,700,0.24,29,121,3.9,165,0.03,0.334,0.063,0.34,0.08,21,1.54,0,0.5,0.24,2.3,50,116
+sourcream:0,3,11.7,40,85,0.1,10,125,0.3,160,0.03,0.1,0.1,0.3,0.03,8,0.3,0.5,0.2,0.5,1.3,,60
+butter:0,0.1,51.4,11,24,0.02,2,24,0.09,684,0.005,0.034,0.042,0.11,0.003,3,0.17,0,1.5,2.32,7,15,215
+walnut:6.7,2.6,6.13,2,98,2.91,158,441,3.09,1,0.341,0.15,1.125,0.57,0.537,98,0,1.3,0,0.7,2.7,0,0
+hazelnut:9.7,4.3,4.46,0,114,4.7,163,680,2.45,1,0.643,0.113,1.8,0.918,0.563,113,0,6.3,0,15.03,14.2,0,0
+almond:12.5,4.4,3.8,1,269,3.71,270,733,3.12,0,0.205,1.138,3.618,0.471,0.137,44,0,0,0,25.63,0,0,0
+peanut:8.5,4.7,6.28,18,92,4.58,168,705,3.27,0,0.64,0.135,12.07,1.767,0.348,240,0,0,0,8.33,0,0,0
+sunseed:8.6,2.6,4.46,9,78,5.25,325,645,5,3,1.48,0.355,8.335,1.13,1.345,227,0,1.4,0,35.17,0,0,0
+pumpseed:6,1.4,8.66,7,46,8.82,592,809,7.81,1,0.273,0.153,4.987,0.75,0.143,58,0,1.9,0,2.18,7.3,0,0
+pistachio:10.6,7.7,5.9,1,105,3.92,121,1025,2.2,26,0.87,0.16,1.3,0.52,1.7,51,0,5.6,0,2.86,0,0,0
+cashew:3.3,5.9,7.78,12,37,6.68,292,660,5.78,0,0.423,0.058,1.062,0.864,0.417,25,0,0.5,0,0.9,34.1,0,0
+pbutter:6,9.2,10.3,400,43,1.9,154,649,2.5,0,0.08,0.1,13.1,1.1,0.44,87,0,0,0,9.1,0.3,0,0
+sunoil:0,0,10.3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,41.08,5.4,0,0
+oliveoil:0,0,13.8,2,1,0.56,0,1,0,0,0,0,0,0,0,0,0,0,0,14.35,60.2,0,0
+sugar:0,99.8,0,1,1,0.05,0,2,0.01,0,0,0.019,0,0,0,0,0,0,0,0,0,0,0
+honey:0.2,82.1,0,4,6,0.42,2,52,0.22,0,0,0.038,0.121,0.068,0.024,2,0,0.5,0,0,0,0,0
+jam:1.1,48.5,0.02,32,20,0.49,4,77,0.07,0,0,0.03,0.04,0,0.02,14,0,8.8,0,0.12,0.6,0,0
+darkchoc:10.9,24,24.5,20,73,11.9,228,715,3.31,2,0.034,0.078,1.054,0.418,0.038,0,0.28,0,0,0.59,7.3,,3
+milkchoc:3.4,51.5,18.5,79,189,2.35,63,372,2.3,50,0.112,0.298,0.386,0.5,0.036,11,0.75,0,0,0.51,5.7,,23
+tomatopaste:4.1,12.2,0.08,59,36,2.98,42,1014,0.63,76,0.06,0.153,3.076,0.142,0.216,12,0,21.9,0,4.3,11.4,0,0
+mayo:0,0.6,11.7,635,8,0.21,1,20,0.17,54,0.01,0.019,0.003,0,0.008,5,0.12,0,0.2,3.28,163,,42
+ketchup:0.3,21.3,0.02,907,15,0.35,13,281,0.17,26,0.011,0.166,1.434,0.143,0.158,9,0,4.1,0,1.46,3,0,0
+egg_boiled:0,1.1,3.27,124,50,1.19,10,126,1.05,149,0.066,0.513,0.064,1.398,0.121,44,1.11,0,2.2,1.03,0.3,5.6,373
+egg_fried:0,0.4,4.3,207,62,1.89,13,152,1.21,216,0.044,0.495,0.075,1.432,0.184,51,0.97,0,2.2,1.31,,5.6,401
+omelet:0,0.3,3.2,155,48,1.48,11,117,1.07,170,0.05,0.4,0.07,1.2,0.14,39,0.8,0,1.7,1.1,,,313
+scrambled:0,1.4,3.3,145,66,1.31,12,132,1.04,147,0.04,0.42,0.08,1,0.13,30,0.8,0,1.7,1.1,,,277
+chliverf:0,0,2,92,11,12.9,25,313,4,4300,0.29,2.31,13.6,6.6,0.75,560,17,,0,0.8,0,14,564
+chliverb:0,0,2.1,76,11,11.6,25,263,3.99,3981,0.29,1.99,11.04,5.4,0.76,578,16.85,27.9,0,0.82,0,14,563
+bliverf:0,0,1.54,77,6,6.17,22,351,5.3,7744,0.18,3.425,17.525,7.11,1.03,260,83.13,0.7,1.2,0.46,3.9,,381
+chdrum:0,0,3.1,90,12,1.33,23,229,2.79,24,0.069,0.204,6.035,1.21,0.37,8,0.4,0,0.2,0.27,2.4,10,91
+chthighr:0,0,4.1,84,12,1.3,22,222,2.3,48,0.07,0.21,6.4,1.2,0.34,7,0.3,0,0.2,0.27,2.4,10,132
+beefpatty:0,0,6.8,75,24,2.6,21,318,6.3,0,0.05,0.18,5.4,0.6,0.37,10,2.6,0,0.1,0.42,1.3,1,90
+salmonb:0,0,2.5,61,15,0.34,30,384,0.43,69,0.34,0.14,8,1.5,0.65,34,2.8,3.7,13.1,3.5,0.1,,63
+troutb:0,0,2.2,61,86,0.4,32,450,0.5,86,0.24,0.08,8.8,1.1,0.4,24,5,3.3,15,,,,68
+mashed:1.5,1.4,2.6,317,24,0.26,19,296,0.31,39,0.09,0.04,1.18,0.5,0.23,8,0.05,10.5,0.1,0.06,2,,11
+bakedpot:2.2,1.2,0.03,10,15,1.08,28,535,0.36,1,0.064,0.048,1.41,0.376,0.311,28,0,9.6,0,0.04,2,0,0
+broccolib:3.3,1.4,0.08,41,40,0.67,21,293,0.45,77,0.063,0.123,0.553,0.616,0.2,108,0,64.9,0,1.45,141.1,0,0
+carrotb:3,3.5,0.03,58,30,0.34,10,235,0.2,852,0.066,0.044,0.645,0.232,0.153,14,0,3.6,0,1.03,13.7,0,0
+beetb:2,8,0.03,77,16,0.79,23,305,0.35,2,0.027,0.04,0.331,0.145,0.067,80,0,3.6,0,0.04,0.2,0,0
+spinachb:2.4,0.4,0.04,70,136,3.57,87,466,0.76,524,0.095,0.236,0.49,0.145,0.242,146,0,9.8,0,2.08,493.6,0,0
+feta:0,4.1,14.9,1116,493,0.65,19,62,2.88,125,0.15,0.84,0.99,0.97,0.42,32,1.69,0,0.4,0.18,1.8,,89
+brynza:0,,13,1200,530,,,,,,,,,,,,,,,,,,70
+mozzarella:0,1,13.2,627,505,0.44,20,76,2.92,179,,0.28,,,,,2.28,,0.4,0.19,2.3,,79
+cheddar:0,0.5,21.1,621,721,0.68,28,98,3.11,265,,0.38,,,,,0.83,,0.6,0.29,2.8,,105
+parmesan:0,0.9,16.4,1600,1184,0.82,44,92,2.75,207,,,,,,,1.2,,,,,,68
+brie:0,0.5,17.4,629,184,0.5,20,152,2.38,173,,0.52,,,,,1.65,,,,,,100
+ricotta:0,0.3,8.3,84,207,0.38,11,105,1.16,120,,,,,,,0.34,,,,,,51
+cottagecheese:0,2.7,1.7,364,83,,,104,0.4,37,,,,,,,0.43,,,,,,17
+creamcheese:0,3.8,20.2,314,97,,,132,,308,,,,,,,,,,,,,101
+mascarpone:0,4,30,40,100,,,,,,,,,,,,,,,,,,120
+pkhali_sp:3.0,1,1.2,300,85,2.3,85,430,,330,,,,,,120,,6,,1.6,340,,0
+pkhali_bt:2.7,6,1.1,300,30,1.1,45,330,,,,,,,,70,,3,,,,,0
+pkhali_gb:3.2,2.5,1.1,300,45,1.0,45,230,,25,,,,,,,,6,,,30,,0
+lobio_ge:5.6,0.6,0.5,300,32,2.6,40,360,,,,,,,,110,,,,,,,0
+lobiani:4.5,1.5,1.5,450,,,,,,,,,,,,,,,,,,,5
+khach_im:1.0,1.5,7.5,600,180,,,,,,,,,,,,,,,,,,35
+khach_me:0.9,1.5,9,650,220,,,,,,,,,,,,,,,,,,45
+khach_aj:0.9,1.5,10,550,170,,,,,,,,,,,,,,,,,,120
+khinkali:1.0,0.8,3.6,450,,1.5,,,2.0,,,,,,,,0.9,,,,,,35
+mtsvadi_p:0,0,8,400,,1.3,,,3.5,,0.6,,,,,,0.7,,,,,,90
+mtsvadi_c:0,0,2.7,350,,1.2,,,2.2,,,,8,,,,0.3,,,,,,95
+kababi:0.3,1,8.5,500,,2.2,,,4,,,,,,,,2,,,,,,75
+chakhokhbili:1.0,3,2.3,350,,,,,,,,,,,,,,8,,,,,55
+chakapuli:0.8,1,4.5,350,,,,,,,,,,,,,,,,,,,45
+ostri:1,3,3.5,400,,1.7,,,,,,,,,,,,,,,,,40
+satsivi:1.8,1,2.5,350,,,,,,,,,,,,,,,,,,,50
+ajapsandali:2.5,4.5,0.8,300,,,,,,60,,,,,,,,15,,,,,0
+badrijani_n:3,3.5,2.4,300,,,,,,,,,,,,,,,,,,,0
+chikhirtma:0.2,0.5,1.2,400,,,,,,,,,,,,,,,,,,,60
+kharcho:0.8,1.2,1.8,400,,,,,,,,,,,,,,,,,,,15
+mchadi:4.5,0.4,0.3,300,,2.1,79,177,,,,,,,,,,,,,,,0
+ghomi:1.6,0.1,0.1,5,,,,,,,,,,,,,,,,,,,0
+churchkhela:2.5,45,1.9,10,,,,,,,,,,,,,,,,,,,0
+gozinaki:2.5,35,3.6,5,,,,,,,,,,,,,,,,,,,0
+tkemali:1.5,7,0,500,,,,,,,,,,,,,,5,,,,,0
+ojuice:0.2,8.4,0,1,,,,200,,,,,,,,30,,50,,,,,0
+ajuice:0.2,9.6,0,4,,,,101,,,,,,,,,,0.9,,,,,0
+cola:0,10.6,0,4,,,,,,,,,,,,,,,,,,,0
+lemonade:0,11,0,5,,,,,,,,,,,,,,,,,,,0
+coffee:0,0,0,2,,,3,49,,,,,0.2,,,,,,,,,,0
+cappuccino:0,2.5,1,30,60,,,,,,,,,,,,,,,,,,5
+tea:0,0,0,3,,,,9,,,,,,,,,,,,,,,0
+beer:0,0,0,4,,,,27,,,,,0.5,,,,,,,,,,0
+wine_r:0,0.6,0,4,,,,127,,,,,,,,,,,,,,,0
+wine_w:0,1,0,5,,,,71,,,,,,,,,,,,,,,0
+chacha:0,0,0,1,,,,,,,,,,,,,,,,,,,0
+sausage:0,1.5,9.8,1000,,,,,1.6,,,,,,,,1.3,,,,,,70
+ham:0,1,3,1200,,,,,,,0.6,,,,,,,,,,,,57
+salami:0,1,12,1800,,,,,,,,,,,,,,,,,,,90
+pizza:2.3,3.6,4.5,600,200,,,,,,,,,,,,,,,,,,17
+shawarma:1.5,2,2.5,550,,,,,,,,,,,,,,,,,,,35
+burger:1.5,5,4,500,,,,,,,,,,,,,,,,,,,35
+icecream:0.7,21,6.8,80,128,,,,,118,,,,,,,,,,,,,44
+maria:2,22,5,300,,,,,,,,,,,,,,,,,,,
+chips:4.4,0.3,3.4,525,,,,1275,,,,,,,,,,,,,,,0
+halva:3,40,3.5,50,,,,,,,,,,,,,,,,,,,0
+cornflakes:3.3,9.5,0.1,700,,,,,,,,,,,,,,,,,,,0
+muesli:7.3,26,1,200,,,,,,,,,,,,,,,,,,,0
+tofu:0.3,0.6,0.7,7,350,5.4,30,,,,,,,,,,,,,,,,0
+mackerel:0,0,3.3,90,,1.6,,,,,,,,,,,8.7,,16.1,,,,70
+ad_agro_satsebeli:,3.48,0,600,,,,,,,,,,,,,,,,,,,0
+ad_agro_tkemali:,2.69,0,600,,,,,,,,,,,,,,,,,,,0
+ad_castello_beans:10,2,0,240,,,,,,,,,,,,,,,,,,,0`;
+  MICRO_DATA.trim().split('\n').forEach(line => {
+    const [id, vals] = line.split(':');
+    if (!FOODS[id]) return;
+    const m = {};
+    vals.split(',').forEach((v, i) => { if (v.trim() !== '') m[MICRO_ORDER[i]] = +v; });
+    FOODS[id].per100.m = m;
+  });
+  // omega-3: EPA+DHA (mg) and plant ALA (g) per 100 g, approximate USDA values
+  const OMEGA3 = {
+    salmon: { o3: 1970 }, salmonb: { o3: 2150 }, trout: { o3: 940 }, troutb: { o3: 1150 }, tuna: { o3: 240 }, shrimp: { o3: 70 },
+    egg: { o3: 40 }, egg_boiled: { o3: 40 }, egg_fried: { o3: 40 }, omelet: { o3: 30 }, scrambled: { o3: 30 },
+    walnut: { ala: 9.1 }, oliveoil: { ala: 0.76 }, butter: { ala: 0.32 }, pistachio: { ala: 0.25 }, spinach: { ala: 0.14 },
+    avocado: { ala: 0.11 }, hazelnut: { ala: 0.09 },
+    mackerel: { o3: 2300 }, satsivi: { ala: 2.2 }, churchkhela: { ala: 2.7 }, gozinaki: { ala: 4.5 },
+    pkhali_sp: { ala: 1.6 }, pkhali_bt: { ala: 1.6 }, pkhali_gb: { ala: 1.6 }, badrijani_n: { ala: 1.5 }
+  };
+  Object.keys(OMEGA3).forEach(id => { if (FOODS[id]) FOODS[id].per100.m = Object.assign(FOODS[id].per100.m || {}, OMEGA3[id]); });
+  const scaleMicro = (m, k) => {
+    if (!m) return undefined;
+    const o = {}; Object.keys(m).forEach(key => { o[key] = m[key] * k; }); return o;
+  };
+  const fmtN = v => v >= 100 ? String(Math.round(v)) : v >= 1 ? String(r1(v)) : String(Math.round(v * 100) / 100);
+  // rows: [{key, val, partial}] → HTML
+  function nutRowsHTML(vals, partialMap, showEmpty) {
+    let html = '';
+    NUT_GROUPS.forEach(([g, gl]) => {
+      const rows = NUTS.filter(n => n[5] === g && (vals[n[0]] != null || showEmpty));
+      if (!rows.length) return;
+      html += `<div class="nutgrp">${gl}</div>`;
+      rows.forEach(([key, label, unit, ref, kind]) => {
+        const v = vals[key];
+        const has = v != null;
+        const pct = has && ref ? v / ref * 100 : null;
+        const cls = kind === 'max' ? 'lim' : (pct != null && pct >= 100 ? 'good' : '');
+        const part = partialMap && partialMap[key] ? ` <span class="part">${partialMap[key]}</span>` : '';
+        html += `<div class="nrow ${cls}"><span>${label}${part}</span>
+          <span class="nv">${has ? fmtN(v) : '—'} <small>${unit}${pct != null ? ' · ' + Math.round(pct) + '%' + (kind === 'max' ? ' ლიმიტის' : '') : ''}</small></span>
+          ${pct != null ? `<div class="bar${kind === 'max' && pct > 100 ? ' over' : ''}"><i style="width:${Math.min(100, pct)}%"></i></div>` : ''}</div>`;
+      });
+    });
+    return html;
+  }
+
+  // ---------- Product score (0–10), Nutri-Score-style + processing & additives ----------
+  const SWEETENERS = new Set(['E420','E421','E950','E951','E952','E954','E955','E957','E959','E960','E960A','E960B','E960C','E961','E962','E964','E965','E966','E967','E968','E969']);
+  const ADD_INFO = [
+    [/^E25[0-2]$|^E249$/, 'ნიტრიტი/ნიტრატი (კონსერვანტი)', 'გადამუშავებული ხორცის ხშირი მოხმარება კიბოს რისკის მატებასთანაა დაკავშირებული', 1],
+    [/^E171$/, 'ტიტანის დიოქსიდი (საღებავი)', 'ევროკავშირში საკვებში 2022 წლიდან აკრძალულია', 1],
+    [/^E10[24]$|^E110$|^E12[249]$/, 'სინთეზური საღებავი', 'ევროკავშირში ეტიკეტზე სავალდებულო გაფრთხილებაა: შეიძლება იმოქმედოს ბავშვების აქტიურობასა და ყურადღებაზე', 0.5],
+    [/^E951$/, 'ასპარტამი', 'WHO-ს კიბოს კვლევის სააგენტომ „შესაძლო კანცეროგენად“ (2B) შეაფასა; დასაშვები დღიური დოზა არ შეცვლილა', 0.5],
+    [/^E407A?$/, 'კარაგენანი (შემასქელებელი)', 'ნაწლავებზე გავლენა სადავოა', 0.3],
+    [/^E32[01]$/, 'BHA/BHT (ანტიოქსიდანტი)', 'უსაფრთხოება სადავოა', 0.5],
+    [/^E211$/, 'ნატრიუმის ბენზოატი', 'C ვიტამინთან ერთად შეიძლება მცირე რაოდენობით ბენზოლი წარმოქმნას', 0.3],
+    [/^E22[0-8]$/, 'სულფიტები', 'ასთმიან და მგრძნობიარე ადამიანებში რეაქციას იწვევს', 0.3],
+    [/^E433$|^E466$/, 'ემულგატორი', 'ცხოველებზე კვლევებში ნაწლავის მიკრობიომზე გავლენა აჩვენა', 0.3],
+    [/^E621$/, 'გლუტამატი (გემოს გამაძლიერებელი)', 'ზოგადად უსაფრთხოდ ითვლება', 0]
+  ];
+  const pts = (v, th) => th.reduce((n, t) => n + (v > t ? 1 : 0), 0);
+  function scoreProduct(prod) {
+    const x = prod.per100 || {}, m = x.m || {}, meta = prod.meta || {};
+    const drink = !!meta.drink;
+    const pros = [], cons = [], notes = [], minor = [];
+    const sug = m.sug, sfa = m.sfa, na = m.na, fib = m.fib;
+    const fatGood = !drink && x.f >= 30 && sfa != null && sfa / x.f <= 0.25;
+    let missing = 0;
+    // negative points
+    let neg = 0;
+    const eTh = drink ? [7, 21, 36, 50, 57, 64, 72, 79, 86] : [80, 160, 240, 320, 400, 480, 560, 640, 720, 800];
+    let eP = pts(x.kcal || 0, eTh); if (fatGood) eP = Math.floor(eP / 2);
+    neg += eP;
+    if (sug != null) neg += pts(sug, drink ? [0.5, 2, 3.5, 5, 6, 7, 8, 9, 10, 11] : [3.4, 6.8, 10, 14, 17, 20, 24, 27, 31, 34, 37, 41, 44, 48, 51]);
+    else if (x.c > 5) missing++;
+    if (sfa != null) neg += fatGood || (x.f >= 30) ? pts(sfa / x.f * 100, [10, 16, 22, 28, 34, 40, 46, 52, 58, 64]) : pts(sfa, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    else if (x.f > 3) missing++;
+    if (na != null) neg += pts(na * 2.5 / 1000, [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.2, 3.4, 3.6, 3.8, 4]);
+    else missing++;
+    // positive points
+    let pos = 0;
+    const protP = pts(x.p || 0, [1.6, 3.2, 4.8, 6.4, 8]);
+    const fibP = fib != null ? pts(fib, [0.9, 1.9, 2.8, 3.7, 4.7]) : 0;
+    pos += fibP;
+    if (neg < 11 || drink || prod.cat === 'ch') pos += protP; // cheese: protein always counts (as in Nutri-Score)
+    const raw = neg - pos;
+    let sc;
+    if (drink) sc = meta.water || ((x.kcal || 0) <= 1 && (sug || 0) === 0) ? 10 : raw <= 0 ? 9.5 : 9 - raw * 0.6;
+    else sc = raw < 0 ? 9 + Math.min(1, -raw * 0.2) : 9 - raw * 0.35;
+
+    // processing & additives
+    const add = meta.add || [];
+    if (meta.pmeat) { sc -= 1.5; cons.push('გადამუშავებული ხორცი — ხშირი მოხმარება ნაწლავის კიბოს რისკს ზრდის (WHO)'); }
+    if (meta.nova === 4) { sc -= 1; cons.push('ულტრადამუშავებული პროდუქტი (NOVA 4)'); }
+    else if (meta.nova === 1) { sc += 0.5; pros.push('მინიმალურად დამუშავებული (NOVA 1)'); }
+    if (meta.palm) { sc -= 0.5; cons.push('შეიცავს პალმის ზეთს'); }
+    const sw = add.filter(a => SWEETENERS.has(a));
+    if (sw.length) { sc -= 0.3; cons.push('შეიცავს დამატკბობლებს: ' + sw.join(', ')); }
+    let addPenalty = 0;
+    add.forEach(a => {
+      const hit = ADD_INFO.find(([re]) => re.test(a));
+      if (hit && hit[3] > 0) { addPenalty += hit[3]; cons.push(`${a} — ${hit[1]}: ${hit[2]}`); }
+    });
+    sc -= Math.min(2, addPenalty);
+    if (add.length >= 5) { sc -= 0.5; cons.push(`ბევრი დანამატი (${add.length})`); }
+    else if (prod.meta && add.length === 0 && meta.ingr) pros.push('დანამატების (E-ების) გარეშე');
+
+    // nutrient pros / cons
+    if (x.p >= 12) pros.push(`ძალიან ბევრი ცილა (${r1(x.p)} გ/100გ)`);
+    else if (x.p >= 8) pros.push(`ბევრი ცილა (${r1(x.p)} გ/100გ)`);
+    if (fib != null && fib >= 6) pros.push(`ბევრი ბოჭკო (${r1(fib)} გ)`);
+    else if (fib != null && fib >= 3) pros.push(`ბოჭკოს კარგი წყარო (${r1(fib)} გ)`);
+    if (fatGood) pros.push('ცხიმი ძირითადად უჯერია (სასარგებლო ცხიმები)');
+    if (sug != null) {
+      if (drink ? sug > 5 : sug > 22.5) cons.push(`ბევრი შაქარი (${r1(sug)} გ/100${drink ? 'მლ' : 'გ'})`);
+      else if (drink ? sug > 2.5 : sug > 10) cons.push(`საკმაოდ ბევრი შაქარი (${r1(sug)} გ)`);
+      else if (drink ? sug <= 2.5 : sug <= 5) minor.push(`ცოტა შაქარი (${r1(sug)} გ)`);
+    }
+    if (sfa != null && !fatGood) {
+      if (sfa > 5) cons.push(`ბევრი ნაჯერი ცხიმი (${r1(sfa)} გ)`);
+      else if (sfa <= 1.5 && x.f > 0.5) minor.push('ცოტა ნაჯერი ცხიმი');
+    }
+    if (na != null) {
+      const salt = r1(na * 2.5 / 1000);
+      if (na > 600) cons.push(`ბევრი მარილი (${salt} გ/100გ)`);
+      else if (na > 240) cons.push(`საშუალოზე მეტი მარილი (${salt} გ)`);
+      else if (na <= 120) minor.push('ცოტა მარილი');
+    }
+    if (!drink && x.kcal > 400) cons.push(`ძალიან კალორიული (${Math.round(x.kcal)} კკალ/100გ) — პორციას დააკვირდი`);
+    else if (!drink && x.kcal <= 80) minor.push('დაბალკალორიული');
+    if (m.chol != null && m.chol > 300) cons.push(`ბევრი ქოლესტერინი (${Math.round(m.chol)} მგ) — მნიშვნელოვანია, თუ ექიმმა ქოლესტერინის შეზღუდვა გირჩია`);
+    // vitamins & minerals that are a good source (≥ 20% of daily reference per 100 g)
+    const good = NUTS.filter(n => n[3] && n[4] !== 'max' && n[5] !== 'main' && m[n[0]] != null)
+      .map(n => [n[1], m[n[0]] / n[3]]).filter(([, r]) => r >= 0.2).sort((a, b) => b[1] - a[1]).slice(0, 4);
+    if (good.length) pros.push('კარგი წყაროა: ' + good.map(([l, r]) => `${l} (${Math.round(r * 100)}%)`).join(', '));
+
+    if (missing >= 2) notes.push('ეტიკეტზე ზოგი მონაცემი (შაქარი, ნაჯერი ცხიმი, მარილი) არ არის — ქულა მიახლოებითია.');
+    if (meta.ns && /^[a-e]$/.test(meta.ns)) notes.push('ოფიციალური Nutri-Score: ' + meta.ns.toUpperCase());
+    if (meta.alcohol) { sc = Math.min(sc, 2); cons.unshift('ალკოჰოლური სასმელი — კალორია ძირითადად ალკოჰოლიდან მოდის; ჯანმრთელობისთვის უსაფრთხო დოზა არ არსებობს (WHO)'); }
+    sc = Math.max(1, Math.min(10, Math.round(sc * 2) / 2));
+    if (sc >= 5) pros.push(...minor);
+    const [label, color] = sc >= 8 ? ['შესანიშნავი არჩევანი', '#16a34a'] : sc >= 6.5 ? ['კარგი არჩევანი', '#65a30d']
+      : sc >= 5 ? ['საშუალო — ზომიერად', '#ca8a04'] : sc >= 3 ? ['ცუდი — იშვიათად', '#ea580c'] : ['ჯობია მოერიდო', '#dc2626'];
+    return { sc, label, color, pros, cons, notes };
+  }
+  function scoreHTML(prod) {
+    const r = scoreProduct(prod);
+    const li = (arr, cls, ic) => arr.map(t => `<li class="${cls}"><b>${ic}</b><span>${esc(t)}</span></li>`).join('');
+    return `<div class="sc-top"><div class="sc-badge" style="background:${r.color}">${String(r.sc).replace('.', ',')}<small>/10</small></div>
+      <div><div class="sc-label" style="color:${r.color}">${r.label}</div><div class="muted" style="font-size:12px">შეფასება 100 გ-ზე: შემადგენლობა, დამუშავება, დანამატები</div></div></div>
+      <ul class="sc-list">${li(r.pros, 'pro', '✓')}${li(r.cons, 'con', '✗')}</ul>
+      ${!r.pros.length && !r.cons.length ? '<div class="nnote">გამორჩეული პლიუსი ან მინუსი არ აქვს.</div>' : ''}
+      ${r.notes.map(n => `<div class="nnote">${esc(n)}</div>`).join('')}`;
+  }
+
+  const FOOD_INGR = {"ad_agro_satsebeli": "პომიდორი 93.9%, ნიორი, მარილი, შაქარი, წითელი წიწაკა დაფქული, ხმელი ქინძი, უცხო სუნელი", "ad_agro_tkemali": "მწვანე ტყემალი 92.5%, ნიორი, შაქარი, მარილი, ნედლი ქინძი, წითელი წიწაკა დაღერღილი, ომბალო, კამა", "ad_castello_beans": "კანელინის მარცვლები, წყალი, მარილი"};
+  function getProduct(code) {
+    if (products[code]) return products[code];
+    if (code && code.startsWith('food-')) {
+      const x = FOODS[code.slice(5)];
+      if (x) return { name: x.name, brand: '', per100: x.per100, serving: null, piece: x.piece, pieceLabel: x.pieceLabel, img: '', source: 'builtin', cat: x.cat,
+        meta: { ingr: FOOD_INGR[x.id] || '', add: FOOD_INGR[x.id] ? [] : undefined, drink: x.cat === 'dr', alcohol: /^(beer|wine_r|wine_w|chacha)$/.test(x.id), pmeat: /^(sausage|ham|salami)$/.test(x.id) } };
+    }
+    return null;
+  }
+
+  const MONTHS = ['იანვარი','თებერვალი','მარტი','აპრილი','მაისი','ივნისი','ივლისი','აგვისტო','სექტემბერი','ოქტომბერი','ნოემბერი','დეკემბერი'];
+  const DAYS = ['კვირა','ორშაბათი','სამშაბათი','ოთხშაბათი','ხუთშაბათი','პარასკევი','შაბათი'];
+
+  // ---------- UI helpers ----------
+  let toastT;
+  function toast(msg) {
+    const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3200);
+  }
+  const loading = on => $('#loading').classList.toggle('show', on);
+  const openSheet = id => $(id).classList.add('open');
+  const closeSheet = id => $(id).classList.remove('open');
+  document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => closeSheet('#' + b.closest('.sheet').id)));
+  document.querySelectorAll('.sheet:not(#scanSheet)').forEach(s => s.addEventListener('click', e => { if (e.target === s) closeSheet('#' + s.id); }));
+
+  function setBar(id, val, goal) {
+    const el = $(id); const pct = goal > 0 ? val / goal * 100 : 0;
+    el.querySelector('i').style.width = Math.min(100, pct) + '%';
+    el.classList.toggle('over', pct > 100);
+  }
+
+  // ---------- Render ----------
+  function render() {
+    const key = dayKey(current);
+    const items = (log[key] || []).slice().sort((a, b) => b.t - a.t);
+    const tot = items.reduce((a, i) => ({ kcal: a.kcal + i.kcal, p: a.p + i.p, c: a.c + i.c, f: a.f + i.f }), { kcal: 0, p: 0, c: 0, f: 0 });
+
+    $('#dateLabel').textContent = dayLabel(current) || DAYS[current.getDay()];
+    $('#dateSub').textContent = `${current.getDate()} ${MONTHS[current.getMonth()]}`;
+    $('#nextDay').disabled = isToday(current);
+
+    $('#kcalVal').textContent = Math.round(tot.kcal);
+    $('#kcalGoal').textContent = goals.kcal;
+    const left = Math.round(goals.kcal - tot.kcal);
+    $('#kcalLeft').innerHTML = left >= 0 ? `დარჩა<br><b>${left}</b> კკალ` : `გადაჭარბება<br><b style="color:var(--over)">${-left}</b> კკალ`;
+    setBar('#kcalBar', tot.kcal, goals.kcal);
+    [['p', tot.p], ['c', tot.c], ['f', tot.f]].forEach(([k, v]) => {
+      $('#' + k + 'Val').textContent = r1(v);
+      $('#' + k + 'Goal').textContent = goals[k];
+      setBar('#' + k + 'Bar', v, goals[k]);
+    });
+
+    // water
+    const wml = water[key] || 0, wgoal = Math.round((goals.water || 0) * 1000);
+    $('#wVal').textContent = liters(wml);
+    $('#wGoal').textContent = liters(wgoal);
+    const wleft = wgoal - wml;
+    $('#wLeft').innerHTML = wgoal <= 0 ? '' : wleft > 0 ? `დარჩა<br><b>${liters(wleft)}</b> ლ` : `<b style="color:#16a34a">მიზანი შესრულდა ✓</b>`;
+    const wb = $('#wBar'); wb.querySelector('i').style.width = (wgoal > 0 ? Math.min(100, wml / wgoal * 100) : 0) + '%';
+    wb.classList.toggle('done', wgoal > 0 && wml >= wgoal);
+
+    // micronutrients for the day
+    const sums = {}, cnt = {};
+    items.forEach(i => { if (!i.m) return; Object.keys(i.m).forEach(k => { sums[k] = (sums[k] || 0) + i.m[k]; cnt[k] = (cnt[k] || 0) + 1; }); });
+    const partial = {};
+    Object.keys(sums).forEach(k => { if (cnt[k] < items.length) partial[k] = `(${cnt[k]}/${items.length})`; });
+    const sm = suppMicro(key), hasSupp = Object.keys(sm).length > 0;
+    Object.keys(sm).forEach(k => { sums[k] = (sums[k] || 0) + sm[k]; delete partial[k]; });
+    renderSupps(key, sums, sm);
+    const note = (hasSupp ? '<div class="nnote">ჯამში ჩათვლილია მონიშნული დანამატებიც.</div>' : '') + `<div class="nnote">% — ზრდასრულის ზოგადი დღიური ნორმიდან (შაქარზე, ნაჯერ ცხიმზე, ქოლესტერინსა და ნატრიუმზე — ზედა ზღვრიდან).
+      „(2/3)“ ნიშნავს, რომ მონაცემი 3 პროდუქტიდან მხოლოდ 2-ზეა. მზა პროდუქტების მნიშვნელობები მიახლოებითია (USDA-ს საშუალოები),
+      დასკანერებულისა — ეტიკეტიდან, თუ მწარმოებელს აქვს მითითებული. K2 ცნობილია მხოლოდ რამდენიმე ცხოველურ პროდუქტზე; B7 — მხოლოდ ზოგიერთ ეტიკეტზე.</div>`;
+    $('#nutBody').innerHTML = !items.length && !hasSupp
+      ? '<div class="nnote">ამ დღეს ჩანაწერი ჯერ არ არის.</div>'
+      : (Object.keys(sums).length ? nutRowsHTML(sums, partial, true) : '<div class="nnote">დამატებულ პროდუქტებზე ვიტამინებისა და მინერალების მონაცემი არ არის.</div>') + note;
+
+    const ul = $('#entries');
+    if (!items.length) {
+      ul.innerHTML = `<li class="empty">${isToday(current) ? 'დღეს ჯერ არაფერი დაგიმატებია.<br>დააჭირე „ბარკოდის სკანირებას“.' : 'ამ დღეს ჩანაწერი არ არის.'}</li>`;
+    } else {
+      ul.innerHTML = items.map(i => {
+        const tm = new Date(i.t);
+        return `<li><button class="item" data-id="${esc(i.id)}">
+          <div class="main"><div class="nm">${esc(i.name)}</div>
+          <div class="sub">${r1(i.grams)} გ · ${pad(tm.getHours())}:${pad(tm.getMinutes())} · ც ${r1(i.p)} · ნ ${r1(i.c)} · ცხ ${r1(i.f)}</div></div>
+          <div class="kc">${Math.round(i.kcal)} <small>კკალ</small></div></button></li>`;
+      }).join('');
+    }
+    $('#listTitle').textContent = items.length ? `დღის ჩანაწერები (${items.length})` : 'დღის ჩანაწერები';
+
+    // recent products
+    const seen = new Set(), recent = [];
+    Object.keys(log).sort().reverse().forEach(d => (log[d] || []).slice().sort((a, b) => b.t - a.t).forEach(i => {
+      if (!seen.has(i.code) && getProduct(i.code) && recent.length < 10) { seen.add(i.code); recent.push(i.code); }
+    }));
+    $('#recentWrap').style.display = recent.length ? '' : 'none';
+    $('#recent').innerHTML = recent.map(c => `<button class="chip" data-code="${esc(c)}">${esc(getProduct(c).name)}</button>`).join('');
+    renderTodayPlan();
+    renderPlan();
+    renderRecipes();
+    if (typeof curTab !== 'undefined' && curTab === 'shop') renderShop();
+  }
+
+  function recentCodes() {
+    const seen = new Set(), out = [];
+    const all = [];
+    Object.keys(log).forEach(d => (log[d] || []).forEach(i => all.push(i)));
+    Object.keys(plans).forEach(d => (plans[d] || []).forEach(i => all.push(Object.assign({ t: new Date(d).getTime() }, i))));
+    all.sort((a, b) => (b.t || 0) - (a.t || 0)).forEach(i => {
+      if (!seen.has(i.code) && getProduct(i.code) && out.length < 14) { seen.add(i.code); out.push(i.code); }
+    });
+    return out;
+  }
+
+  // ---------- Page 1: today's plan card ----------
+  function renderTodayPlan() {
+    const key = dayKey(current), items = plans[key] || [];
+    $('#todayPlan').hidden = !items.length;
+    if (!items.length) { closeSheet('#planSheet'); return; }
+    const total = items.reduce((a, i) => a + i.kcal, 0), doneK = items.filter(i => i.done).reduce((a, i) => a + i.kcal, 0);
+    const doneN = items.filter(i => i.done).length;
+    $('#tpSub').textContent = `${doneN}/${items.length} შესრულებული · ${Math.round(doneK)} / ${Math.round(total)} კკალ`;
+    $('#tpBtnSub').textContent = `${doneN}/${items.length} შესრულებული · ${Math.round(doneK)} / ${Math.round(total)} კკალ`;
+    $('#tpBtnBar').style.width = (total ? Math.min(100, doneK / total * 100) : 0) + '%';
+    $('#tpBar').querySelector('i').style.width = (total ? Math.min(100, doneK / total * 100) : 0) + '%';
+    $('#tpAll').style.display = doneN < items.length ? '' : 'none';
+    let html = '';
+    MEALS.forEach(([mk, ml]) => {
+      const list = items.filter(i => (i.meal || 'b') === mk);
+      if (!list.length) return;
+      html += `<div class="tp-meal">${ml}</div>`;
+      html += list.map(i => `<div class="tp-row${i.done ? ' done' : ''}">
+        <button class="tp-chk" data-pid="${esc(i.id)}" aria-label="შევჭამე">✓</button>
+        <span class="nm">${esc(i.name)} · ${r1(i.grams)} გ</span>
+        <span class="kc">${Math.round(i.kcal)} კკალ</span></div>`).join('');
+    });
+    $('#tpList').innerHTML = html;
+  }
+  function setPlanDone(key, it, done) {
+    if (done && !it.done) {
+      const now = new Date(), d = new Date(key + 'T12:00:00');
+      const t = key === dayKey(now) ? now.getTime() : new Date(d.getFullYear(), d.getMonth(), d.getDate(), now.getHours(), now.getMinutes()).getTime();
+      const entry = { id: newId(), code: it.code, name: it.name, t, grams: it.grams, kcal: it.kcal, p: it.p, c: it.c, f: it.f, per100: it.per100, m: it.m, planId: it.id };
+      log[key] = log[key] || []; log[key].push(entry);
+      it.done = true; it.logId = entry.id;
+    } else if (!done && it.done) {
+      log[key] = (log[key] || []).filter(e => e.id !== it.logId && e.planId !== it.id);
+      if (!log[key].length) delete log[key];
+      it.done = false; delete it.logId;
+    }
+  }
+  $('#tpList').addEventListener('click', e => {
+    const b = e.target.closest('.tp-chk'); if (!b) return;
+    const key = dayKey(current), it = (plans[key] || []).find(i => i.id === b.dataset.pid); if (!it) return;
+    setPlanDone(key, it, !it.done);
+    try { navigator.vibrate && navigator.vibrate(20); } catch (err) {}
+    saveAll(); savePlans(); render();
+    toast(it.done ? `ჩაიწერა: ${it.name} · ${Math.round(it.kcal)} კკალ` : 'მონიშვნა მოიხსნა');
+  });
+  $('#tpAll').onclick = () => {
+    const key = dayKey(current);
+    (plans[key] || []).forEach(it => setPlanDone(key, it, true));
+    saveAll(); savePlans(); render(); toast('მთელი გეგმა ჩაიწერა');
+  };
+  $('#tpEdit').onclick = () => { closeSheet('#planSheet'); planDate = new Date(current); showTab('plan'); };
+  $('#todayPlan').onclick = () => { renderTodayPlan(); openSheet('#planSheet'); };
+
+  // ---------- Page 2: meal plan ----------
+  function renderPlan() {
+    const key = dayKey(planDate), items = plans[key] || [];
+    $('#plDateLabel').textContent = dayLabel(planDate) || DAYS[planDate.getDay()];
+    $('#plDateSub').textContent = `${DAYS[planDate.getDay()]}, ${planDate.getDate()} ${MONTHS[planDate.getMonth()]}`;
+    const { tot, sums, partial } = sumItems(items);
+    $('#plKcalVal').textContent = Math.round(tot.kcal);
+    $('#plKcalGoal').textContent = goals.kcal;
+    const left = Math.round(goals.kcal - tot.kcal);
+    $('#plKcalLeft').innerHTML = !items.length ? '' : left >= 0 ? `კიდევ შეიძლება<br><b>${left}</b> კკალ` : `გადაჭარბება<br><b style="color:var(--over)">${-left}</b> კკალ`;
+    setBar('#plKcalBar', tot.kcal, goals.kcal);
+    [['P', 'p'], ['C', 'c'], ['F', 'f']].forEach(([U, k]) => {
+      $('#pl' + U + 'Val').textContent = r1(tot[k]);
+      $('#pl' + U + 'Goal').textContent = goals[k];
+      setBar('#pl' + U + 'Bar', tot[k], goals[k]);
+    });
+    $('#plNutBody').innerHTML = !items.length
+      ? '<div class="nnote">ჯერ არაფერი დაგიგეგმავს.</div>'
+      : (Object.keys(sums).length ? nutRowsHTML(sums, partial, true) : '<div class="nnote">დაგეგმილ პროდუქტებზე ვიტამინების მონაცემი არ არის.</div>')
+        + '<div class="nnote">% — ზრდასრულის ზოგადი დღიური ნორმიდან. მზა პროდუქტების მნიშვნელობები მიახლოებითია.</div>';
+    // meals
+    let html = '';
+    MEALS.forEach(([mk, ml]) => {
+      const list = items.filter(i => (i.meal || 'b') === mk);
+      const mk_k = list.reduce((a, i) => a + i.kcal, 0);
+      html += `<div class="meal"><div class="meal-h"><b>${ml}</b><span>${list.length ? Math.round(mk_k) + ' კკალ' : ''}</span></div>`;
+      html += list.length ? '<ul class="list">' + list.map(i => `<li><button class="item" data-pid="${esc(i.id)}">
+          <div class="main"><div class="nm">${i.done ? '✅ ' : ''}${esc(i.name)}</div>
+          <div class="sub">${r1(i.grams)} გ · ც ${r1(i.p)} · ნ ${r1(i.c)} · ცხ ${r1(i.f)}</div></div>
+          <div class="kc">${Math.round(i.kcal)} <small>კკალ</small></div></button></li>`).join('') + '</ul>'
+        : `<div class="empty" data-addmeal="${mk}">+ დაამატე ${ml.split(' ')[1]}</div>`;
+      html += '</div>';
+    });
+    $('#plMeals').innerHTML = html;
+    $('#plActions').style.display = items.length ? '' : 'none';
+    const rc = recentCodes();
+    $('#plRecentWrap').style.display = rc.length ? '' : 'none';
+    $('#plRecent').innerHTML = rc.map(c => `<button class="chip" data-code="${esc(c)}">${esc(getProduct(c).name)}</button>`).join('');
+  }
+  $('#plPrev').onclick = () => { planDate = addDays(planDate, -1); renderPlan(); };
+  $('#plNext').onclick = () => { planDate = addDays(planDate, 1); renderPlan(); };
+  $('#plMeals').addEventListener('click', e => {
+    const add = e.target.closest('[data-addmeal]');
+    if (add) { lastMeal = add.dataset.addmeal; addTarget = 'plan'; $('#openFoods').onclick(); return; }
+    const b = e.target.closest('.item'); if (!b) return;
+    const it = (plans[dayKey(planDate)] || []).find(i => i.id === b.dataset.pid); if (!it) return;
+    const product = getProduct(it.code) || { name: it.name, brand: '', per100: it.per100, img: '' };
+    showProductSheet(it.code, Object.assign({}, product, { per100: it.per100 || product.per100 }), it.grams, it.id, 'plan', it.meal);
+  });
+  $('#plRecent').addEventListener('click', e => { const b = e.target.closest('.chip'); if (b) { addTarget = 'plan'; openProduct(b.dataset.code); } });
+  $('#plScan').onclick = () => { addTarget = 'plan'; openScanner(); };
+  $('#plFoods').onclick = () => { addTarget = 'plan'; $('#openFoods').onclick(); };
+  $('#plCode').onclick = () => { addTarget = 'plan'; $('#openCode').onclick(); };
+  $('#plCustom').onclick = () => { addTarget = 'plan'; $('#openCustom').onclick(); };
+  let clearArmed = 0;
+  $('#plClear').onclick = () => {
+    if (Date.now() - clearArmed > 4000) { clearArmed = Date.now(); toast('წასაშლელად დააჭირე კიდევ ერთხელ'); return; }
+    const key = dayKey(planDate);
+    delete plans[key]; savePlans(); clearArmed = 0; render(); toast('გეგმა წაიშალა (ჩაწერილი ჩანაწერები დარჩა)');
+  };
+  $('#plCopy').onclick = () => {
+    $('#copySub').textContent = `${dayLabel(planDate) || DAYS[planDate.getDay()]}, ${planDate.getDate()} ${MONTHS[planDate.getMonth()]} — ${(plans[dayKey(planDate)] || []).length} საჭმელი`;
+    $('#copyDate').value = dayKey(addDays(planDate, 1));
+    openSheet('#copySheet');
+  };
+  function copyPlanTo(keys) {
+    const src = plans[dayKey(planDate)] || [];
+    keys.forEach(k => {
+      plans[k] = (plans[k] || []).concat(src.map(i => { const c = Object.assign({}, i, { id: newId(), done: false }); delete c.logId; return c; }));
+    });
+    savePlans(); closeSheet('#copySheet'); render();
+  }
+  $('#copyGo').onclick = () => {
+    const v = $('#copyDate').value; if (!v) { toast('აირჩიე თარიღი'); return; }
+    if (v === dayKey(planDate)) { toast('აირჩიე სხვა დღე'); return; }
+    copyPlanTo([v]); toast('გეგმა დაკოპირდა');
+  };
+  $('#copyWeek').onclick = () => {
+    copyPlanTo([1, 2, 3, 4, 5, 6].map(n => dayKey(addDays(planDate, n)))); toast('გეგმა დაკოპირდა 6 დღეზე');
+  };
+
+  // ---------- Tabs ----------
+  // ---------- Recipes ----------
+  function calcRecipe(d) {
+    const raw = d.items.reduce((a, i) => a + (+i.grams || 0), 0);
+    const cooked = num(d.cooked) > 0 ? num(d.cooked) : raw;
+    const parts = d.items.map(i => {
+      const k = (+i.grams || 0) / 100, x = i.per100 || {};
+      return { kcal: (x.kcal || 0) * k, p: (x.p || 0) * k, c: (x.c || 0) * k, f: (x.f || 0) * k, m: scaleMicro(x.m, k) };
+    });
+    const { tot, sums, partial } = sumItems(parts);
+    const fct = cooked > 0 ? 100 / cooked : 0;
+    const m = {}; Object.keys(sums).forEach(k => { m[k] = sums[k] * fct; });
+    const per100 = { kcal: r1(tot.kcal * fct), p: r1(tot.p * fct), c: r1(tot.c * fct), f: r1(tot.f * fct), m };
+    const portions = Math.max(1, Math.round(num(d.portions) || 1));
+    return { raw, cooked, tot, per100, portions, portionW: cooked / portions, partial };
+  }
+  function renderRecipes() {
+    const editing = !!rcDraft;
+    $('#rcList').hidden = editing;
+    $('#rcEdit').hidden = !editing;
+    if (!editing) {
+      const list = Object.values(recipes).sort((a, b) => (b.updated || 0) - (a.updated || 0));
+      $('#rcItems').innerHTML = list.length ? list.map(r => {
+        const c = calcRecipe(r);
+        return `<li><button class="item" data-rid="${esc(r.id)}"><div class="main"><div class="nm">${esc(r.name)}</div>
+          <div class="sub">${r.items.length} ინგრედიენტი · ${c.portions} პორცია · 1 პორცია ${Math.round(c.portionW)} გ = ${Math.round(c.per100.kcal * c.portionW / 100)} კკალ</div></div>
+          <div class="kc">${Math.round(c.per100.kcal)} <small>კკალ/100გ</small></div></button></li>`;
+      }).join('') : '<li class="empty">ჯერ რეცეპტი არ გაქვს. დააჭირე „+ ახალი რეცეპტი“ და ჩაამატე ინგრედიენტები.</li>';
+      return;
+    }
+    const c = calcRecipe(rcDraft);
+    $('#rcK').textContent = Math.round(c.per100.kcal);
+    $('#rcP').textContent = c.per100.p; $('#rcC').textContent = c.per100.c; $('#rcF').textContent = c.per100.f;
+    const line = (w) => {
+      const k = w / 100, x = c.per100;
+      return `${Math.round(w)} გ · ${Math.round(x.kcal * k)} კკალ · ც ${r1(x.p * k)} · ნ ${r1(x.c * k)} · ცხ ${r1(x.f * k)}`;
+    };
+    $('#rcPortion').textContent = c.cooked > 0 ? line(c.portionW) : '—';
+    $('#rcWhole').textContent = c.cooked > 0 ? line(c.cooked) : '—';
+    $('#rcNutBody').innerHTML = Object.keys(c.per100.m).length
+      ? nutRowsHTML(c.per100.m, c.partial, true) + '<div class="nnote">„(2/3)“ — მონაცემი მხოლოდ ზოგიერთ ინგრედიენტზეა.</div>'
+      : '<div class="nnote">ინგრედიენტებზე ვიტამინების მონაცემი არ არის.</div>';
+    $('#rcCooked').placeholder = c.raw ? `${Math.round(c.raw)} (ინგრედიენტების ჯამი)` : 'მაგ. 1200';
+    $('#rcIngTitle').textContent = rcDraft.items.length ? `ინგრედიენტები (${rcDraft.items.length}) · ${Math.round(c.raw)} გ` : 'ინგრედიენტები';
+    $('#rcIng').innerHTML = rcDraft.items.length ? rcDraft.items.map(i => {
+      const k = i.grams / 100, x = i.per100 || {};
+      return `<li><button class="item" data-iid="${esc(i.id)}"><div class="main"><div class="nm">${esc(i.name)}</div>
+        <div class="sub">${r1(i.grams)} გ · ც ${r1((x.p || 0) * k)} · ნ ${r1((x.c || 0) * k)} · ცხ ${r1((x.f || 0) * k)}</div></div>
+        <div class="kc">${Math.round((x.kcal || 0) * k)} <small>კკალ</small></div></button></li>`;
+    }).join('') : '<li class="empty">დაამატე ინგრედიენტები ზემოთა ღილაკებით — ზუსტად ის რაოდენობა, რაც ქვაბში ჩაყარე (უმი / მშრალი წონით).</li>';
+    const saved = !!recipes[rcDraft.id];
+    $('#rcAfter').hidden = !saved || rcDirty;
+    $('#rcDelete').hidden = !saved;
+    $('#rcSave').textContent = saved ? (rcDirty ? 'ცვლილებების შენახვა' : 'შენახულია ✓') : 'რეცეპტის შენახვა';
+    const rc = recentCodes().filter(code => code !== 'recipe-' + rcDraft.id);
+    $('#rcRecentWrap').style.display = rc.length ? '' : 'none';
+    $('#rcRecent').innerHTML = rc.map(code => `<button class="chip" data-code="${esc(code)}">${esc(getProduct(code).name)}</button>`).join('');
+  }
+  function openRecipe(id) {
+    rcDraft = id && recipes[id] ? JSON.parse(JSON.stringify(recipes[id])) : { id: newId(), name: '', items: [], cooked: '', portions: 1 };
+    rcDirty = false; saveDraft();
+    fillRecipeInputs(); renderRecipes(); window.scrollTo(0, 0);
+  }
+  function fillRecipeInputs() {
+    if (!rcDraft) return;
+    $('#rcName').value = rcDraft.name || '';
+    $('#rcCooked').value = rcDraft.cooked || '';
+    $('#rcPortions').value = rcDraft.portions || 1;
+  }
+  function saveRecipe() {
+    if (!rcDraft) return false;
+    rcDraft.name = $('#rcName').value.trim();
+    if (!rcDraft.name) { toast('ჩაწერე კერძის სახელი'); $('#rcName').focus(); return false; }
+    if (!rcDraft.items.length) { toast('დაამატე მინიმუმ ერთი ინგრედიენტი'); return false; }
+    const c = calcRecipe(rcDraft);
+    if (!(c.cooked > 0)) { toast('კერძის წონა 0-ია'); return false; }
+    rcDraft.updated = Date.now();
+    recipes[rcDraft.id] = JSON.parse(JSON.stringify(rcDraft));
+    products['recipe-' + rcDraft.id] = {
+      name: rcDraft.name, brand: '', img: '', source: 'recipe',
+      per100: c.per100, piece: r1(c.portionW), pieceLabel: '1 პორცია', serving: null,
+      meta: { ingr: rcDraft.items.map(i => `${i.name} — ${r1(i.grams)} გ`).join(', ') + (num(rcDraft.cooked) ? `. მზა კერძის წონა: ${r1(num(rcDraft.cooked))} გ` : '') }
+    };
+    rcDirty = false;
+    saveRecipes(); saveAll(); saveDraft(); renderRecipes();
+    toast('რეცეპტი შენახულია');
+    return true;
+  }
+  $('#rcNew').onclick = () => openRecipe(null);
+  $('#rcItems').addEventListener('click', e => { const b = e.target.closest('.item'); if (b) openRecipe(b.dataset.rid); });
+  let rcBackArmed = 0;
+  $('#rcBack').onclick = () => {
+    const hasStuff = rcDraft && (rcDraft.items.length || $('#rcName').value.trim());
+    if (rcDirty && hasStuff && Date.now() - rcBackArmed > 4000) { rcBackArmed = Date.now(); toast('შეუნახავი ცვლილებები დაიკარგება — დააჭირე კიდევ ერთხელ'); return; }
+    rcDraft = null; rcDirty = false; saveDraft(); renderRecipes(); window.scrollTo(0, 0);
+  };
+  $('#rcName').addEventListener('input', () => { if (rcDraft) { rcDraft.name = $('#rcName').value; rcDirty = true; saveDraft(); $('#rcAfter').hidden = true; $('#rcSave').textContent = recipes[rcDraft.id] ? 'ცვლილებების შენახვა' : 'რეცეპტის შენახვა'; } });
+  ['#rcCooked', '#rcPortions'].forEach(id => $(id).addEventListener('input', () => {
+    if (!rcDraft) return;
+    rcDraft.cooked = $('#rcCooked').value; rcDraft.portions = $('#rcPortions').value;
+    rcDirty = true; saveDraft(); renderRecipes();
+  }));
+  $('#rcIng').addEventListener('click', e => {
+    const b = e.target.closest('.item'); if (!b || !rcDraft) return;
+    const it = rcDraft.items.find(i => i.id === b.dataset.iid); if (!it) return;
+    const product = getProduct(it.code) || { name: it.name, brand: '', per100: it.per100, img: '' };
+    showProductSheet(it.code, Object.assign({}, product, { per100: it.per100 || product.per100 }), it.grams, it.id, 'recipe');
+  });
+  $('#rcRecent').addEventListener('click', e => { const b = e.target.closest('.chip'); if (b) { addTarget = 'recipe'; openProduct(b.dataset.code); } });
+  $('#rcScan').onclick = () => { addTarget = 'recipe'; openScanner(); };
+  $('#rcFoods').onclick = () => { addTarget = 'recipe'; $('#openFoods').onclick(); };
+  $('#rcCode').onclick = () => { addTarget = 'recipe'; $('#openCode').onclick(); };
+  $('#rcCustom').onclick = () => { addTarget = 'recipe'; $('#openCustom').onclick(); };
+  $('#rcSave').onclick = () => { saveRecipe(); };
+  $('#rcToLog').onclick = () => {
+    if (rcDirty && !saveRecipe()) return;
+    const code = 'recipe-' + rcDraft.id;
+    rcDraft = null; saveDraft();
+    current = new Date(); showTab('log'); addTarget = 'log'; openProduct(code);
+  };
+  $('#rcToPlan').onclick = () => {
+    if (rcDirty && !saveRecipe()) return;
+    const code = 'recipe-' + rcDraft.id;
+    rcDraft = null; saveDraft();
+    showTab('plan'); addTarget = 'plan'; openProduct(code);
+  };
+  let rcDelArmed = 0;
+  $('#rcDelete').onclick = () => {
+    if (Date.now() - rcDelArmed > 4000) { rcDelArmed = Date.now(); toast('წასაშლელად დააჭირე კიდევ ერთხელ'); return; }
+    delete recipes[rcDraft.id]; delete products['recipe-' + rcDraft.id];
+    rcDraft = null; rcDirty = false; saveRecipes(); saveAll(); saveDraft(); renderRecipes(); toast('რეცეპტი წაიშალა');
+  };
+
+  // ---------- Pages & menu ----------
+  const PAGES = { log: ['#pageLog', 'დღის კონტროლი'], plan: ['#pagePlan', 'კვების ცხრილი'], recipes: ['#pageRecipes', 'რეცეპტები'], shop: ['#pageShop', 'სავაჭრო სია'], stats: ['#pageStats', 'სტატისტიკა'] };
+  let curTab = 'log';
+  function openMenu() {
+    $('#menu').classList.add('open'); $('#drawerBg').classList.add('open');
+    $('#menu').setAttribute('aria-hidden', 'false'); $('#menuBtn').setAttribute('aria-expanded', 'true');
+  }
+  function closeMenu() {
+    $('#menu').classList.remove('open'); $('#drawerBg').classList.remove('open');
+    $('#menu').setAttribute('aria-hidden', 'true'); $('#menuBtn').setAttribute('aria-expanded', 'false');
+  }
+  function showTab(t) {
+    if (!PAGES[t]) t = 'log';
+    Object.entries(PAGES).forEach(([k, [sel]]) => { $(sel).hidden = k !== t; });
+    $('#pageTitle').textContent = PAGES[t][1];
+    document.querySelectorAll('#menu button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+    store.set('mt_tab', t);
+    curTab = t;
+    closeMenu();
+    if (t === 'recipes') fillRecipeInputs();
+    render(); window.scrollTo(0, 0);
+    if (t === 'stats') renderStats();
+    if (t === 'shop') renderShop();
+  }
+  $('#menuBtn').onclick = () => { $('#menu').classList.contains('open') ? closeMenu() : openMenu(); };
+  $('#drawerClose').onclick = closeMenu;
+  $('#drawerBg').onclick = closeMenu;
+  document.querySelectorAll('#menu button[data-tab]').forEach(b => b.onclick = () => showTab(b.dataset.tab));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+
+
+  // ---------- Supplements ----------
+  const SUPP_PRESETS = [
+    ['ვიტამინი D3', '1000 IU', { d: 25 }], ['ვიტამინი D3', '2000 IU', { d: 50 }], ['მაგნიუმი', '200 მგ', { mg: 200 }],
+    ['ომეგა-3', '1 კაფსულა', { o3: 300 }], ['რკინა', '18 მგ', { fe: 18 }], ['ვიტამინი B12', '500 მკგ', { b12: 500 }],
+    ['ვიტამინი C', '500 მგ', { c: 500 }], ['თუთია', '15 მგ', { zn: 15 }], ['კალციუმი', '500 მგ', { ca: 500 }],
+    ['ფოლიუმის მჟავა', '400 მკგ', { b9: 400 }]
+  ];
+  // tolerable upper intake levels for adults (total intake; magnesium: supplements only)
+  const UL = { d: 100, a: 3000, fe: 45, zn: 25, b6: 12, c: 2000, b9: 1000, ca: 2500, e: 300, o3: 5000 };
+  const nutInfo = k => NUTS.find(n => n[0] === k) || [k, k, '', null];
+  function renderSupps(key, totals, sm) {
+    const taken = suppTaken[key] || [];
+    $('#suppChips').innerHTML = supps.length
+      ? supps.map(x => `<button class="spc${taken.includes(x.id) ? ' on' : ''}" data-sid="${esc(x.id)}" title="${esc(x.dose || '')}"><i>✓</i>${esc(x.name)}</button>`).join('')
+      : '<span class="sp-empty">დაამატე, რასაც იღებ</span>';
+    const warns = [];
+    Object.keys(UL).forEach(k => {
+      if (sm[k] != null && totals[k] > UL[k]) {
+        const [, l, u] = nutInfo(k);
+        warns.push(`⚠ ${l}: ${fmtN(totals[k])} ${u} — ზედა უსაფრთხო ზღვარზე (${UL[k]}) მეტია`);
+      }
+    });
+    if (sm.mg != null && sm.mg > 250) warns.push(`⚠ მაგნიუმი დანამატებიდან: ${fmtN(sm.mg)} მგ — ზღვარზე (250) მეტია`);
+    $('#suppWarn').innerHTML = warns.map(esc).join('<br>');
+  }
+  $('#suppChips').addEventListener('click', e => {
+    const b = e.target.closest('.spc');
+    if (!b) { if (!supps.length) openSuppManage(); return; }
+    const key = dayKey(current), arr = suppTaken[key] || [], id = b.dataset.sid;
+    suppTaken[key] = arr.includes(id) ? arr.filter(x => x !== id) : arr.concat(id);
+    if (!suppTaken[key].length) delete suppTaken[key];
+    try { navigator.vibrate && navigator.vibrate(15); } catch (err) {}
+    saveSupps(); render();
+  });
+  function openSuppManage() {
+    $('#suppList').innerHTML = supps.length ? supps.map(x => {
+      const parts = Object.keys(x.m || {}).map(k => { const [, l, u] = nutInfo(k); return `${l} ${fmtN(x.m[k])} ${u}`; });
+      return `<li><button class="item" data-sid="${esc(x.id)}"><div class="main"><div class="nm">${esc(x.name)}${x.dose ? ' · ' + esc(x.dose) : ''}</div>
+        <div class="sub">${parts.length ? esc(parts.join(', ')) : 'შემადგენლობა არ არის მითითებული'}</div></div><div class="kc"><small>შეცვლა</small></div></button></li>`;
+    }).join('') : '<li class="empty">ჯერ არცერთი დანამატი არ გაქვს.</li>';
+    $('#suppPresets').innerHTML = SUPP_PRESETS.map((p, i) => `<button data-pi="${i}">${p[0]} ${p[1]}</button>`).join('');
+    openSheet('#suppSheet');
+  }
+  $('#suppManage').onclick = openSuppManage;
+  $('#suppPresets').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const [name, dose, m] = SUPP_PRESETS[+b.dataset.pi];
+    supps.push({ id: newId(), name, dose, m: Object.assign({}, m) });
+    saveSupps(); openSuppManage(); render(); toast(`დაემატა: ${name} ${dose}`);
+  });
+  let seId = null;
+  const SE_KEYS = NUTS.filter(n => n[5] !== 'main').map(n => n[0]);
+  function seRowHTML(k, v) {
+    return `<div class="se-row"><select>${SE_KEYS.map(x => `<option value="${x}"${x === k ? ' selected' : ''}>${nutInfo(x)[1]}</option>`).join('')}</select>
+      <input type="number" inputmode="decimal" min="0" step="any" value="${v ?? ''}" placeholder="რაოდ."><span>${nutInfo(k)[2]}</span><button aria-label="წაშლა">✕</button></div>`;
+  }
+  function openSuppEdit(id) {
+    seId = id; const x = supps.find(z => z.id === id) || { name: '', dose: '', m: {} };
+    $('#seTitle').textContent = id ? 'დანამატის შეცვლა' : 'ახალი დანამატი';
+    $('#seName').value = x.name; $('#seDose').value = x.dose || '';
+    const keys = Object.keys(x.m || {});
+    $('#seRows').innerHTML = (keys.length ? keys.map(k => seRowHTML(k, x.m[k])) : [seRowHTML('d', '')]).join('');
+    $('#seDelete').hidden = !id;
+    closeSheet('#suppSheet'); openSheet('#suppEditSheet');
+  }
+  $('#suppNew').onclick = () => openSuppEdit(null);
+  $('#suppList').addEventListener('click', e => { const b = e.target.closest('.item'); if (b) openSuppEdit(b.dataset.sid); });
+  $('#seAddRow').onclick = () => $('#seRows').insertAdjacentHTML('beforeend', seRowHTML('c', ''));
+  $('#seRows').addEventListener('change', e => { if (e.target.tagName === 'SELECT') e.target.parentElement.querySelector('span').textContent = nutInfo(e.target.value)[2]; });
+  $('#seRows').addEventListener('click', e => { if (e.target.tagName === 'BUTTON') e.target.parentElement.remove(); });
+  $('#seSave').onclick = () => {
+    const name = $('#seName').value.trim(); if (!name) { toast('ჩაწერე სახელი'); return; }
+    const m = {};
+    $('#seRows').querySelectorAll('.se-row').forEach(r => { const v = num(r.querySelector('input').value); if (v != null && v > 0) m[r.querySelector('select').value] = (m[r.querySelector('select').value] || 0) + v; });
+    if (seId) Object.assign(supps.find(z => z.id === seId), { name, dose: $('#seDose').value.trim(), m });
+    else supps.push({ id: newId(), name, dose: $('#seDose').value.trim(), m });
+    saveSupps(); closeSheet('#suppEditSheet'); render(); openSuppManage(); toast('შენახულია');
+  };
+  let seDelArmed = 0;
+  $('#seDelete').onclick = () => {
+    if (Date.now() - seDelArmed > 4000) { seDelArmed = Date.now(); toast('წასაშლელად დააჭირე კიდევ ერთხელ'); return; }
+    supps = supps.filter(z => z.id !== seId);
+    Object.keys(suppTaken).forEach(k => { suppTaken[k] = suppTaken[k].filter(x => x !== seId); if (!suppTaken[k].length) delete suppTaken[k]; });
+    saveSupps(); closeSheet('#suppEditSheet'); render(); openSuppManage(); toast('წაიშალა');
+  };
+
+  // ---------- Shopping list ----------
+  const COOKED_TO_RAW = { buckwheatc: 'buckwheat', ricec: 'rice', pastac: 'pasta', bulgurc: 'bulgur', quinoac: 'quinoa', beansc: 'beans',
+    lentilc: 'lentil', chickpeac: 'chickpea', oatmeal: 'oats', potatob: 'potato', bakedpot: 'potato', chbreastc: 'chbreast',
+    chliverf: 'chliver', chliverb: 'chliver', salmonb: 'salmon', troutb: 'trout', chthighr: 'chthigh', beefpatty: 'beefmince',
+    broccolib: 'broccoli', carrotb: 'carrot', beetb: 'beet', spinachb: 'spinach', egg_boiled: 'egg' };
+  const CAT_PLAIN = { fr: 'ხილი', vg: 'ბოსტნეული', gr: 'ბურღულეული და პური', lg: 'პარკოსნები', mt: 'ხორცი და თევზი', dy: 'რძის ნაწარმი და კვერცხი', ch: 'ყველი', nt: 'თხილეული', ot: 'სხვა', ck: 'მომზადებული', ge: 'მზა კერძები', ad: 'დამატებული პროდუქტები', dr: 'სასმელები', sw: 'ტკბილეული და სნეკები', pr: 'ძეხვეული და ფასტფუდი' };
+  function shopDays() {
+    const t0 = new Date(); t0.setHours(0, 0, 0, 0);
+    const start = shopIncToday ? 0 : 1, out = [];
+    for (let i = 0; i < shopRange; i++) out.push(addDays(t0, start + i));
+    return out;
+  }
+  function shopItems() {
+    const agg = {};
+    const add = (code, name, grams, depth) => {
+      if (!(grams > 0)) return;
+      if (code && code.startsWith('recipe-')) {
+        const r = recipes[code.slice(7)];
+        if (r && depth < 3) { const c = calcRecipe(r), fr = c.cooked > 0 ? grams / c.cooked : 0; r.items.forEach(i => add(i.code, i.name, i.grams * fr, depth + 1)); return; }
+      }
+      let conv = false;
+      if (code && code.startsWith('food-')) {
+        const id = code.slice(5), raw = COOKED_TO_RAW[id];
+        if (raw && FOODS[raw] && FOODS[id]) { grams = grams * FOODS[id].per100.kcal / FOODS[raw].per100.kcal; code = 'food-' + raw; conv = true; }
+      }
+      const p = code ? getProduct(code) : null;
+      const k = code || 'n:' + name;
+      agg[k] = agg[k] || { key: k, code, name: (p && p.name) || name, grams: 0, conv: false, piece: p && p.piece, pieceLabel: p && p.pieceLabel };
+      agg[k].grams += grams; if (conv) agg[k].conv = true;
+    };
+    shopDays().forEach(d => (plans[dayKey(d)] || []).forEach(i => add(i.code, i.name, +i.grams || 0, 0)));
+    return Object.values(agg);
+  }
+  const fmtW = g => g >= 1000 ? `${r1(g / 1000)} კგ` : g >= 100 ? `${Math.round(g / 10) * 10} გ` : `${Math.max(1, Math.round(g))} გ`;
+  function shopGroup(it) {
+    if (!it.code) return 'სხვა';
+    if (it.code.startsWith('food-')) { const f = FOODS[it.code.slice(5)]; return f ? CAT_PLAIN[f.cat] : 'სხვა'; }
+    if (it.code.startsWith('custom-')) return 'სხვა';
+    return 'შეფუთული პროდუქტები';
+  }
+  function renderShop() {
+    document.querySelectorAll('#shRange button').forEach(b => b.classList.toggle('on', +b.dataset.r === shopRange));
+    $('#shIncToday').checked = shopIncToday;
+    const days = shopDays(), planned = days.filter(d => (plans[dayKey(d)] || []).length);
+    const a = days[0], z = days[days.length - 1];
+    const rng = days.length === 1 ? `${a.getDate()} ${MONTHS[a.getMonth()]}` : `${a.getDate()} ${MONTHS[a.getMonth()]} – ${z.getDate()} ${MONTHS[z.getMonth()]}`;
+    $('#shSub').textContent = `${rng} · დაგეგმილია ${planned.length} დღე`;
+    const items = shopItems();
+    const groups = {};
+    items.forEach(it => { const g = shopGroup(it); (groups[g] = groups[g] || []).push(it); });
+    const order = ['ბოსტნეული', 'ხილი', 'ხორცი და თევზი', 'ძეხვეული და ფასტფუდი', 'ყველი', 'რძის ნაწარმი და კვერცხი', 'ბურღულეული და პური', 'პარკოსნები', 'თხილეული', 'სასმელები', 'ტკბილეული და სნეკები', 'შეფუთული პროდუქტები', 'დამატებული პროდუქტები', 'მზა კერძები', 'მომზადებული', 'სხვა'];
+    const row = (key, name, amt, done) => `<button class="sh-row${done ? ' done' : ''}" data-key="${esc(key)}"><span class="tp-chk">✓</span><span class="nm">${esc(name)}</span><span class="amt">${amt}</span></button>`;
+    let html = '';
+    order.filter(g => groups[g]).forEach(g => {
+      html += `<div class="sh-grp">${g}</div><div class="sh-list">`;
+      html += groups[g].sort((x, y) => x.name.localeCompare(y.name, 'ka')).map(it => {
+        let amt = fmtW(it.grams);
+        if (it.piece && it.piece >= 20) amt += ` · ≈${Math.ceil(it.grams / it.piece)} ${String(it.pieceLabel || '1 ცალი').replace(/^1\s*/, '')}`;
+        if (it.conv) amt += it.code && /^food-(buckwheat|rice|pasta|bulgur|quinoa|beans|lentil|chickpea|oats)$/.test(it.code) ? ' მშრალი' : ' უმი';
+        return row(it.key, it.name, amt, !!shopDone[it.key]);
+      }).join('') + '</div>';
+    });
+    if (shopExtra.length) {
+      html += `<div class="sh-grp">ხელით დამატებული</div><div class="sh-list">` +
+        shopExtra.map(x => row('x:' + x.id, x.name, '<span data-del="' + esc(x.id) + '" style="padding:4px">✕</span>', x.done)).join('') + '</div>';
+    }
+    $('#shList').innerHTML = html || '<div class="empty">ამ დღეებისთვის „კვების ცხრილში“ ჯერ არაფერია დაგეგმილი. დაგეგმე კერძები და სია აქ თავად შეიკრიბება — ან დაამატე ნივთები ხელით.</div>';
+  }
+  $('#shRange').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; shopRange = +b.dataset.r; store.set('mt_shoprange', shopRange); renderShop(); });
+  $('#shIncToday').onchange = () => { shopIncToday = $('#shIncToday').checked; store.set('mt_shoptoday', shopIncToday); renderShop(); };
+  $('#shList').addEventListener('click', e => {
+    const del = e.target.closest('[data-del]');
+    if (del) { shopExtra = shopExtra.filter(x => x.id !== del.dataset.del); store.set('mt_shopextra_v1', shopExtra); renderShop(); return; }
+    const b = e.target.closest('.sh-row'); if (!b) return;
+    const k = b.dataset.key;
+    if (k.startsWith('x:')) { const x = shopExtra.find(z => z.id === k.slice(2)); if (x) x.done = !x.done; store.set('mt_shopextra_v1', shopExtra); }
+    else { if (shopDone[k]) delete shopDone[k]; else shopDone[k] = true; store.set('mt_shopdone_v1', shopDone); }
+    renderShop();
+  });
+  const addExtra = () => {
+    const v = $('#shAdd').value.trim(); if (!v) return;
+    shopExtra.push({ id: newId(), name: v, done: false }); store.set('mt_shopextra_v1', shopExtra);
+    $('#shAdd').value = ''; renderShop();
+  };
+  $('#shAddGo').onclick = addExtra;
+  $('#shAdd').addEventListener('keydown', e => { if (e.key === 'Enter') addExtra(); });
+  $('#shClearDone').onclick = () => {
+    shopDone = {}; store.set('mt_shopdone_v1', shopDone);
+    shopExtra = shopExtra.filter(x => !x.done); store.set('mt_shopextra_v1', shopExtra);
+    renderShop(); toast('ნაყიდების მონიშვნა მოიხსნა');
+  };
+  $('#shCopy').onclick = async () => {
+    const lines = [];
+    $('#shList').querySelectorAll('.sh-grp, .sh-row').forEach(el => {
+      if (el.classList.contains('sh-grp')) lines.push('', el.textContent + ':');
+      else if (!el.classList.contains('done')) lines.push('• ' + el.querySelector('.nm').textContent + (el.querySelector('.amt').textContent.replace('✕', '').trim() ? ' — ' + el.querySelector('.amt').textContent.replace('✕', '').trim() : ''));
+    });
+    const text = ('სავაჭრო სია\n' + lines.join('\n')).trim();
+    try { await navigator.clipboard.writeText(text); toast('დაკოპირდა — ჩასვი მესენჯერში ან ჩანაწერებში'); }
+    catch (err) { toast('კოპირება ვერ მოხერხდა'); }
+  };
+
+  // ---------- Weight ----------
+  function renderWeight() {
+    const keys = Object.keys(weights).sort();
+    if (!$('#wtDate').value) $('#wtDate').value = dayKey(new Date());
+    if (!keys.length) {
+      $('#wtLast').textContent = '—'; $('#wtLastSub').textContent = 'ჩაწერე დღევანდელი წონა';
+      $('#wtChange').innerHTML = ''; $('#wtChart').innerHTML = ''; $('#wtChart').style.height = '0px'; $('#wtTip').textContent = '';
+      $('#wtList').innerHTML = '<div class="nnote">ჯერ ჩანაწერი არ არის.</div>';
+      return;
+    }
+    $('#wtChart').style.height = '140px';
+    const lastK = keys[keys.length - 1], ld = new Date(lastK + 'T12:00:00');
+    $('#wtLast').textContent = r1(weights[lastK]) + ' კგ';
+    $('#wtLastSub').textContent = 'ბოლო აწონვა: ' + (dayLabel(ld) || ld.getDate() + ' ' + MONTHS[ld.getMonth()]);
+    const t0 = new Date(); t0.setHours(0, 0, 0, 0);
+    const days = []; for (let i = stN - 1; i >= 0; i--) days.push(addDays(t0, -i));
+    const pts = days.map((d, i) => ({ i, d, v: weights[dayKey(d)] })).filter(x => x.v != null);
+    if (pts.length >= 2) {
+      const diff = pts[pts.length - 1].v - pts[0].v, span = (pts[pts.length - 1].d - pts[0].d) / 864e5;
+      const sign = diff > 0 ? '+' : diff < 0 ? '−' : '';
+      $('#wtChange').innerHTML = `<b>${sign}${r1(Math.abs(diff))} კგ</b><br>${Math.round(span)} დღეში` + (span >= 7 ? ` · ${sign}${r1(Math.abs(diff) / span * 7)} კგ/კვირა` : '');
+    } else $('#wtChange').innerHTML = pts.length ? 'ტრენდისთვის საჭიროა<br>2+ აწონვა' : 'ამ პერიოდში<br>აწონვა არ არის';
+    drawWeightChart(days, pts);
+    $('#wtList').innerHTML = keys.slice().reverse().map(k => {
+      const d = new Date(k + 'T12:00:00');
+      return `<div class="wt-row"><span>${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}</span><span><b>${r1(weights[k])} კგ</b> <button data-wk="${k}" aria-label="წაშლა">✕</button></span></div>`;
+    }).join('');
+  }
+  let wtPts = [];
+  function drawWeightChart(days, pts) {
+    const box = $('#wtChart'); wtPts = pts;
+    if (!pts.length) { box.innerHTML = ''; $('#wtTip').textContent = ''; return; }
+    const W = box.clientWidth || 340, H = 140, padL = 34, padR = 8, padT = 10, padB = 20;
+    let lo = Math.min(...pts.map(p => p.v)), hi = Math.max(...pts.map(p => p.v));
+    const pad = Math.max(0.5, (hi - lo) * 0.25); lo = Math.floor(lo - pad); hi = Math.ceil(hi + pad);
+    const x = i => padL + (W - padL - padR) * (days.length === 1 ? 0.5 : i / (days.length - 1));
+    const y = v => padT + (H - padT - padB) * (1 - (v - lo) / (hi - lo));
+    const step = (hi - lo) <= 4 ? 1 : (hi - lo) <= 10 ? 2 : 5;
+    let g = '';
+    for (let t = Math.ceil(lo / step) * step; t <= hi; t += step) {
+      g += `<line x1="${padL}" x2="${W - padR}" y1="${y(t)}" y2="${y(t)}" stroke="#e8edeb"/><text x="${padL - 6}" y="${y(t) + 4}" text-anchor="end" font-size="10" fill="#7a8682">${t}</text>`;
+    }
+    const line = pts.length > 1 ? `<polyline points="${pts.map(p => `${x(p.i)},${y(p.v)}`).join(' ')}" fill="none" stroke="#0f766e" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>` : '';
+    const dots = pts.map((p, k) => `<circle cx="${x(p.i)}" cy="${y(p.v)}" r="4" fill="#0f766e" stroke="#fff" stroke-width="2"/><circle cx="${x(p.i)}" cy="${y(p.v)}" r="14" fill="transparent" data-k="${k}" style="cursor:pointer"/>`).join('');
+    const every = days.length <= 7 ? 1 : days.length <= 31 ? 5 : 15;
+    const labels = days.map((d, i) => (days.length - 1 - i) % every === 0
+      ? `<text x="${x(i)}" y="${H - 5}" text-anchor="middle" font-size="10" fill="#7a8682">${days.length <= 7 ? WD[d.getDay()] : d.getDate()}</text>` : '').join('');
+    box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="წონის დინამიკა">${g}${line}${labels}${dots}</svg>`;
+    $('#wtTip').textContent = pts.length ? 'შეეხე წერტილს დეტალებისთვის' : '';
+  }
+  $('#wtChart').addEventListener('click', e => {
+    const c = e.target.closest('[data-k]'); if (!c) return;
+    const p = wtPts[+c.dataset.k]; if (!p) return;
+    $('#wtTip').innerHTML = `${DAYS[p.d.getDay()]}, ${p.d.getDate()} ${MONTHS[p.d.getMonth()]}: <b>${r1(p.v)} კგ</b>`;
+  });
+  $('#wtSave').onclick = () => {
+    const v = num($('#wtVal').value), k = $('#wtDate').value;
+    if (!(v > 20 && v < 400)) { toast('ჩაწერე წონა კილოგრამებში'); return; }
+    if (!k) { toast('აირჩიე თარიღი'); return; }
+    weights[k] = Math.round(v * 10) / 10; store.set('mt_weights_v1', weights);
+    $('#wtVal').value = ''; renderWeight(); toast('წონა შენახულია');
+  };
+  $('#wtList').addEventListener('click', e => {
+    const b = e.target.closest('[data-wk]'); if (!b) return;
+    delete weights[b.dataset.wk]; store.set('mt_weights_v1', weights); renderWeight(); toast('ჩანაწერი წაიშალა');
+  });
+
+  // ---------- Statistics ----------
+  let stN = store.get('mt_stats_n', 7);
+  const WD = ['კვ', 'ორ', 'სა', 'ოთ', 'ხუ', 'პა', 'შა'];
+  let stDays = [];
+  function renderStats() {
+    document.querySelectorAll('#stPeriod button').forEach(b => b.classList.toggle('on', +b.dataset.n === stN));
+    renderWeight();
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    stDays = [];
+    for (let i = stN - 1; i >= 0; i--) {
+      const d = addDays(today, -i), key = dayKey(d), items = log[key] || [];
+      const st = sumItems(items);
+      const sm = suppMicro(key); Object.keys(sm).forEach(k => { st.sums[k] = (st.sums[k] || 0) + sm[k]; });
+      stDays.push({ d, key, items, tot: st.tot, sums: st.sums, water: water[key] || 0, plan: plans[key] || [] });
+    }
+    const logged = stDays.filter(x => x.items.length);
+    $('#stEmpty').hidden = !!logged.length;
+    $('#stEmpty').textContent = 'ამ პერიოდში კვების ჩანაწერი ჯერ არ არის. სტატისტიკა „დღის კონტროლის“ ჩანაწერებიდან ითვლება.';
+    $('#stBody').hidden = !logged.length;
+    if (!logged.length) return;
+    const n = logged.length;
+    const avg = k => logged.reduce((a, x) => a + x.tot[k], 0) / n;
+    const aK = avg('kcal'), aP = avg('p'), aC = avg('c'), aF = avg('f');
+    $('#stKcal').textContent = Math.round(aK);
+    $('#stKcalSub').textContent = goals.kcal ? `მიზანი ${goals.kcal} · ${Math.round(aK / goals.kcal * 100)}%` : '';
+    $('#stProt').textContent = r1(aP) + ' გ';
+    $('#stProtSub').textContent = goals.p ? `მიზანი ${goals.p} გ · ${Math.round(aP / goals.p * 100)}%` : '';
+    $('#stDays').textContent = `${n} / ${stN}`;
+    // streak: consecutive logged days ending today (or yesterday)
+    let streak = 0, d = new Date(today);
+    if (!(log[dayKey(d)] || []).length) d = addDays(d, -1);
+    while ((log[dayKey(d)] || []).length) { streak++; d = addDays(d, -1); }
+    $('#stDaysSub').textContent = streak ? `ზედიზედ ${streak} დღე` : 'დღეს ჯერ არაფერი ჩაგიწერია';
+    const wDays = stDays.filter(x => x.water > 0);
+    const wGoal = Math.round((goals.water || 0) * 1000);
+    $('#stWater').textContent = wDays.length ? liters(wDays.reduce((a, x) => a + x.water, 0) / wDays.length) + ' ლ' : '—';
+    $('#stWaterSub').textContent = wDays.length && wGoal ? `მიზანი შესრულდა ${wDays.filter(x => x.water >= wGoal).length} დღეს` : 'წყალი არ ჩაგიწერია';
+
+    drawKcalChart();
+
+    // macros vs goals
+    $('#stMacros').innerHTML = [['ცილა', aP, goals.p, 'var(--prot)'], ['ნახშირწყალი', aC, goals.c, 'var(--carb)'], ['ცხიმი', aF, goals.f, 'var(--fat)']]
+      .map(([l, v, g, col]) => `<div class="st-row"><span>${l}</span><span class="v">${r1(v)} <small>/ ${g} გ</small></span>
+        <div class="bar"><i style="background:${col};width:${g ? Math.min(100, v / g * 100) : 0}%"></i></div></div>`).join('');
+    const kP = aP * 4, kC = aC * 4, kF = aF * 9, kT = kP + kC + kF || 1;
+    const parts = [['ცილა', kP, 'var(--prot)'], ['ნახშირწყალი', kC, 'var(--carb)'], ['ცხიმი', kF, 'var(--fat)']];
+    $('#stStack').innerHTML = parts.map(([, v, col]) => `<i style="background:${col};width:${v / kT * 100}%"></i>`).join('');
+    $('#stLegend').innerHTML = parts.map(([l, v, col]) => `<span><i class="dot" style="background:${col}"></i>${l} ${Math.round(v / kT * 100)}%</span>`).join('');
+
+    // plan adherence
+    const pItems = stDays.flatMap(x => x.plan);
+    $('#stPlanCard').hidden = !pItems.length;
+    if (pItems.length) {
+      const done = pItems.filter(i => i.done).length;
+      const pDays = stDays.filter(x => x.plan.length);
+      $('#stPlan').innerHTML = `<div class="st-row"><span>შესრულებული საჭმელები</span><span class="v">${done} <small>/ ${pItems.length} · ${Math.round(done / pItems.length * 100)}%</small></span>
+        <div class="bar"><i style="background:#16a34a;width:${done / pItems.length * 100}%"></i></div></div>
+        <div class="st-note" style="margin:6px 0 0">დაგეგმილი იყო ${pDays.length} დღე ამ პერიოდში.</div>`;
+    }
+
+    // micronutrients: daily averages
+    const msum = {};
+    logged.forEach(x => Object.keys(x.sums).forEach(k => { msum[k] = (msum[k] || 0) + x.sums[k]; }));
+    const mavg = {}; Object.keys(msum).forEach(k => { mavg[k] = msum[k] / n; });
+    const low = NUTS.filter(nn => nn[3] && nn[4] !== 'max' && nn[5] !== 'main' && mavg[nn[0]] != null)
+      .map(nn => [nn[1], mavg[nn[0]] / nn[3], mavg[nn[0]], nn[2]]).sort((a, b) => a[1] - b[1]).slice(0, 5);
+    $('#stLow').innerHTML = low.length ? low.map(([l, r, v, u]) => `<div class="st-row"><span>${l}</span><span class="v">${Math.round(r * 100)}% <small>· ${fmtN(v)} ${u}</small></span>
+        <div class="bar"><i style="background:${r >= 1 ? '#16a34a' : '#64748b'};width:${Math.min(100, r * 100)}%"></i></div></div>`).join('')
+      : '<div class="nnote">ჩაწერილ პროდუქტებზე ვიტამინების მონაცემი არ არის.</div>';
+    $('#stNutBody').innerHTML = Object.keys(mavg).length ? nutRowsHTML(mavg, null, true) : '<div class="nnote">მონაცემი არ არის.</div>';
+
+    // top foods by calories
+    const agg = {};
+    logged.forEach(x => x.items.forEach(i => {
+      const k = i.code || i.name; agg[k] = agg[k] || { name: i.name, kcal: 0, n: 0 };
+      agg[k].kcal += i.kcal; agg[k].n++;
+    }));
+    const top = Object.values(agg).sort((a, b) => b.kcal - a.kcal).slice(0, 6);
+    const totalK = logged.reduce((a, x) => a + x.tot.kcal, 0) || 1;
+    $('#stTop').innerHTML = top.map(t => `<div class="st-top"><span>${esc(t.name)}</span><span>${Math.round(t.kcal / totalK * 100)}% · ${t.n}-ჯერ</span></div>`).join('');
+  }
+  function drawKcalChart() {
+    const box = $('#stChart'); const W = box.clientWidth || 340, H = 170;
+    const padL = 34, padR = 6, padT = 10, padB = 22;
+    const vals = stDays.map(x => x.tot.kcal);
+    const maxV = Math.max(goals.kcal || 0, ...vals, 500);
+    const step = maxV > 3000 ? 1000 : 500;
+    const top = Math.ceil(maxV * 1.08 / step) * step;
+    const y = v => padT + (H - padT - padB) * (1 - v / top);
+    const slot = (W - padL - padR) / stDays.length;
+    const bw = Math.max(2, Math.min(24, slot * 0.7));
+    let g = '';
+    for (let t = 0; t <= top; t += step) {
+      g += `<line x1="${padL}" x2="${W - padR}" y1="${y(t)}" y2="${y(t)}" stroke="#e8edeb" stroke-width="1"/>`;
+      g += `<text x="${padL - 6}" y="${y(t) + 4}" text-anchor="end" font-size="10" fill="#7a8682">${t >= 1000 ? (t / 1000) + 'k' : t}</text>`;
+    }
+    let bars = '', hits = '', labels = '';
+    stDays.forEach((x, i) => {
+      const cx = padL + slot * i + slot / 2, v = x.tot.kcal;
+      if (v > 0) {
+        const top_ = y(v), bot = y(0), r = Math.min(4, bw / 2, bot - top_);
+        const xl = cx - bw / 2, xr = cx + bw / 2;
+        bars += `<path d="M${xl},${bot} L${xl},${top_ + r} Q${xl},${top_} ${xl + r},${top_} L${xr - r},${top_} Q${xr},${top_} ${xr},${top_ + r} L${xr},${bot} Z" fill="${x.key === dayKey(new Date()) ? '#0f766e' : '#5fa8a0'}" data-i="${i}"/>`;
+      }
+      hits += `<rect x="${padL + slot * i}" y="${padT}" width="${slot}" height="${H - padT - padB}" fill="transparent" data-i="${i}" style="cursor:pointer"/>`;
+      const every = stDays.length <= 7 ? 1 : stDays.length <= 31 ? 5 : 15;
+      if ((stDays.length - 1 - i) % every === 0) {
+        const lab = stDays.length <= 7 ? WD[x.d.getDay()] : String(x.d.getDate());
+        labels += `<text x="${cx}" y="${H - 6}" text-anchor="middle" font-size="10" fill="#7a8682">${lab}</text>`;
+      }
+    });
+    let goal = '';
+    if (goals.kcal) {
+      goal = `<line x1="${padL}" x2="${W - padR}" y1="${y(goals.kcal)}" y2="${y(goals.kcal)}" stroke="#14201d" stroke-width="1" opacity=".55"/>
+        <text x="${W - padR}" y="${y(goals.kcal) - 4}" text-anchor="end" font-size="10" fill="#14201d" opacity=".7">მიზანი ${goals.kcal}</text>`;
+    }
+    box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="კალორია დღეების მიხედვით">${g}${bars}${goal}${labels}${hits}</svg>`;
+    $('#stTip').textContent = 'შეეხე სვეტს დეტალებისთვის';
+  }
+  $('#stChart').addEventListener('click', e => {
+    const el = e.target.closest('[data-i]'); if (!el) return;
+    const x = stDays[+el.dataset.i]; if (!x) return;
+    const lab = `${DAYS[x.d.getDay()]}, ${x.d.getDate()} ${MONTHS[x.d.getMonth()]}`;
+    $('#stTip').innerHTML = x.items.length
+      ? `${lab}: <b>${Math.round(x.tot.kcal)} კკალ</b> · ც ${r1(x.tot.p)} · ნ ${r1(x.tot.c)} · ცხ ${r1(x.tot.f)}`
+      : `${lab}: ჩანაწერი არ არის`;
+  });
+  $('#stPeriod').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    stN = +b.dataset.n; store.set('mt_stats_n', stN); renderStats();
+  });
+  let rsT; window.addEventListener('resize', () => { clearTimeout(rsT); rsT = setTimeout(() => { if (curTab === 'stats') { drawKcalChart(); renderWeight(); } }, 150); });
+
+  ['#openScan', '#openFoods', '#openCode', '#openCustom'].forEach(id => $(id).addEventListener('click', () => { addTarget = 'log'; }, true));
+  $('#entries').addEventListener('click', e => {
+    const b = e.target.closest('.item'); if (!b) return;
+    const it = (log[dayKey(current)] || []).find(x => x.id === b.dataset.id);
+    if (it) openEntryEdit(it);
+  });
+  $('#recent').addEventListener('click', e => {
+    addTarget = 'log';
+    const b = e.target.closest('.chip'); if (b) openProduct(b.dataset.code);
+  });
+  $('#wBtns').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const key = dayKey(current), d = +b.dataset.w;
+    const before = water[key] || 0;
+    if (d < 0 && before <= 0) { toast('ამ დღეს წყალი ჯერ არ დაგიმატებია'); return; }
+    const after = Math.max(0, before + d);
+    if (after) water[key] = after; else delete water[key];
+    store.set(K.water, water);
+    try { navigator.vibrate && navigator.vibrate(25); } catch (err) {}
+    toast(d > 0 ? `+${liters(d)} ლ წყალი · სულ ${liters(after)} ლ` : `−${liters(before - after)} ლ · სულ ${liters(after)} ლ`);
+    render();
+  });
+  $('#prevDay').onclick = () => { current = new Date(current.getFullYear(), current.getMonth(), current.getDate() - 1); render(); };
+  $('#nextDay').onclick = () => { if (!isToday(current)) { current = new Date(current.getFullYear(), current.getMonth(), current.getDate() + 1); render(); } };
+
+  // ---------- Open Food Facts ----------
+  const OFF_FIELDS = 'product_name,product_name_ka,product_name_en,product_name_ru,generic_name,brands,nutriments,serving_quantity,image_front_small_url,nutriscore_grade,nova_group,additives_tags,ingredients_text,ingredients_text_ka,ingredients_text_en,ingredients_text_ru,ingredients_analysis_tags,categories_tags';
+  async function fetchOFF(code) {
+    const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=${OFF_FIELDS}`);
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const j = await res.json();
+    if (j.status !== 1 || !j.product) return null;
+    return parseOFF(j.product);
+  }
+  // name search in Open Food Facts (for products whose barcode is not in any database)
+  async function searchOFF(q) {
+    const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=15&fields=code,${OFF_FIELDS}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const j = await res.json();
+    return (j.products || []).map(parseOFF).filter(x => x.complete);
+  }
+  // second source: USDA FoodData Central branded foods (mostly US / international brands)
+  async function fetchUSDA(code) {
+    const res = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?api_key=DEMO_KEY&dataType=Branded&pageSize=5&query=${encodeURIComponent(code)}`);
+    if (!res.ok) return null;
+    const j = await res.json();
+    const strip = v => String(v || '').replace(/^0+/, '');
+    const fd = (j.foods || []).find(x => strip(x.gtinUpc) === strip(code));
+    if (!fd) return null;
+    const N = {};
+    (fd.foodNutrients || []).forEach(x => { if (x.nutrientNumber != null && isFinite(+x.value)) N[String(x.nutrientNumber)] = +x.value; });
+    const kcal = N['208'];
+    if (kcal == null) return null;
+    const m = {};
+    [['fib', '291'], ['sug', '269'], ['sfa', '606'], ['na', '307'], ['chol', '601'], ['ca', '301'], ['fe', '303'], ['k', '306'],
+     ['mg', '304'], ['zn', '309'], ['a', '320'], ['c', '401'], ['d', '328'], ['b12', '418'], ['b9', '435']].forEach(([k, id]) => { if (N[id] != null) m[k] = N[id]; });
+    if (N['629'] != null || N['621'] != null) m.o3 = Math.round(((N['629'] || 0) + (N['621'] || 0)) * 1000);
+    if (N['851'] != null) m.ala = N['851'];
+    const cap = t => String(t || '').toLowerCase().replace(/(^|\s)\S/g, ch => ch.toUpperCase());
+    return {
+      name: cap(fd.description) || 'უცნობი პროდუქტი',
+      brand: fd.brandName || fd.brandOwner || '',
+      per100: { kcal: r1(kcal), p: r1(N['203'] || 0), c: r1(N['205'] || 0), f: r1(N['204'] || 0), m },
+      serving: String(fd.servingSizeUnit || '').toLowerCase() === 'g' ? num(fd.servingSize) : null,
+      img: '', source: 'usda',
+      meta: { ingr: String(fd.ingredients || '').trim(), add: [], drink: /beverage|soda|drink|juice|water|tea|coffee/i.test(String(fd.foodCategory || '')) || /^(ml|mlt)$/i.test(String(fd.servingSizeUnit || '')) }
+    };
+  }
+  function parseOFF(pr) {
+    const n = pr.nutriments || {};
+    let kcal = num(n['energy-kcal_100g']);
+    if (kcal == null) { const kj = num(n['energy-kj_100g']) ?? num(n['energy_100g']); if (kj != null) kcal = kj / 4.184; }
+    const p = num(n.proteins_100g), c = num(n.carbohydrates_100g), f = num(n.fat_100g);
+    // Open Food Facts stores *_100g values in grams → convert to mg / µg
+    const OFFMAP = [['fib', 'fiber', 1], ['sug', 'sugars', 1], ['sfa', 'saturated-fat', 1], ['chol', 'cholesterol', 1e3], ['na', 'sodium', 1e3],
+      ['k', 'potassium', 1e3], ['mg', 'magnesium', 1e3], ['ca', 'calcium', 1e3], ['fe', 'iron', 1e3], ['zn', 'zinc', 1e3],
+      ['a', 'vitamin-a', 1e6], ['b1', 'vitamin-b1', 1e3], ['b2', 'vitamin-b2', 1e3], ['b3', 'vitamin-pp', 1e3],
+      ['b5', 'pantothenic-acid', 1e3], ['b6', 'vitamin-b6', 1e3], ['b7', 'biotin', 1e6], ['b9', 'vitamin-b9', 1e6],
+      ['b12', 'vitamin-b12', 1e6], ['c', 'vitamin-c', 1e3], ['d', 'vitamin-d', 1e6], ['e', 'vitamin-e', 1e3], ['k1', 'vitamin-k', 1e6]];
+    const m = {};
+    OFFMAP.forEach(([key, off, mul]) => { const v = num(n[off + '_100g']); if (v != null && v >= 0) m[key] = Math.round(v * mul * 1000) / 1000; });
+    if (m.na == null) { const s = num(n['salt_100g']); if (s != null) m.na = Math.round(s / 2.5 * 1000); }
+    if (m.b9 == null) { const fo = num(n['folates_100g']); if (fo != null) m.b9 = Math.round(fo * 1e6 * 10) / 10; }
+    const epa = num(n['eicosapentaenoic-acid_100g']), dha = num(n['docosahexaenoic-acid_100g']), ala = num(n['alpha-linolenic-acid_100g']);
+    if (epa != null || dha != null) m.o3 = Math.round(((epa || 0) + (dha || 0)) * 1000);
+    if (ala != null) m.ala = Math.round(ala * 100) / 100;
+    return {
+      name: (pr.product_name_ka || pr.product_name || pr.product_name_en || pr.product_name_ru || pr.generic_name || '').trim() || 'უცნობი პროდუქტი',
+      brand: String(pr.brands || '').split(',')[0].trim(),
+      per100: { kcal: r1(kcal ?? 0), p: r1(p ?? 0), c: r1(c ?? 0), f: r1(f ?? 0), m },
+      serving: num(pr.serving_quantity),
+      img: pr.image_front_small_url || '',
+      source: 'off',
+      meta: {
+        nova: num(pr.nova_group),
+        ns: String(pr.nutriscore_grade || '').toLowerCase(),
+        add: (pr.additives_tags || []).map(t => String(t).replace(/^[a-z]{2}:/, '').toUpperCase()),
+        ingr: String(pr.ingredients_text_ka || pr.ingredients_text || pr.ingredients_text_en || pr.ingredients_text_ru || '').trim(),
+        palm: (pr.ingredients_analysis_tags || []).includes('en:palm-oil'),
+        drink: (pr.categories_tags || []).includes('en:beverages') && !(pr.categories_tags || []).some(t => /milks|yogurts|dairies/.test(t)),
+        water: (pr.categories_tags || []).includes('en:waters')
+      },
+      complete: kcal != null && (p != null || c != null || f != null)
+    };
+  }
+
+  let busy = false;
+  async function handleCode(raw) {
+    const code = String(raw || '').replace(/\D/g, '');
+    if (code.length < 6) { toast('ბარკოდი არასწორია — შეამოწმე ციფრები'); return; }
+    const cached = products[code];
+    if (cached && (cached.source !== 'off' || cached.meta)) { openProduct(code); return; }
+    if (busy) return; busy = true; loading(true);
+    try {
+      let p = null;
+      try { p = await fetchOFF(code); } catch (e) { p = null; }
+      if (!(p && p.complete)) {
+        let u = null;
+        try { u = await fetchUSDA(code); } catch (e) { u = null; }
+        if (u) p = Object.assign(u, { complete: true });
+      }
+      if (p && p.complete) { delete p.complete; products[code] = p; saveAll(); openProduct(code); }
+      else if (cached) { openProduct(code); }
+      else {
+        openManual(code, p);
+        toast(p ? 'ბაზაში ეს პროდუქტი არის, მაგრამ შემადგენლობის გარეშე — მოძებნე მსგავსი სახელით ან შეავსე ეტიკეტიდან'
+                : 'ბარკოდით ვერ მოიძებნა — მოძებნე მსგავსი პროდუქტი სახელით ან შეავსე ეტიკეტიდან');
+      }
+    } catch (e) {
+      if (cached) { openProduct(code); return; }
+      openManual(code, null);
+      toast('ინტერნეტთან კავშირი ვერ მოხერხდა — შეგიძლია ხელით შეავსო');
+    } finally { busy = false; loading(false); }
+  }
+
+  // ---------- Product sheet ----------
+  function fillCalc() {
+    const g = num($('#pGrams').value) || 0, x = pending.product.per100, k = g / 100;
+    $('#cK').textContent = Math.round(x.kcal * k);
+    $('#cP').textContent = r1(x.p * k);
+    $('#cC').textContent = r1(x.c * k);
+    $('#cF').textContent = r1(x.f * k);
+    const m = scaleMicro(x.m, k);
+    $('#pNutBody').innerHTML = m && Object.keys(m).length
+      ? nutRowsHTML(m, null, false)
+      : '<div class="nnote">ამ პროდუქტზე ვიტამინებისა და მინერალების მონაცემი არ არის.</div>';
+  }
+  function showProductSheet(code, product, grams, entryId, target, meal) {
+    target = target || (entryId ? 'log' : addTarget);
+    pending = { code, product, entryId, target, meal: meal || lastMeal || 'b' };
+    $('#pMealWrap').hidden = target !== 'plan';
+    $('#pMeal').innerHTML = MEALS.map(([k, l]) => `<button data-meal="${k}" class="${k === pending.meal ? 'on' : ''}">${l}</button>`).join('');
+    $('#pImg').src = product.img || '';
+    $('#pName').textContent = product.name;
+    $('#pBrand').textContent = product.brand || '';
+    $('#pCode').textContent = code.startsWith('custom-') ? 'ბარკოდის გარეშე'
+      : code.startsWith('food-') ? (product.cat === 'ge' ? 'ქართული კერძი · ტიპური რეცეპტით, შეიძლება ±25%-ით განსხვავდებოდეს' : product.cat === 'ad' ? 'დამატებული პროდუქტი · ეტიკეტის მიხედვით' : 'მზა პროდუქტი · საშუალო მნიშვნელობები')
+      : code.startsWith('recipe-') ? 'ჩემი რეცეპტი' : 'ბარკოდი: ' + code;
+    const x = product.per100;
+    $('#p100').textContent = `100 გ: ${Math.round(x.kcal)} კკალ · ც ${x.p} · ნ ${x.c} · ცხ ${x.f}`;
+    $('#pEdit').style.display = getProduct(code) ? '' : 'none';
+    $('#pGrams').value = grams;
+    const q = [];
+    if (product.piece) q.push([product.piece, `${product.pieceLabel || '1 ცალი'} (${r1(product.piece)} გ)`]);
+    if (product.serving) q.push([product.serving, `პორცია (${r1(product.serving)} გ)`]);
+    [50, 100, 150, 200, 250].forEach(v => q.push([v, v + ' გ']));
+    $('#pQuick').innerHTML = q.map(([v, l]) => `<button data-g="${v}">${l}</button>`).join('');
+    $('#pAdd').textContent = entryId ? 'შენახვა' : target === 'recipe' ? 'რეცეპტში დამატება' : target === 'plan' ? `გეგმაში დამატება (${dayLabel(planDate) || planDate.getDate() + ' ' + MONTHS[planDate.getMonth()]})` : 'დამატება';
+    $('#pDelete').hidden = !entryId;
+    $('#pDelete').textContent = target === 'plan' ? 'გეგმიდან ამოღება' : target === 'recipe' ? 'რეცეპტიდან ამოღება' : 'ჩანაწერის წაშლა';
+    $('#pScore').innerHTML = scoreHTML(product);
+    const meta = product.meta || {};
+    const ingrParts = [];
+    if (meta.ingr) ingrParts.push(`<div class="nnote" style="color:var(--ink);font-size:13.5px">${esc(meta.ingr)}</div>`);
+    if (meta.add && meta.add.length) ingrParts.push(`<div class="nnote"><b>დანამატები:</b> ${esc(meta.add.join(', '))}</div>`);
+    if (meta.nova) ingrParts.push(`<div class="nnote"><b>დამუშავების დონე (NOVA):</b> ${meta.nova} / 4</div>`);
+    $('#pIngr').style.display = ingrParts.length ? '' : 'none';
+    $('#pIngrBody').innerHTML = ingrParts.join('');
+    fillCalc();
+    openSheet('#prodSheet');
+  }
+  function openProduct(code) {
+    const p = getProduct(code); if (!p) return;
+    showProductSheet(code, p, p.piece ? r1(p.piece) : p.serving ? r1(p.serving) : 100, null);
+  }
+  function openEntryEdit(it) {
+    const product = getProduct(it.code) || { name: it.name, brand: '', per100: it.per100 || { kcal: it.kcal / it.grams * 100, p: it.p / it.grams * 100, c: it.c / it.grams * 100, f: it.f / it.grams * 100 }, img: '' };
+    showProductSheet(it.code, Object.assign({}, product, { per100: it.per100 || product.per100 }), it.grams, it.id);
+  }
+  $('#pGrams').addEventListener('input', fillCalc);
+  document.querySelectorAll('.grams button').forEach(b => b.onclick = () => {
+    $('#pGrams').value = Math.max(0, (num($('#pGrams').value) || 0) + (+b.dataset.d)); fillCalc();
+  });
+  $('#pMeal').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    pending.meal = b.dataset.meal; lastMeal = b.dataset.meal; store.set('mt_lastmeal', lastMeal);
+    $('#pMeal').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+  });
+  $('#pQuick').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { $('#pGrams').value = b.dataset.g; fillCalc(); } });
+  $('#pAdd').onclick = () => {
+    const g = num($('#pGrams').value);
+    if (!g || g <= 0) { toast('ჩაწერე რაოდენობა გრამებში'); return; }
+    const x = pending.product.per100, k = g / 100;
+    const vals = { grams: g, kcal: x.kcal * k, p: x.p * k, c: x.c * k, f: x.f * k, per100: x, m: scaleMicro(x.m, k) };
+    if (pending.target === 'recipe') {
+      if (!rcDraft) { closeSheet('#prodSheet'); return; }
+      if (pending.code === 'recipe-' + rcDraft.id) { toast('რეცეპტს თავის თავში ვერ ჩაამატებ'); return; }
+      if (pending.entryId) {
+        const it = rcDraft.items.find(i => i.id === pending.entryId);
+        if (it) it.grams = g;
+      } else {
+        rcDraft.items.push({ id: newId(), code: pending.code, name: pending.product.name, grams: g, per100: x });
+      }
+      rcDirty = true; saveDraft(); closeSheet('#prodSheet'); renderRecipes();
+      toast(pending.entryId ? 'შეინახა' : `ინგრედიენტი დაემატა: ${pending.product.name}`);
+      return;
+    }
+    if (pending.target === 'plan') {
+      const pk = dayKey(planDate);
+      plans[pk] = plans[pk] || [];
+      if (pending.entryId) {
+        const it = plans[pk].find(i => i.id === pending.entryId);
+        if (it) {
+          Object.assign(it, vals, { meal: pending.meal });
+          if (it.done && it.logId) { const le = (log[pk] || []).find(e => e.id === it.logId); if (le) Object.assign(le, vals); }
+        }
+        toast('შეინახა');
+      } else {
+        plans[pk].push(Object.assign({ id: newId(), code: pending.code, name: pending.product.name, meal: pending.meal, done: false }, vals));
+        toast(`გეგმაში დაემატა: ${Math.round(vals.kcal)} კკალ`);
+      }
+      saveAll(); savePlans(); closeSheet('#prodSheet'); render();
+      return;
+    }
+    const key = dayKey(current);
+    log[key] = log[key] || [];
+    if (pending.entryId) {
+      const it = log[key].find(i => i.id === pending.entryId);
+      if (it) Object.assign(it, vals);
+      toast('შეინახა');
+    } else {
+      const now = new Date();
+      const t = isToday(current) ? now.getTime() : new Date(current.getFullYear(), current.getMonth(), current.getDate(), now.getHours(), now.getMinutes()).getTime();
+      log[key].push(Object.assign({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), code: pending.code, name: pending.product.name, t }, vals));
+      toast(`დაემატა: ${Math.round(vals.kcal)} კკალ`);
+    }
+    saveAll(); closeSheet('#prodSheet'); render();
+  };
+  $('#pDelete').onclick = () => {
+    if (pending.target === 'recipe') {
+      if (rcDraft) { rcDraft.items = rcDraft.items.filter(i => i.id !== pending.entryId); rcDirty = true; saveDraft(); }
+      closeSheet('#prodSheet'); renderRecipes(); toast('ინგრედიენტი ამოღებულია');
+      return;
+    }
+    if (pending.target === 'plan') {
+      const pk = dayKey(planDate), it = (plans[pk] || []).find(i => i.id === pending.entryId);
+      if (it && it.done) setPlanDone(pk, it, false);
+      plans[pk] = (plans[pk] || []).filter(i => i.id !== pending.entryId);
+      if (!plans[pk].length) delete plans[pk];
+      saveAll(); savePlans(); closeSheet('#prodSheet'); render(); toast('გეგმიდან ამოღებულია');
+      return;
+    }
+    const key = dayKey(current);
+    // un-tick the plan item if this entry came from the plan
+    (plans[key] || []).forEach(pi => { if (pi.logId === pending.entryId) { pi.done = false; delete pi.logId; } });
+    savePlans();
+    log[key] = (log[key] || []).filter(i => i.id !== pending.entryId);
+    if (!log[key].length) delete log[key];
+    saveAll(); closeSheet('#prodSheet'); render(); toast('ჩანაწერი წაიშალა');
+  };
+  $('#pEdit').onclick = () => { closeSheet('#prodSheet'); openManual(pending.code, getProduct(pending.code), true); };
+
+  // ---------- Built-in foods sheet ----------
+  let foodCat = 'all';
+  const norm = s => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+  function renderFoods() {
+    const q = norm($('#foodSearch').value);
+    const own = Object.keys(products).filter(c => !c.startsWith('food-') && !c.startsWith('recipe-') && products[c] && products[c].per100)
+      .map(c => {
+        const pr = products[c];
+        return { code: c, name: pr.name + (pr.brand ? ' · ' + pr.brand : ''), cat: /^(off|usda)$/.test(pr.source) ? 'scan' : 'own', aliases: pr.brand || '', per100: pr.per100 };
+      }).sort((a, b) => a.name.localeCompare(b.name, 'ka'));
+    const mine = own.filter(x => x.cat === 'own')
+      .concat(Object.keys(products).filter(c => c.startsWith('recipe-')).map(c => ({ code: c, name: products[c].name, cat: 'my', aliases: '', per100: products[c].per100 })))
+      .concat(own.filter(x => x.cat === 'scan'));
+    const has = k => mine.some(x => x.cat === k);
+    const cats = [['own', 'ჩემი პროდუქტები'], ['my', 'ჩემი რეცეპტები'], ['scan', 'დასკანერებული']].filter(([k]) => has(k)).concat(FOOD_CATS);
+    if (/^(my|own|scan)$/.test(foodCat) && !has(foodCat)) foodCat = 'all';
+    $('#foodCats').innerHTML = [['all', 'ყველა']].concat(cats)
+      .map(([id, label]) => `<button class="chip${id === foodCat && !q ? ' on' : ''}" data-cat="${id}">${label}</button>`).join('');
+    const all = mine.concat(Object.values(FOODS).map(x => Object.assign({ code: 'food-' + x.id }, x)));
+    const list = all.filter(x => q
+      ? norm(x.name + ' ' + x.aliases).includes(q)
+      : (foodCat === 'all' || x.cat === foodCat));
+    $('#foodList').innerHTML = list.length ? list.map(x => {
+      const v = (getProduct(x.code) || x).per100;
+      return `<li><button class="fitem" data-code="${esc(x.code)}"><div><div class="nm">${esc(x.name)}</div>
+        <div class="sub">ც ${v.p} · ნ ${v.c} · ცხ ${v.f} გ</div></div>
+        <div class="kc">${Math.round(v.kcal)} <small>კკალ/100გ</small></div></button></li>`;
+    }).join('') : `<li class="empty" style="margin-top:10px">ვერ მოიძებნა. დაამატე „ბარკოდის გარეშე“ ღილაკით.</li>`;
+  }
+  $('#openFoods').onclick = () => { $('#foodSearch').value = ''; renderFoods(); openSheet('#foodSheet'); $('#foodSheet .sheet-card').scrollTop = 0; };
+  $('#foodSearch').addEventListener('input', renderFoods);
+  $('#foodCats').addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    foodCat = b.dataset.cat; $('#foodSearch').value = ''; renderFoods();
+  });
+  $('#foodList').addEventListener('click', e => {
+    const b = e.target.closest('.fitem'); if (!b) return;
+    closeSheet('#foodSheet'); openProduct(b.dataset.code);
+  });
+
+  // ---------- Manual product ----------
+  let manCode = null;
+  function openManual(code, pre, editing) {
+    manCode = code; manPrefill = null; manResults = [];
+    $('#mResults').innerHTML = '';
+    $('#mSearchWrap').style.display = editing ? 'none' : '';
+    $('#mDelete').hidden = !(editing && !code.startsWith('food-') && !code.startsWith('recipe-') && products[code]);
+    $('#mQuery').value = pre && pre.name && pre.name !== 'უცნობი პროდუქტი' ? pre.name : '';
+    $('#mSearchMsg').textContent = 'ამოირჩიე ყველაზე ახლოს მყოფი — მონაცემები ფორმაში ჩაიწერება და ეტიკეტთან შეადარებ.';
+    $('#mTitle').textContent = editing ? 'მონაცემების შესწორება' : 'პროდუქტის დამატება';
+    $('#mSub').textContent = code.startsWith('custom-')
+      ? 'მაგ. სახლის საჭმელი ან წონით ნაყიდი პროდუქტი.'
+      : code.startsWith('food-') ? 'შეცვლილ მნიშვნელობებს აპი დაიმახსოვრებს.'
+      : `ბარკოდი ${code}. ჩაწერე მონაცემები ეტიკეტიდან — ერთხელ შეავსებ და შემდეგ ჯერზე თავად იცნობს.`;
+    $('#mName').value = pre && pre.name !== 'უცნობი პროდუქტი' ? pre.name : '';
+    $('#mBase').value = 100;
+    const x = pre && pre.per100;
+    const has = x && (x.kcal || x.p || x.c || x.f);
+    $('#mK').value = has ? x.kcal : ''; $('#mP').value = has ? x.p : ''; $('#mC').value = has ? x.c : ''; $('#mF').value = has ? x.f : '';
+    $('#mServ').value = pre && pre.serving ? pre.serving : '';
+    const pm = (x && x.m) || {};
+    $('#mFib').value = pm.fib ?? ''; $('#mSug').value = pm.sug ?? ''; $('#mSfa').value = pm.sfa ?? '';
+    $('#mSalt').value = pm.na != null ? r1(pm.na * 2.5 / 1000) : ''; $('#mChol').value = pm.chol ?? '';
+    $('#mExtra').open = ['fib', 'sug', 'sfa', 'na', 'chol'].some(k => pm[k] != null);
+    openSheet('#manSheet');
+  }
+  let manPrefill = null; // { m, meta, img, brand } from a chosen search result
+  let manResults = [];
+  async function runManSearch() {
+    const q = $('#mQuery').value.trim();
+    if (q.length < 2) { toast('ჩაწერე სახელი'); return; }
+    const nq = norm(q);
+    const local = Object.values(FOODS).filter(x => norm(x.name + ' ' + x.aliases).includes(nq)).slice(0, 5)
+      .map(x => Object.assign({}, getProduct('food-' + x.id), { _src: 'მზა სია' }));
+    manResults = local;
+    renderManResults();
+    $('#mSearchMsg').textContent = 'ვეძებ ბაზაში…';
+    try {
+      const r = await searchOFF(q);
+      manResults = local.concat(r.slice(0, 12).map(x => Object.assign(x, { _src: 'Open Food Facts' })));
+      $('#mSearchMsg').textContent = manResults.length ? 'ამოირჩიე ყველაზე მსგავსი (მნიშვნელობები 100 გ-ზე):' : 'ვერაფერი მოიძებნა — სცადე სხვა სიტყვით (ლათინურად / რუსულად) ან შეავსე ეტიკეტიდან.';
+    } catch (e) {
+      $('#mSearchMsg').textContent = local.length ? 'ბაზასთან კავშირი ვერ მოხერხდა — ნაჩვენებია მხოლოდ მზა სიიდან.' : 'ბაზასთან კავშირი ვერ მოხერხდა. სცადე ცოტა ხანში.';
+    }
+    renderManResults();
+  }
+  function renderManResults() {
+    $('#mResults').innerHTML = manResults.map((x, i) => {
+      const v = x.per100;
+      return `<li><button class="fitem" data-i="${i}"><div style="min-width:0"><div class="nm">${esc(x.name)}${x.brand ? ' · ' + esc(x.brand) : ''}</div>
+        <div class="sub">ც ${v.p} · ნ ${v.c} · ცხ ${v.f} გ</div><div class="src">${esc(x._src || '')}</div></div>
+        <div class="kc">${Math.round(v.kcal)} <small>კკალ</small></div></button></li>`;
+    }).join('');
+  }
+  $('#mQueryGo').onclick = runManSearch;
+  $('#mQuery').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); runManSearch(); } });
+  $('#mResults').addEventListener('click', e => {
+    const b = e.target.closest('.fitem'); if (!b) return;
+    const x = manResults[+b.dataset.i]; if (!x) return;
+    const v = x.per100, m = v.m || {};
+    if (!$('#mName').value.trim()) $('#mName').value = x.name + (x.brand ? ' · ' + x.brand : '');
+    $('#mBase').value = 100;
+    $('#mK').value = Math.round(v.kcal); $('#mP').value = v.p; $('#mC').value = v.c; $('#mF').value = v.f;
+    if (x.serving && !$('#mServ').value) $('#mServ').value = x.serving;
+    $('#mFib').value = m.fib ?? ''; $('#mSug').value = m.sug ?? ''; $('#mSfa').value = m.sfa ?? '';
+    $('#mSalt').value = m.na != null ? r1(m.na * 2.5 / 1000) : ''; $('#mChol').value = m.chol ?? '';
+    $('#mExtra').open = true;
+    manPrefill = { m, meta: x.meta || null, img: x.img || '', brand: x.brand || '' };
+    toast('მონაცემები ჩაიწერა — შეადარე ეტიკეტს და შეინახე');
+    $('#mName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  let mDelArmed = 0;
+  $('#mDelete').onclick = () => {
+    if (Date.now() - mDelArmed > 4000) { mDelArmed = Date.now(); toast('წასაშლელად დააჭირე კიდევ ერთხელ (ჩაწერილი დღეები არ წაიშლება)'); return; }
+    delete products[manCode]; saveAll(); closeSheet('#manSheet'); render(); toast('პროდუქტი სიიდან წაიშალა');
+  };
+  $('#mSave').onclick = () => {
+    const name = $('#mName').value.trim();
+    const base = num($('#mBase').value) || 100;
+    const k = num($('#mK').value), p = num($('#mP').value) ?? 0, c = num($('#mC').value) ?? 0, f = num($('#mF').value) ?? 0;
+    if (!name) { toast('ჩაწერე დასახელება'); return; }
+    if (k == null) { toast('ჩაწერე კალორია'); return; }
+    const m = 100 / base;
+    const old = getProduct(manCode) || {};
+    const micro = Object.assign({}, (old.per100 && old.per100.m) || {}, (manPrefill && manPrefill.m) || {});
+    [['fib', '#mFib', 1], ['sug', '#mSug', 1], ['sfa', '#mSfa', 1], ['na', '#mSalt', 1000 / 2.5], ['chol', '#mChol', 1]].forEach(([key, sel, mul]) => {
+      const v = num($(sel).value);
+      if (v != null) micro[key] = Math.round(v * mul * m * 100) / 100; else delete micro[key];
+    });
+    products[manCode] = {
+      name, brand: old.brand || (manPrefill && manPrefill.brand) || '', img: old.img || (manPrefill && manPrefill.img) || '',
+      piece: old.piece || null, pieceLabel: old.pieceLabel,
+      meta: old.meta || (manPrefill && manPrefill.meta) || undefined,
+      per100: { kcal: r1(k * m), p: r1(p * m), c: r1(c * m), f: r1(f * m), m: micro },
+      serving: num($('#mServ').value), source: 'manual'
+    };
+    const isNew = !old.name;
+    saveAll(); closeSheet('#manSheet'); render(); openProduct(manCode);
+    if (isNew) toast('შენახულია „ჩემ პროდუქტებში“ — შემდეგ ჯერზე სიიდან აირჩევ');
+  };
+  $('#openCustom').onclick = () => openManual('custom-' + Date.now().toString(36), null);
+  $('#foodNew').onclick = () => { closeSheet('#foodSheet'); openManual('custom-' + Date.now().toString(36), null); };
+
+  // ---------- Settings ----------
+  $('#openSettings').onclick = () => {
+    $('#gK').value = goals.kcal; $('#gP').value = goals.p; $('#gC').value = goals.c; $('#gF').value = goals.f; $('#gW').value = goals.water;
+    openSheet('#setSheet');
+  };
+  $('#gSave').onclick = () => {
+    goals = { kcal: num($('#gK').value) || 2000, p: num($('#gP').value) || 0, c: num($('#gC').value) || 0, f: num($('#gF').value) || 0, water: num($('#gW').value) ?? 2.5 };
+    store.set(K.goals, goals); closeSheet('#setSheet'); render(); toast('მიზნები შეინახა');
+  };
+  $('#exportBtn').onclick = () => {
+    try {
+      const blob = new Blob([JSON.stringify({ app: 'makro-skaneri', v: 5, log, products, goals, water, plans, recipes, supps, suppTaken, weights, shopExtra }, null, 1)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = `makro-backup-${dayKey(new Date())}.json`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    } catch (e) { toast('ჩამოტვირთვა ვერ მოხერხდა'); }
+  };
+  $('#importInput').onchange = async e => {
+    const file = e.target.files[0]; e.target.value = ''; if (!file) return;
+    try {
+      const d = JSON.parse(await file.text());
+      if (!d || typeof d !== 'object' || !d.log) throw 0;
+      products = Object.assign({}, d.products || {}, products);
+      Object.keys(d.log).forEach(day => {
+        const ids = new Set((log[day] || []).map(i => i.id));
+        log[day] = (log[day] || []).concat((d.log[day] || []).filter(i => !ids.has(i.id)));
+      });
+      if (d.goals) { goals = Object.assign(goals, d.goals); store.set(K.goals, goals); }
+      if (d.recipes && typeof d.recipes === 'object') { recipes = Object.assign({}, d.recipes, recipes); saveRecipes(); }
+      if (Array.isArray(d.supps)) { const ids = new Set(supps.map(x => x.id)); supps = supps.concat(d.supps.filter(x => !ids.has(x.id))); }
+      if (d.suppTaken && typeof d.suppTaken === 'object') Object.keys(d.suppTaken).forEach(k => { suppTaken[k] = Array.from(new Set((suppTaken[k] || []).concat(d.suppTaken[k] || []))); });
+      saveSupps();
+      if (d.weights && typeof d.weights === 'object') { weights = Object.assign({}, d.weights, weights); store.set('mt_weights_v1', weights); }
+      if (Array.isArray(d.shopExtra)) { const ids = new Set(shopExtra.map(x => x.id)); shopExtra = shopExtra.concat(d.shopExtra.filter(x => !ids.has(x.id))); store.set('mt_shopextra_v1', shopExtra); }
+      if (d.plans && typeof d.plans === 'object') {
+        Object.keys(d.plans).forEach(day => {
+          const ids = new Set((plans[day] || []).map(i => i.id));
+          plans[day] = (plans[day] || []).concat((d.plans[day] || []).filter(i => !ids.has(i.id)));
+        });
+        savePlans();
+      }
+      if (d.water && typeof d.water === 'object') {
+        Object.keys(d.water).forEach(day => { water[day] = Math.max(water[day] || 0, +d.water[day] || 0); });
+        store.set(K.water, water);
+      }
+      saveAll(); render(); closeSheet('#setSheet'); toast('მონაცემები აღდგა');
+    } catch (err) { toast('ფაილი ვერ წავიკითხე'); }
+  };
+
+  // ---------- Scanner ----------
+  // Android Chrome: built-in BarcodeDetector. iPhone/Safari & others: ZXing-C++ (WebAssembly) polyfill.
+  const FORMATS = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'itf'];
+  const POLY_URLS = [
+    'https://fastly.jsdelivr.net/npm/barcode-detector@3/dist/iife/ponyfill.min.js',
+    'https://cdn.jsdelivr.net/npm/barcode-detector@3/dist/iife/ponyfill.min.js'
+  ];
+  let detector = null, detectorKind = '';
+  const loadScript = src => new Promise((res, rej) => {
+    const sc = document.createElement('script'); sc.src = src; sc.async = true;
+    sc.onload = res; sc.onerror = () => { sc.remove(); rej(new Error('load ' + src)); };
+    document.head.appendChild(sc);
+  });
+  async function getDetector() {
+    if (detector) return detector;
+    if ('BarcodeDetector' in window) {
+      try {
+        const sup = await window.BarcodeDetector.getSupportedFormats();
+        const f = FORMATS.filter(x => sup.includes(x));
+        if (f.includes('ean_13')) { detector = new window.BarcodeDetector({ formats: f }); detectorKind = 'native'; return detector; }
+      } catch (e) {}
+    }
+    if (!(window.BarcodeDetectionAPI && window.BarcodeDetectionAPI.BarcodeDetector)) {
+      let ok = false;
+      for (const u of POLY_URLS) { try { await loadScript(u); ok = true; break; } catch (e) {} }
+      if (!ok) throw new Error('scanner library failed to load');
+    }
+    detector = new window.BarcodeDetectionAPI.BarcodeDetector({ formats: FORMATS });
+    detectorKind = 'zxing';
+    return detector;
+  }
+  // reject misreads: verify EAN/UPC check digit
+  function validCode(c) {
+    if (!/^\d+$/.test(c)) return c.length >= 4;
+    if (![8, 12, 13, 14].includes(c.length)) return c.length >= 6;
+    const d = c.split('').map(Number), chk = d.pop();
+    let sum = 0;
+    d.reverse().forEach((n, i) => { sum += n * (i % 2 === 0 ? 3 : 1); });
+    return (10 - (sum % 10)) % 10 === chk;
+  }
+
+  const video = $('#video');
+  const cv = document.createElement('canvas');
+  const cctx = cv.getContext('2d', { willReadFrequently: true });
+  let stream = null, camOn = false, wantOpen = false, handled = false, loopTimer = null, detecting = false;
+
+  function stopCam() {
+    camOn = false; clearTimeout(loopTimer);
+    if (stream) { stream.getTracks().forEach(t => { try { t.stop(); } catch (e) {} }); stream = null; }
+    try { video.pause(); } catch (e) {}
+    video.srcObject = null;
+  }
+  function onDetected(code) {
+    if (handled) return; handled = true;
+    try { navigator.vibrate && navigator.vibrate(60); } catch (e) {}
+    closeScanner(); handleCode(code);
+  }
+  async function scanTick() {
+    if (!camOn) return;
+    if (!detecting && video.readyState >= 2 && video.videoWidth) {
+      detecting = true;
+      try {
+        const vw = video.videoWidth, vh = video.videoHeight;
+        // the area inside the on-screen frame (with some margin)
+        const cw = Math.round(vw * 0.9), ch = Math.round(vh * 0.5);
+        const sx = Math.round((vw - cw) / 2), sy = Math.round((vh - ch) / 2);
+        const sc = Math.min(1, 1280 / cw);
+        cv.width = Math.round(cw * sc); cv.height = Math.round(ch * sc);
+        cctx.drawImage(video, sx, sy, cw, ch, 0, 0, cv.width, cv.height);
+        const res = await detector.detect(cv);
+        const hit = (res || []).map(r => r.rawValue).find(v => v && validCode(v));
+        if (hit) { detecting = false; onDetected(hit); return; }
+      } catch (e) {}
+      detecting = false;
+    }
+    loopTimer = setTimeout(scanTick, detectorKind === 'native' ? 100 : 150);
+  }
+  async function openScanner() {
+    wantOpen = true; handled = false;
+    $('#manualCode').value = '';
+    $('#camWrap').style.display = '';
+    openSheet('#scanSheet');
+    $('#scanMsg').textContent = 'კამერა ირთვება…';
+    try {
+      const [st] = await Promise.all([
+        navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }
+        }),
+        getDetector()
+      ]);
+      if (!wantOpen) { st.getTracks().forEach(t => t.stop()); return; }
+      stream = st;
+      video.srcObject = stream;
+      video.setAttribute('playsinline', ''); video.muted = true;
+      await video.play();
+      const track = stream.getVideoTracks()[0];
+      try {
+        const caps = track.getCapabilities ? track.getCapabilities() : {};
+        if (caps.focusMode && caps.focusMode.includes('continuous')) await track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
+      } catch (e) {}
+      camOn = true;
+      $('#scanMsg').textContent = 'ბარკოდი ჩარჩოში მოაქციე, 15–25 სმ მანძილზე — თავად ამოიცნობს';
+      scanTick();
+    } catch (e) {
+      stopCam();
+      const msg = String(e && (e.name || e.message) || '');
+      $('#scanMsg').textContent = /NotAllowed|Permission/i.test(msg)
+        ? 'კამერაზე წვდომა არ არის. ჩართე კამერის ნებართვა ამ საიტისთვის (iPhone: Settings → Safari → Camera), ან გამოიყენე ფოტო / ციფრების ჩაწერა.'
+        : /library/i.test(msg)
+          ? 'სკანერი ვერ ჩაიტვირთა (ინტერნეტი?). გამოიყენე ციფრების ჩაწერა.'
+          : 'კამერა ვერ ჩაირთო. გამოიყენე ფოტო ან ციფრების ჩაწერა.';
+    }
+  }
+  function closeScanner() {
+    wantOpen = false; closeSheet('#scanSheet'); stopCam();
+    return Promise.resolve();
+  }
+  $('#openScan').onclick = openScanner;
+  $('#closeScan').onclick = closeScanner;
+  $('#openCode').onclick = () => {
+    wantOpen = false; stopCam(); $('#manualCode').value = '';
+    $('#camWrap').style.display = 'none';
+    openSheet('#scanSheet');
+    $('#scanMsg').textContent = 'ჩაწერე ბარკოდის ქვეშ მოცემული ციფრები';
+    setTimeout(() => $('#manualCode').focus(), 50);
+  };
+  const goManual = () => { const v = $('#manualCode').value; closeScanner().then(() => handleCode(v)); };
+  $('#manualGo').onclick = goManual;
+  $('#manualCode').addEventListener('keydown', e => { if (e.key === 'Enter') goManual(); });
+
+  // photo fallback: the phone's own camera app focuses better on close-ups
+  async function fileToCanvas(file, maxDim) {
+    let src;
+    try { src = await createImageBitmap(file); }
+    catch (e) {
+      src = await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = URL.createObjectURL(file); });
+    }
+    const w = src.width, h = src.height, k = Math.min(1, maxDim / Math.max(w, h));
+    const c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k);
+    c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
+    return c;
+  }
+  $('#photoInput').addEventListener('click', () => { camOn = false; clearTimeout(loopTimer); });
+  $('#photoInput').onchange = async e => {
+    const file = e.target.files[0]; e.target.value = ''; if (!file) { if (wantOpen) openScanner(); return; }
+    stopCam();
+    $('#scanMsg').textContent = 'ფოტოს ვამუშავებ…';
+    try {
+      const det = await getDetector();
+      let hit = null;
+      for (const dim of [1600, 2600, 1000]) {
+        const c = await fileToCanvas(file, dim);
+        const res = await det.detect(c);
+        hit = (res || []).map(r => r.rawValue).find(v => v && validCode(v));
+        if (hit) break;
+      }
+      if (!hit) throw new Error('none');
+      await closeScanner(); handleCode(hit);
+    } catch (err) {
+      $('#scanMsg').textContent = 'ფოტოზე ბარკოდი ვერ ამოვიცანი. გადაუღე ახლოდან, სწორად და კარგ განათებაზე, ან ჩაწერე ციფრები.';
+    }
+  };
+
+  // ---------- Home-screen icon (PNG for iPhone) ----------
+  try {
+    const cv = document.createElement('canvas'); cv.width = cv.height = 180;
+    const x = cv.getContext('2d');
+    x.fillStyle = '#0f766e'; x.fillRect(0, 0, 180, 180);
+    x.fillStyle = '#fff';
+    [[40, 10], [58, 5], [72, 14], [94, 5], [108, 11], [127, 7]].forEach(([px, w]) => x.fillRect(px, 50, w, 80));
+    $('#touchIcon').href = cv.toDataURL('image/png');
+  } catch (e) {}
+
+  // refresh "today" when app comes back after midnight
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
+
+  showTab(store.get('mt_tab', 'log'));
+})();
+</script>
+</body>
+</html>
