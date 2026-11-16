@@ -89,6 +89,15 @@
   .nutgrp{font-size:12.5px;color:var(--muted);font-weight:700;margin:12px 0 4px;text-transform:uppercase;letter-spacing:.02em}
   .nrow{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:6px 0;border-bottom:1px solid #f0f3f2;font-size:14px}
   .nrow:last-child{border-bottom:0}
+  #nutBody .nrow,#plNutBody .nrow{cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:6px}
+  #nutBody .nrow:active,#plNutBody .nrow:active,.macro[data-bk]:active,.kcal-top[data-bk]:active{background:#f3f6f5}
+  .macro[data-bk],.kcal-top[data-bk]{cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:10px}
+  .bk-sub{font-size:13px;color:var(--muted);margin:2px 0 8px}
+  .bk-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 10px;padding:8px 0;border-bottom:1px solid #f0f3f2;font-size:14px}
+  .bk-row:last-child{border-bottom:0}
+  .bk-row .nm small,.bk-row .v small{color:var(--muted);font-weight:500;font-size:12px}
+  .bk-row .v{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .bk-row .bar{grid-column:1 / -1;height:4px;margin:0}
   .nrow .nv{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
   .nrow .nv small{color:var(--muted);font-weight:500}
   .nrow .bar{grid-column:1 / -1;height:5px;margin-top:3px}
@@ -824,6 +833,17 @@
   </div>
 </div>
 
+<!-- Nutrient breakdown by product -->
+<div class="sheet" id="brkSheet">
+  <div class="sheet-card">
+    <h3 id="bkTitle"></h3>
+    <div class="bk-sub" id="bkSub"></div>
+    <div id="bkList"></div>
+    <div class="nnote" id="bkNote"></div>
+    <button class="ghost" data-close>დახურვა</button>
+  </div>
+</div>
+
 <!-- Supplements: manage -->
 <div class="sheet" id="suppSheet">
   <div class="sheet-card">
@@ -1019,6 +1039,7 @@ zucchini|ყაბაყი|vg|17|1.2|3.1|0.3|||ცუკინი
 pumpkin|გოგრა|vg|26|1.0|6.5|0.1|||
 beet|ჭარხალი|vg|43|1.6|9.6|0.2|||
 spinach|ისპანახი|vg|23|2.9|3.6|0.4|||
+arugula|რუკოლა|vg|25|2.6|3.7|0.7|||რუკოლა არუგულა rucola arugula
 lettuce|სალათის ფოთოლი|vg|15|1.4|2.9|0.2|||სალათა
 radish|ბოლოკი|vg|16|0.7|3.4|0.1|||
 mushroom|სოკო (შამპინიონი)|vg|22|3.1|3.3|0.3|||
@@ -1282,6 +1303,8 @@ ad_castello_beans|Castello კონსერვის ლობიო|ad|142|9|
 broth_ch|ქათმის ბულიონი (სახლის)|ck|36|2.5|3.5|1.2|250|1 თასი|ბულიონი წვნიანი სუპი
 broth_bf|საქონლის ბულიონი (სახლის)|ck|13|2|1.2|0.1|250|1 თასი|ბულიონი წვნიანი სუპი ძროხა
 ad_vici_mussels|VICI მიდიები ზეთში|ad|182|14.03|0|14|200|1 შეფუთვა|მიდია მიდიები vici ზღვის პროდუქტი
+ad_selfish_tuna|Selfish ტუნას ნაჭრები მარილწყალში|ad|79.1|17.3|0|1.1|185|1 ქილა (185 გ)|ტუნა თევზი კონსერვი selfish tuna
+ad_olympus_feta|Olympus ფეტა ლაქტოზის გარეშე|ad|276|16.5|0.7|23|150|1 შეფუთვა (150 გ)|ფეტა ყველი olympus feta ლაქტოზის გარეშე
 egg_boiled|მოხარშული კვერცხი|ck|155|12.6|1.1|10.6|50||კვერცხი
 egg_fried|შემწვარი კვერცხი (ერბოკვერცხი)|ck|196|13.6|0.8|14.8|46||კვერცხი ერბო გლაზუნია
 omelet|ომლეტი (უბრალო)|ck|154|10.6|0.6|11.7|||კვერცხი
@@ -1547,6 +1570,9 @@ ad_castello_beans:10,2,0,240,,,,,,,,,,,,,,,,,,,0
 broth_ch:0,1.2,0.3,143,,,,105,,,,,,,,,,,,,,,3
 broth_bf:0,0.5,0.04,198,,,,185,,,,,,,,,,,,,,,0
 ad_vici_mussels:0,0.2,1.05,880,,,,,,,,,,,,,,,,,,,
+ad_selfish_tuna:,0,0.71,97.6,,,,,,,,,,,,,,,,,,,
+ad_olympus_feta:,0.7,16.1,880,,,,,,,,,,,,,,,,,,,
+arugula:1.6,2.05,0.086,27,160,1.46,47,369,0.47,119,0.044,0.086,0.305,0.437,0.073,97,0,15,0,0.43,108.6,0,0
 chbreast_b:0,0,0.646,40.6,6.44,0.477,25.3,301,0.876,11.6,0.073,0.183,8.74,1.35,0.627,3.61,0.217,0,0.129,0.722,0,11.6,94.1
 chbreast_f:0,0,0.969,59.8,7,0.518,37.2,444,0.952,12.6,0.105,0.223,12.4,1.78,0.908,4.76,0.265,0,0.14,0.784,0,12.6,102
 chthighs_b:0,0,1.41,87.8,9.24,1.06,21.2,222,2.11,13.2,0.071,0.201,4.98,1.02,0.317,3.7,0.528,0,0.132,0.264,2.24,11.9,124
@@ -1671,7 +1697,7 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
   const OMEGA3 = {
     salmon: { o3: 1970 }, salmonb: { o3: 2150 }, trout: { o3: 940 }, troutb: { o3: 1150 }, tuna: { o3: 240 }, shrimp: { o3: 70 },
     egg: { o3: 40 }, egg_boiled: { o3: 40 }, egg_fried: { o3: 40 }, omelet: { o3: 30 }, scrambled: { o3: 30 },
-    walnut: { ala: 9.1 }, oliveoil: { ala: 0.76 }, butter: { ala: 0.32 }, pistachio: { ala: 0.25 }, spinach: { ala: 0.14 },
+    walnut: { ala: 9.1 }, oliveoil: { ala: 0.76 }, butter: { ala: 0.32 }, pistachio: { ala: 0.25 }, spinach: { ala: 0.14 }, arugula: { ala: 0.17 },
     avocado: { ala: 0.11 }, hazelnut: { ala: 0.09 },
     mackerel: { o3: 2300 }, satsivi: { ala: 2.2 }, churchkhela: { ala: 2.7 }, gozinaki: { ala: 4.5 },
     pkhali_sp: { ala: 1.6 }, pkhali_bt: { ala: 1.6 }, pkhali_gb: { ala: 1.6 }, badrijani_n: { ala: 1.5 }
@@ -1695,12 +1721,45 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
         const pct = has && ref ? v / ref * 100 : null;
         const cls = kind === 'max' ? 'lim' : (pct != null && pct >= 100 ? 'good' : '');
         const part = partialMap && partialMap[key] ? ` <span class="part">${partialMap[key]}</span>` : '';
-        html += `<div class="nrow ${cls}"><span>${label}${part}</span>
+        html += `<div class="nrow ${cls}" data-nk="${key}"><span>${label}${part}</span>
           <span class="nv">${has ? fmtN(v) : '—'} <small>${unit}${pct != null ? ' · ' + Math.round(pct) + '%' + (kind === 'max' ? ' ლიმიტის' : '') : ''}</small></span>
           ${pct != null ? `<div class="bar${kind === 'max' && pct > 100 ? ' over' : ''}"><i style="width:${Math.min(100, pct)}%"></i></div>` : ''}</div>`;
       });
     });
     return html;
+  }
+
+  // ---------- Breakdown: which products gave how much ----------
+  const BK_MACRO = { kcal: ['კალორია', 'კკალ', 'var(--kcal)'], p: ['ცილა', 'გ', 'var(--prot)'], c: ['ნახშირწყლები', 'გ', 'var(--carb)'], f: ['ცხიმი', 'გ', 'var(--fat)'] };
+  function openBreakdown(scope, k) {
+    const d = scope === 'plan' ? planDate : current, dk = dayKey(d);
+    const items = (scope === 'plan' ? plans[dk] : log[dk]) || [];
+    const isMac = k in BK_MACRO, nut = isMac ? null : NUTS.find(n => n[0] === k);
+    if (!isMac && !nut) return;
+    const [label, unit, color] = isMac ? BK_MACRO[k] : [nut[1], nut[2], nut[4] === 'max' ? '#d97706' : '#64748b'];
+    const ref = isMac ? +goals[k] : nut[3];
+    const rows = new Map(); let missing = 0;
+    items.forEach(i => {
+      const v = isMac ? (+i[k] || 0) : (i.m && i.m[k] != null ? +i.m[k] : null);
+      if (v == null) { missing++; return; }
+      const id = i.code || i.name, r = rows.get(id) || { name: i.name, g: 0, v: 0 };
+      r.g += +i.grams || 0; r.v += v; rows.set(id, r);
+    });
+    if (scope !== 'plan' && !isMac) supps.filter(x => (suppTaken[dk] || []).includes(x.id))
+      .forEach(x => { const v = +((x.m || {})[k]) || 0; if (v) rows.set('supp-' + x.id, { name: x.name, supp: true, v }); });
+    const list = [...rows.values()].filter(r => r.v > 0.0005).sort((a, b) => b.v - a.v);
+    const total = list.reduce((a, r) => a + r.v, 0);
+    $('#bkTitle').textContent = label;
+    $('#bkSub').textContent = `${dayLabel(d) || (d.getDate() + ' ' + MONTHS[d.getMonth()])}${scope === 'plan' ? ' (გეგმა)' : ''} · სულ ${fmtN(total)} ${unit}`
+      + (ref ? ` · ${Math.round(total / ref * 100)}% ${isMac ? 'მიზნის' : nut[4] === 'max' ? 'ლიმიტის' : 'ნორმის'}` : '');
+    $('#bkList').innerHTML = list.length ? list.map(r => {
+      const sh = total ? r.v / total * 100 : 0;
+      return `<div class="bk-row"><span class="nm">${esc(r.name)} <small>${r.supp ? 'დანამატი' : r.g ? Math.round(r.g) + ' გ' : ''}</small></span>
+        <span class="v">${fmtN(r.v)} <small>${unit} · ${Math.round(sh)}%</small></span>
+        <div class="bar"><i style="width:${sh}%;background:${color}"></i></div></div>`;
+    }).join('') : '<div class="nnote">ამ დღეს ამ მაჩვენებელს პროდუქტებიდან არაფერი შეუტანია.</div>';
+    $('#bkNote').textContent = missing ? `${missing} პროდუქტზე ამ მაჩვენებლის მონაცემი არ არის, ამიტომ აქ არ ჩანს.` : '';
+    openSheet('#brkSheet');
   }
 
   // ---------- Product score (0–10), Nutri-Score-style + processing & additives ----------
@@ -1812,7 +1871,7 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
       ${r.notes.map(n => `<div class="nnote">${esc(n)}</div>`).join('')}`;
   }
 
-  const FOOD_INGR = {"ad_agro_satsebeli": "პომიდორი 93.9%, ნიორი, მარილი, შაქარი, წითელი წიწაკა დაფქული, ხმელი ქინძი, უცხო სუნელი", "ad_agro_tkemali": "მწვანე ტყემალი 92.5%, ნიორი, შაქარი, მარილი, ნედლი ქინძი, წითელი წიწაკა დაღერღილი, ომბალო, კამა", "ad_castello_beans": "კანელინის მარცვლები, წყალი, მარილი", "ad_vici_mussels": "ჩილიური მიდიის ხორცი (მოხარშული), რაფსის ზეთი, მარილი, მჟავიანობის რეგულატორი: ლიმონმჟავა; გემოსა და არომატის გამაძლიერებელი: ნატრიუმის გლუტამატი; კონსერვანტები: ნატრიუმის ბენზოატი, კალიუმის სორბატი; ანტიოქსიდანტი: ასკორბინის მჟავა; დამატკბობელი: საქარინი"};
+  const FOOD_INGR = {"ad_olympus_feta": "ცხვრის რძე (მინ. 70%), თხის რძე (მაქს. 30%), მარილი, ფერმენტული კულტურები, მიკრობული რენეტი", "ad_agro_satsebeli": "პომიდორი 93.9%, ნიორი, მარილი, შაქარი, წითელი წიწაკა დაფქული, ხმელი ქინძი, უცხო სუნელი", "ad_agro_tkemali": "მწვანე ტყემალი 92.5%, ნიორი, შაქარი, მარილი, ნედლი ქინძი, წითელი წიწაკა დაღერღილი, ომბალო, კამა", "ad_castello_beans": "კანელინის მარცვლები, წყალი, მარილი", "ad_vici_mussels": "ჩილიური მიდიის ხორცი (მოხარშული), რაფსის ზეთი, მარილი, მჟავიანობის რეგულატორი: ლიმონმჟავა; გემოსა და არომატის გამაძლიერებელი: ნატრიუმის გლუტამატი; კონსერვანტები: ნატრიუმის ბენზოატი, კალიუმის სორბატი; ანტიოქსიდანტი: ასკორბინის მჟავა; დამატკბობელი: საქარინი"};
   const FOOD_ADD = { ad_vici_mussels: ['E330', 'E621', 'E211', 'E202', 'E300', 'E954'] };
   function getProduct(code) {
     if (products[code]) return products[code];
@@ -1837,6 +1896,14 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
   const openSheet = id => $(id).classList.add('open');
   const closeSheet = id => $(id).classList.remove('open');
   document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => closeSheet('#' + b.closest('.sheet').id)));
+  [['#nutBody', 'log'], ['#plNutBody', 'plan']].forEach(([sel, scope]) => $(sel).addEventListener('click', e => {
+    const r = e.target.closest('.nrow[data-nk]'); if (r) openBreakdown(scope, r.dataset.nk);
+  }));
+  [['log', '#kcalVal', '#pVal', '#cVal', '#fVal'], ['plan', '#plKcalVal', '#plPVal', '#plCVal', '#plFVal']].forEach(([scope, ...ids]) =>
+    ['kcal', 'p', 'c', 'f'].forEach((k, n) => {
+      const el = $(ids[n]).closest(n ? '.macro' : '.kcal-top'); if (!el) return;
+      el.dataset.bk = k; el.addEventListener('click', () => openBreakdown(scope, k));
+    }));
   document.querySelectorAll('.sheet:not(#scanSheet)').forEach(s => s.addEventListener('click', e => { if (e.target === s) closeSheet('#' + s.id); }));
 
   function setBar(id, val, goal) {
@@ -1883,7 +1950,7 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
     const sm = suppMicro(key), hasSupp = Object.keys(sm).length > 0;
     Object.keys(sm).forEach(k => { sums[k] = (sums[k] || 0) + sm[k]; delete partial[k]; });
     renderSupps(key, sums, sm);
-    const note = (hasSupp ? '<div class="nnote">ჯამში ჩათვლილია მონიშნული დანამატებიც.</div>' : '') + `<div class="nnote">% — ზრდასრულის ზოგადი დღიური ნორმიდან (შაქარზე, ნაჯერ ცხიმზე, ქოლესტერინსა და ნატრიუმზე — ზედა ზღვრიდან).
+    const note = (hasSupp ? '<div class="nnote">ჯამში ჩათვლილია მონიშნული დანამატებიც.</div>' : '') + `<div class="nnote">მაჩვენებელზე დააჭირე და ნახავ, რომელი პროდუქტიდან რამდენი მიიღე.<br>% — ზრდასრულის ზოგადი დღიური ნორმიდან (შაქარზე, ნაჯერ ცხიმზე, ქოლესტერინსა და ნატრიუმზე — ზედა ზღვრიდან).
       „(2/3)“ ნიშნავს, რომ მონაცემი 3 პროდუქტიდან მხოლოდ 2-ზეა. მზა პროდუქტების მნიშვნელობები მიახლოებითია (USDA-ს საშუალოები),
       დასკანერებულისა — ეტიკეტიდან, თუ მწარმოებელს აქვს მითითებული. K2 ცნობილია მხოლოდ რამდენიმე ცხოველურ პროდუქტზე; B7 — მხოლოდ ზოგიერთ ეტიკეტზე.</div>`;
     $('#nutBody').innerHTML = !items.length && !hasSupp
@@ -2000,7 +2067,7 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
     $('#plNutBody').innerHTML = !items.length
       ? '<div class="nnote">ჯერ არაფერი დაგიგეგმავს.</div>'
       : (Object.keys(sums).length ? nutRowsHTML(sums, partial, true) : '<div class="nnote">დაგეგმილ პროდუქტებზე ვიტამინების მონაცემი არ არის.</div>')
-        + '<div class="nnote">% — ზრდასრულის ზოგადი დღიური ნორმიდან. მზა პროდუქტების მნიშვნელობები მიახლოებითია.</div>';
+        + '<div class="nnote">მაჩვენებელზე დააჭირე და ნახავ, რომელი პროდუქტიდან რამდენი მოდის.<br>% — ზრდასრულის ზოგადი დღიური ნორმიდან. მზა პროდუქტების მნიშვნელობები მიახლოებითია.</div>';
     // meals
     let html = '';
     MEALS.forEach(([mk, ml]) => {
@@ -3263,7 +3330,7 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
   showTab(store.get('mt_tab', 'log'));
 
   // ---------- Update check (home-screen apps on iPhone keep the old page cached) ----------
-  const APP_VERSION = '2026.11.16-4';
+  const APP_VERSION = '2026.11.16-6';
   let newVer = null;
   async function checkUpdate() {
     if (!/^https?:/.test(location.protocol)) return;
