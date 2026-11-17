@@ -98,6 +98,15 @@
   .bk-row .nm small,.bk-row .v small{color:var(--muted);font-weight:500;font-size:12px}
   .bk-row .v{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
   .bk-row .bar{grid-column:1 / -1;height:4px;margin:0}
+  .bk-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .bk-head h3{margin:0}
+  .bk-src{flex:0 0 auto;font-size:12px;font-weight:500;color:var(--brand);border:1px solid var(--line);border-radius:8px;padding:5px 9px;background:#fff}
+  .bk-sort{margin:4px 0 6px}
+  .bk-sort button{font-size:12px;padding:5px 0}
+  .bk-pick{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;width:100%;text-align:left;padding:8px 0;border-bottom:1px solid #f0f3f2;font-size:14px}
+  .bk-pick:last-child{border-bottom:0}
+  .bk-pick small{color:var(--muted);font-size:11.5px;font-weight:500}
+  .bk-pick .v{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right}
   .nrow .nv{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
   .nrow .nv small{color:var(--muted);font-weight:500}
   .nrow .bar{grid-column:1 / -1;height:5px;margin-top:3px}
@@ -1044,10 +1053,17 @@
 <!-- Nutrient breakdown by product -->
 <div class="sheet" id="brkSheet">
   <div class="sheet-card">
-    <h3 id="bkTitle"></h3>
+    <div class="bk-head"><h3 id="bkTitle"></h3><button class="bk-src" id="bkSrc">რისგან მივიღო</button></div>
     <div class="bk-sub" id="bkSub"></div>
-    <div id="bkList"></div>
-    <div class="nnote" id="bkNote"></div>
+    <div id="bkDay">
+      <div id="bkList"></div>
+      <div class="nnote" id="bkNote"></div>
+    </div>
+    <div id="bkSrcView" hidden>
+      <div class="seg bk-sort" id="bkSort"><button data-s="k" class="on">100 კკალ-ზე</button><button data-s="g">100 გ-ზე</button></div>
+      <div id="bkSrcList"></div>
+      <div class="nnote" id="bkSrcNote"></div>
+    </div>
     <button class="ghost" data-close>დახურვა</button>
   </div>
 </div>
@@ -2066,8 +2082,58 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
         <div class="bar"><i style="width:${sh}%;background:${color}"></i></div></div>`;
     }).join('') : '<div class="nnote">ამ დღეს ამ მაჩვენებელს პროდუქტებიდან არაფერი შეუტანია.</div>';
     $('#bkNote').textContent = missing ? `${missing} პროდუქტზე ამ მაჩვენებლის მონაცემი არ არის, ამიტომ აქ არ ჩანს.` : '';
+    bkState = { k, isMac, nut, label, unit, scope };
+    const lim = !isMac && nut[4] === 'max';
+    $('#bkSrc').hidden = k === 'kcal';
+    $('#bkSrc').textContent = lim ? 'სად არის ბევრი' : 'რისგან მივიღო';
+    showBkView(false);
     openSheet('#brkSheet');
   }
+  let bkState = null, bkSort = 'k';
+  function showBkView(src) {
+    $('#bkDay').hidden = src; $('#bkSrcView').hidden = !src; $('#bkSub').hidden = src;
+    const lim = bkState && !bkState.isMac && bkState.nut[4] === 'max';
+    $('#bkSrc').textContent = src ? '‹ ჩემი დღე' : lim ? 'სად არის ბევრი' : 'რისგან მივიღო';
+    if (src) renderBkSources();
+  }
+  function renderBkSources() {
+    const { k, isMac, nut, unit } = bkState, lim = !isMac && nut[4] === 'max';
+    $('#bkSort').hidden = lim; const sort = lim ? 'g' : bkSort;
+    $('#bkSort').querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.s === sort));
+    const ref = isMac ? +goals[k] : nut[3];
+    const val = per => isMac ? +per[k] : (per.m && per.m[k] != null && per.m[k] !== '' ? +per.m[k] : null);
+    const cand = [];
+    Object.values(FOODS).forEach(x => { if (x.cat !== 'sc') cand.push({ code: 'food-' + x.id, name: x.name, per: x.per100, piece: x.piece, pl: x.pieceLabel }); });
+    Object.entries(products).forEach(([code, p]) => { if (p && p.per100 && !String(code).startsWith('recipe-')) cand.push({ code, name: p.name, per: p.per100, piece: p.piece || (p.serving && p.serving.g) || null, pl: p.pieceLabel || '1 პორცია' }); });
+    const ranked = cand.map(x => {
+      const v = val(x.per); if (v == null || !(v > 0)) return null;
+      const kc = +x.per.kcal || 0;
+      if (sort === 'k' && kc < 15) return null;
+      return Object.assign(x, { v, score: sort === 'k' ? v / kc * 100 : v });
+    }).filter(Boolean).sort((a, b) => b.score - a.score);
+    // one row per product: raw / boiled / fried variants collapse into the best one
+    const seen = new Set(), list = [];
+    for (const x of ranked) { const base = x.name.replace(/\s*\([^)]*\)\s*$/, ''); if (seen.has(base)) continue; seen.add(base); list.push(x); if (list.length >= 15) break; }
+    $('#bkSrcList').innerHTML = list.length ? list.map(x => {
+      const shown = x.score, pct = ref ? Math.round(shown / ref * 100) : null;
+      const pc = x.piece ? `${esc(x.pl)} (${Math.round(x.piece)} გ): ${fmtN(x.v * x.piece / 100)} ${unit}` : '';
+      return `<button class="bk-pick" data-code="${esc(x.code)}"><span>${esc(x.name)}</span><span class="v">${fmtN(shown)} ${unit}</span>
+        <small>${pc}</small><small style="text-align:right">${pct != null ? pct + '% ' + (isMac ? 'მიზნის' : lim ? 'ლიმიტის' : 'ნორმის') : ''}</small></button>`;
+    }).join('') : '<div class="nnote">ამ მაჩვენებლის მონაცემი პროდუქტებზე არ არის.</div>';
+    $('#bkSrcNote').textContent = (sort === 'k'
+      ? 'დალაგებულია 100 კკალ-ზე: ზემოთაა ის, რაც ცოტა კალორიით ბევრს გაძლევს. დაკლებისას ასე ჯობია.'
+      : 'დალაგებულია 100 გ-ზე.') + (lim ? ' ეს ის პროდუქტებია, რისი ბევრი ჭამაც ჯობია მოერიდო.' : ' პროდუქტს შეეხე და დაამატებ.') + ' სანელებლები და სოუსები არ ჩანს.';
+  }
+  $('#bkSrc').onclick = () => showBkView($('#bkSrcView').hidden);
+  $('#bkSort').addEventListener('click', e => {
+    const b = e.target.closest('button[data-s]'); if (!b) return;
+    bkSort = b.dataset.s; $('#bkSort').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); renderBkSources();
+  });
+  $('#bkSrcList').addEventListener('click', e => {
+    const b = e.target.closest('.bk-pick'); if (!b) return;
+    addTarget = bkState.scope === 'plan' ? 'plan' : 'log';
+    closeSheet('#brkSheet'); openProduct(b.dataset.code);
+  });
 
   // ---------- Product score (0–10), Nutri-Score-style + processing & additives ----------
   const SWEETENERS = new Set(['E420','E421','E950','E951','E952','E954','E955','E957','E959','E960','E960A','E960B','E960C','E961','E962','E964','E965','E966','E967','E968','E969']);
@@ -3993,7 +4059,7 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
   showTab(store.get('mt_tab', 'log'));
 
   // ---------- Update check (home-screen apps on iPhone keep the old page cached) ----------
-  const APP_VERSION = '2026.11.17-5';
+  const APP_VERSION = '2026.11.17-6';
   let newVer = null;
   async function checkUpdate() {
     if (!/^https?:/.test(location.protocol)) return;
