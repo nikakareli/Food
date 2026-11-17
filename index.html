@@ -481,6 +481,36 @@
   .tp-chk{border-radius:6px}
   .updbar,.toast{border-radius:10px}
   .toast{font-size:13px}
+  .pback{flex:0 0 32px;height:32px;border-radius:8px;border:1px solid var(--line);font-size:20px;line-height:1;color:var(--ink);display:grid;place-items:center;align-self:flex-start}
+  .pback[hidden]{display:none}
+  .ts-ex{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 0;border-bottom:1px solid #f0f3f2}
+  .ts-ex:last-child{border-bottom:0}
+  .ts-ex .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+  .ts-ex .t b{font-size:14px;font-weight:600}
+  .ts-ex .t span{font-size:11.5px;color:var(--muted)}
+  .ts-ex .chg{font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .ts-ex .chg.up{color:#3f7d58}.ts-ex .chg.dn{color:#a9473f}.ts-ex .chg.eq{color:var(--muted);font-weight:500}
+  .ts-new{font-size:10.5px;font-weight:600;color:#3f7d58;border:1px solid #cfdcd3;border-radius:5px;padding:0 4px;margin-left:4px}
+  .tr-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .tr-tiles div{display:flex;flex-direction:column;gap:1px}
+  .tr-tiles b{font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+  .tr-tiles span{font-size:11.5px;color:var(--muted)}
+  .tr-h{display:flex;justify-content:space-between;align-items:center}
+  .tr-h .link{font-size:12px;padding:0 2px}
+  #trQuick .chip.new{color:var(--brand);border-style:dashed}
+  .tr-group{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 10px 10px 12px;margin-bottom:8px}
+  .tr-gh{display:flex;align-items:center;gap:10px}
+  .tr-name{flex:1;min-width:0;text-align:left;display:flex;flex-direction:column;gap:1px}
+  .tr-name b{font-size:14px;font-weight:600}
+  .tr-name span{font-size:11.5px;color:var(--muted)}
+  .tr-plus{flex:0 0 32px;height:32px;border-radius:8px;background:var(--brand);color:#fff;font-size:18px;line-height:1}
+  .tr-sets{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .tr-set{padding:4px 9px;border-radius:7px;background:#f4f5f3;border:1px solid var(--line);font-size:12.5px;font-variant-numeric:tabular-nums}
+  .tr-field{display:grid;grid-template-columns:1fr 40px 96px 40px;gap:6px;align-items:center;margin-top:12px}
+  .tr-field label{font-size:13px;color:var(--muted)}
+  .tr-field button{height:40px;border-radius:8px;background:#f1f3f1;font-size:18px}
+  .tr-field input{height:40px;text-align:center;font-size:17px;font-weight:600;border:1px solid var(--line);border-radius:8px;background:#fafbfb;min-width:0}
+  #teType button.on,#trPresets button:active{background:var(--brand);color:#fff}
 </style>
 </head>
 <body>
@@ -501,6 +531,9 @@
     <button data-tab="recipes">რეცეპტები</button>
     <button data-tab="shop">სავაჭრო სია</button>
     <button data-tab="stats">სტატისტიკა</button>
+    <div class="dr-group">ვარჯიში</div>
+    <button data-tab="train">დღის ვარჯიში</button>
+    <button data-tab="trstats">ვარჯიშის სტატისტიკა</button>
   </aside>
 
   <div id="pageLog">
@@ -719,6 +752,44 @@
     <div class="nnote">რაოდენობა ითვლება „კვების ცხრილიდან“. მოხარშული ბურღულეული და მომზადებული ხორცი გადაყვანილია მშრალ ან უმ წონაზე, რეცეპტები კი დაშლილია ინგრედიენტებად.</div>
   </div><!-- /pageShop -->
 
+  <div id="pageTrain" hidden>
+    <header>
+      <div class="daynav">
+        <button class="iconbtn" id="trPrev" aria-label="წინა დღე">‹</button>
+        <div class="datebox"><b id="trDateLabel">დღეს</b><span id="trDateSub"></span></div>
+        <button class="iconbtn" id="trNext" aria-label="შემდეგი დღე">›</button>
+      </div>
+    </header>
+    <section class="card"><div class="tr-tiles" id="trSum"></div></section>
+    <h2 class="tr-h"><span>დაამატე</span><button class="link" id="trManage">ვარჯიშების სია</button></h2>
+    <div class="chips" id="trQuick"></div>
+    <h2>დღის ვარჯიშები</h2>
+    <div id="trList"></div>
+    <div class="nnote">ვარჯიშის სახელს შეეხე და სეტს დაამატებ, „+“ კი ბოლო სეტს იმეორებს. სეტზე დაჭერით შეცვლი ან წაშლი.</div>
+  </div><!-- /pageTrain -->
+
+  <div id="pageTrStats" hidden>
+    <div class="seg st-period" id="tsPeriod">
+      <button data-n="7">7 დღე</button>
+      <button data-n="30">30 დღე</button>
+      <button data-n="90">90 დღე</button>
+    </div>
+    <div id="tsEmpty" class="empty" hidden>ამ პერიოდში ვარჯიში ჯერ არ არის ჩაწერილი. სტატისტიკა „დღის ვარჯიშის“ ჩანაწერებიდან ითვლება.</div>
+    <div id="tsBody">
+      <div class="st-tiles" id="tsTiles"></div>
+      <section class="card st-card">
+        <div class="st-h">სეტები დღეების მიხედვით</div>
+        <div class="st-chart" id="tsChart"></div>
+        <div class="st-tip" id="tsTip"></div>
+      </section>
+      <section class="card st-card">
+        <div class="st-h">ვარჯიშები</div>
+        <div id="tsExList"></div>
+        <div class="nnote">ისარი წინა იმავე ხანგრძლივობის პერიოდთან შედარებაა. ვარჯიშს შეეხე და პროგრესს ნახავ.</div>
+      </section>
+    </div>
+  </div><!-- /pageTrStats -->
+
   <div id="pageStats" hidden>
     <div class="seg st-period" id="stPeriod">
       <button data-n="7" class="on">7 დღე</button>
@@ -827,6 +898,7 @@
 <div class="sheet" id="prodSheet">
   <div class="sheet-card">
     <div class="phead">
+      <button class="pback" id="pBack" aria-label="უკან, სიაში" hidden>‹</button>
       <img id="pImg" src="" alt="">
       <div style="min-width:0">
         <h3 id="pName"></h3>
@@ -915,6 +987,56 @@
     <div class="bar" id="tpBar"><i style="background:#3f7d58"></i></div>
     <div id="tpList"></div>
     <button class="btn2" id="tpEdit" style="width:100%;margin-top:14px">გეგმის შეცვლა</button>
+    <button class="ghost" data-close>დახურვა</button>
+  </div>
+</div>
+
+<!-- Training: add / edit set -->
+<div class="sheet" id="trSetSheet">
+  <div class="sheet-card">
+    <h3 id="tsTitle"></h3>
+    <div class="muted" id="tsSub"></div>
+    <div id="tsFields"></div>
+    <button class="primary" id="tsSave">დამატება</button>
+    <button class="ghost danger" id="tsDel" hidden>სეტის წაშლა</button>
+    <button class="ghost" data-close>გაუქმება</button>
+  </div>
+</div>
+
+<!-- Training: exercise list -->
+<div class="sheet" id="trExSheet">
+  <div class="sheet-card">
+    <h3>ვარჯიშების სია</h3>
+    <div class="muted">რასაც აკეთებ. დაჭერით შეცვლი სახელს ან ტიპს.</div>
+    <ul class="list" id="trExList" style="margin-top:10px"></ul>
+    <button class="btn2" id="trExNew" style="width:100%;margin-top:10px">+ ახალი ვარჯიში</button>
+    <div class="st-sub">სწრაფი დამატება</div>
+    <div class="quick" id="trPresets"></div>
+    <button class="ghost" data-close>დახურვა</button>
+  </div>
+</div>
+
+<!-- Training: edit exercise -->
+<div class="sheet" id="trExEdit">
+  <div class="sheet-card">
+    <h3 id="teTitle">ახალი ვარჯიში</h3>
+    <div class="field"><label>სახელი</label><input id="teName" placeholder="მაგ. ბიძგები" autocomplete="off"></div>
+    <div class="field"><label>რას ითვლი</label></div>
+    <div class="quick" id="teType"></div>
+    <button class="primary" id="teSave">შენახვა</button>
+    <button class="ghost danger" id="teDel" hidden>ვარჯიშის წაშლა</button>
+    <button class="ghost" data-close>გაუქმება</button>
+  </div>
+</div>
+
+<!-- Training: exercise progress -->
+<div class="sheet" id="trDetSheet">
+  <div class="sheet-card">
+    <h3 id="tdTitle"></h3>
+    <div class="muted" id="tdSub"></div>
+    <div class="st-chart" id="tdChart" style="height:150px;margin-top:10px"></div>
+    <div class="st-tip" id="tdTip"></div>
+    <div id="tdRows"></div>
     <button class="ghost" data-close>დახურვა</button>
   </div>
 </div>
@@ -1391,6 +1513,9 @@ broth_bf|საქონლის ბულიონი (სახლის)|ck|
 ad_vici_mussels|VICI მიდიები ზეთში|ad|182|14.03|0|14|200|1 შეფუთვა|მიდია მიდიები vici ზღვის პროდუქტი
 ad_selfish_tuna|Selfish ტუნას ნაჭრები მარილწყალში|ad|79.1|17.3|0|1.1|185|1 ქილა|ტუნა თევზი კონსერვი selfish tuna
 ad_olympus_feta|Olympus ფეტა ლაქტოზის გარეშე|ad|276|16.5|0.7|23|150|1 შეფუთვა|ფეტა ყველი olympus feta ლაქტოზის გარეშე
+ad_castello_chickpeas|Castello კონსერვის მუხუდო|ad|108|5.8|12|2.6|240|1 ქილა (გადაწურული)|მუხუდო ნუტი castello chickpeas კონსერვი
+ad_mioliva_green|miOliva მწვანე ზეთისხილი, უკურკო|ad|145|1|3.8|15.3|170|1 ქილა (გადაწურული)|ზეთისხილი ოლივა mioliva
+ad_laexpl_anchovy|La Explanada ზეთისხილი ანჩოუსის პასტით|ad|155|1.3|0|16|||ზეთისხილი ოლივა ანჩოუსი თევზი la explanada
 egg_boiled|მოხარშული კვერცხი|ck|155|12.6|1.1|10.6|50||კვერცხი
 egg_fried|შემწვარი კვერცხი (ერბოკვერცხი)|ck|196|13.6|0.8|14.8|46||კვერცხი ერბო გლაზუნია
 omelet|ომლეტი (უბრალო)|ck|154|10.6|0.6|11.7|||კვერცხი
@@ -1771,6 +1896,9 @@ vermicelli:3.2,2.7,0.28,6,21,1.3,53,223,1.41,0,0.09,0.06,1.7,0.43,0.142,18,0,0,0
 vermicellic:1.8,0.6,0.18,1,7,0.5,18,44,0.51,0,0.02,0.02,0.4,0.112,0.049,7,0,0,0,0.06,0.1,0,0
 shoti:2.3,2,0.25,480,15,1.2,22,110,0.7,0,0.15,0.07,1.6,0.4,0.06,30,0,0,0,0.2,0.2,0,0
 pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3,0.2,0,0
+ad_castello_chickpeas:6.9,0,0.4,132,,,,,,,,,,,,,,,,,,,
+ad_mioliva_green:3.3,0.54,2.03,1556,52,0.49,11,42,0.04,20,0.021,0.007,0.237,0.023,0.031,3,0,0,0,3.81,1.4,0,0
+ad_laexpl_anchovy:,0,3,1280,,,,,,,,,,,,,,,,,,,
 `;
   MICRO_DATA.trim().split('\n').forEach(line => {
     const [id, vals] = line.split(':');
@@ -1935,7 +2063,7 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
     else if (x.p >= 8 && !drink) notes.push(`ცილა ${r1(x.p)} გ, მაგრამ კალორიის მხოლოდ ${Math.round(pShare * 100)}% მოდის ცილიდან — ცილის ძირითად წყაროდ არ გამოდგება.`);
     if (fib != null && fib >= 6) pros.push(`ბევრი ბოჭკო (${r1(fib)} გ)`);
     else if (fib != null && fib >= 3) pros.push(`ბოჭკოს კარგი წყარო (${r1(fib)} გ)`);
-    if (fatGood) pros.push('ცხიმი ძირითადად უჯერია (სასარგებლო ცხიმები)');
+    if (fatGood || (!drink && x.f >= 10 && sfa != null && sfa / x.f <= 0.25)) pros.push('ცხიმი ძირითადად უჯერია (სასარგებლო ცხიმები)');
     if (sug != null) {
       if (drink ? sug > 5 : sug > 22.5) cons.push(`ბევრი შაქარი (${r1(sug)} გ/100${drink ? 'მლ' : 'გ'})`);
       else if (drink ? sug > 2.5 : sug > 10) cons.push(`საკმაოდ ბევრი შაქარი (${r1(sug)} გ)`);
@@ -1978,8 +2106,9 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
       ${r.notes.map(n => `<div class="nnote">${esc(n)}</div>`).join('')}`;
   }
 
-  const FOOD_INGR = {"ad_olympus_feta": "ცხვრის რძე (მინ. 70%), თხის რძე (მაქს. 30%), მარილი, ფერმენტული კულტურები, მიკრობული რენეტი", "ad_agro_satsebeli": "პომიდორი 93.9%, ნიორი, მარილი, შაქარი, წითელი წიწაკა დაფქული, ხმელი ქინძი, უცხო სუნელი", "ad_agro_tkemali": "მწვანე ტყემალი 92.5%, ნიორი, შაქარი, მარილი, ნედლი ქინძი, წითელი წიწაკა დაღერღილი, ომბალო, კამა", "ad_castello_beans": "კანელინის მარცვლები, წყალი, მარილი", "ad_vici_mussels": "ჩილიური მიდიის ხორცი (მოხარშული), რაფსის ზეთი, მარილი, მჟავიანობის რეგულატორი: ლიმონმჟავა; გემოსა და არომატის გამაძლიერებელი: ნატრიუმის გლუტამატი; კონსერვანტები: ნატრიუმის ბენზოატი, კალიუმის სორბატი; ანტიოქსიდანტი: ასკორბინის მჟავა; დამატკბობელი: საქარინი"};
-  const FOOD_ADD = { ad_vici_mussels: ['E330', 'E621', 'E211', 'E202', 'E300', 'E954'] };
+  const FOOD_INGR = {"ad_olympus_feta": "ცხვრის რძე (მინ. 70%), თხის რძე (მაქს. 30%), მარილი, ფერმენტული კულტურები, მიკრობული რენეტი", "ad_agro_satsebeli": "პომიდორი 93.9%, ნიორი, მარილი, შაქარი, წითელი წიწაკა დაფქული, ხმელი ქინძი, უცხო სუნელი", "ad_agro_tkemali": "მწვანე ტყემალი 92.5%, ნიორი, შაქარი, მარილი, ნედლი ქინძი, წითელი წიწაკა დაღერღილი, ომბალო, კამა", "ad_castello_beans": "კანელინის მარცვლები, წყალი, მარილი", "ad_vici_mussels": "ჩილიური მიდიის ხორცი (მოხარშული), რაფსის ზეთი, მარილი, მჟავიანობის რეგულატორი: ლიმონმჟავა; გემოსა და არომატის გამაძლიერებელი: ნატრიუმის გლუტამატი; კონსერვანტები: ნატრიუმის ბენზოატი, კალიუმის სორბატი; ანტიოქსიდანტი: ასკორბინის მჟავა; დამატკბობელი: საქარინი", "ad_castello_chickpeas": "რეჰიდრირებული მუხუდო 60%, წყალი, მარილი, ანტიოქსიდანტი: ასკორბინის მჟავა (E300)", "ad_mioliva_green": "წყალი, მწვანე ზეთისხილი 42.5%, მარილი, მჟავიანობის რეგულატორები: რძემჟავა (E270), ლიმონმჟავა (E330); ანტიოქსიდანტი: ასკორბინის მჟავა (E300)"};
+  const FOOD_ADD = { ad_vici_mussels: ['E330', 'E621', 'E211', 'E202', 'E300', 'E954'], ad_castello_chickpeas: ['E300'], ad_mioliva_green: ['E270', 'E330', 'E300'] };
+  const AD_APPROX = new Set(['ad_mioliva_green']); // no nutrition table on the label — typical values
   function getProduct(code) {
     if (products[code]) return products[code];
     if (code && code.startsWith('food-')) {
@@ -2370,7 +2499,326 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
   };
 
   // ---------- Pages & menu ----------
-  const PAGES = { log: ['#pageLog', 'დღის კონტროლი'], plan: ['#pagePlan', 'კვების ცხრილი'], recipes: ['#pageRecipes', 'რეცეპტები'], shop: ['#pageShop', 'სავაჭრო სია'], stats: ['#pageStats', 'სტატისტიკა'] };
+
+  // ---------- Training ----------
+  let exercises = store.get('mt_exercises_v1', []);   // [{ id, name, type }]
+  let train = store.get('mt_train_v1', {});           // { 'YYYY-MM-DD': [{ id, ex, t, reps, kg, sec, km }] }
+  let trDate = new Date();
+  const saveTrain = () => { store.set('mt_exercises_v1', exercises); store.set('mt_train_v1', train); };
+  const TR_TYPES = [['reps', 'გამეორებები'], ['wreps', 'წონა × გამეორება'], ['time', 'დრო'], ['dist', 'მანძილი და დრო']];
+  const TR_PRESETS = [['ბიძგები', 'reps'], ['აზიდვები (ტურნიკი)', 'reps'], ['ჩაჯდომები', 'reps'], ['პრესი', 'reps'], ['ბრუსები', 'reps'],
+    ['ლანჯები', 'reps'], ['პლანკა', 'time'], ['სირბილი', 'dist'], ['სიარული', 'dist'], ['ველოსიპედი', 'time'], ['კარდიო ტრენაჟორი', 'time'],
+    ['ჟიმი წოლით', 'wreps'], ['ჩაჯდომა შტანგით', 'wreps'], ['მკვდარი აწევა', 'wreps'], ['ბიცეფსი ჰანტელით', 'wreps'], ['მხრები ჰანტელით', 'wreps'], ['გაჭიმვა', 'time']];
+  const exById = id => exercises.find(x => x.id === id);
+  const mmss = sec => { sec = Math.round(sec || 0); const m = Math.floor(sec / 60), s2 = sec % 60; return m + ':' + String(s2).padStart(2, '0'); };
+  const durTxt = sec => sec >= 3600 ? `${Math.floor(sec / 3600)} სთ ${Math.round(sec % 3600 / 60)} წთ` : sec >= 600 ? `${Math.round(sec / 60)} წთ` : sec >= 60 ? mmss(sec) + ' წთ' : `${Math.round(sec)} წმ`;
+  function setTxt(ex, x) {
+    const t = ex ? ex.type : 'reps';
+    if (t === 'wreps') return `${r1(x.kg)} კგ × ${x.reps}`;
+    if (t === 'time') return mmss(x.sec);
+    if (t === 'dist') return `${r1(x.km)} კმ` + (x.sec ? ` · ${Math.round(x.sec / 60)} წთ` : '');
+    return String(x.reps);
+  }
+  function lastSet(exId) {
+    let best = null;
+    Object.keys(train).forEach(k => (train[k] || []).forEach(x => { if (x.ex === exId && (!best || x.t > best.t)) best = x; }));
+    return best;
+  }
+  function renderTrain() {
+    const key = dayKey(trDate), items = (train[key] || []).slice().sort((a, b) => a.t - b.t);
+    $('#trDateLabel').textContent = dayLabel(trDate) || DAYS[trDate.getDay()];
+    $('#trDateSub').textContent = `${trDate.getDate()} ${MONTHS[trDate.getMonth()]}`;
+    $('#trNext').disabled = isToday(trDate);
+    // summary
+    let reps = 0, vol = 0, sec = 0, km = 0;
+    items.forEach(x => { reps += +x.reps || 0; vol += (+x.kg || 0) * (+x.reps || 0); sec += +x.sec || 0; km += +x.km || 0; });
+    const exCount = new Set(items.map(x => x.ex)).size;
+    const tiles = [[items.length, 'სეტი'], [exCount, 'ვარჯიში']];
+    if (reps) tiles.push([reps, 'გამეორება']);
+    if (vol) tiles.push([Math.round(vol), 'კგ აწეული']);
+    if (sec) tiles.push([durTxt(sec), 'დრო']);
+    if (km) tiles.push([r1(km), 'კმ']);
+    if (tiles.length < 3) tiles.push(['—', 'გამეორება']);
+    $('#trSum').innerHTML = tiles.map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('');
+    // quick chips: my exercises, most used first
+    const use = {}; Object.values(train).forEach(arr => (arr || []).forEach(x => { use[x.ex] = (use[x.ex] || 0) + 1; }));
+    $('#trQuick').innerHTML = exercises.length
+      ? exercises.slice().sort((a, b) => (use[b.id] || 0) - (use[a.id] || 0)).map(x => `<button class="chip" data-ex="${esc(x.id)}">${esc(x.name)}</button>`).join('')
+        + '<button class="chip new" data-new="1">+ ახალი</button>'
+      : TR_PRESETS.slice(0, 8).map((p, i) => `<button class="chip" data-pi="${i}">${esc(p[0])}</button>`).join('') + '<button class="chip new" data-new="1">+ სხვა</button>';
+    // groups
+    const groups = [];
+    items.forEach(x => { let g = groups.find(g => g.ex === x.ex); if (!g) groups.push(g = { ex: x.ex, sets: [] }); g.sets.push(x); });
+    $('#trList').innerHTML = groups.length ? groups.map(g => {
+      const ex = exById(g.ex) || { name: 'წაშლილი ვარჯიში', type: 'reps' };
+      let sub = `${g.sets.length} სეტი`;
+      const gr = g.sets.reduce((a, x) => a + (+x.reps || 0), 0), gs = g.sets.reduce((a, x) => a + (+x.sec || 0), 0), gk = g.sets.reduce((a, x) => a + (+x.km || 0), 0);
+      if (ex.type === 'reps') sub += ` · ${gr} გამეორება`;
+      if (ex.type === 'wreps') sub += ` · ${gr} გამ. · ${Math.round(g.sets.reduce((a, x) => a + (+x.kg || 0) * (+x.reps || 0), 0))} კგ`;
+      if (ex.type === 'time') sub += ` · ${durTxt(gs)}`;
+      if (ex.type === 'dist') sub += ` · ${r1(gk)} კმ` + (gs ? ` · ${durTxt(gs)}` : '');
+      return `<div class="tr-group"><div class="tr-gh"><button class="tr-name" data-ex="${esc(g.ex)}"><b>${esc(ex.name)}</b><span>${sub}</span></button>
+        <button class="tr-plus" data-rep="${esc(g.ex)}" aria-label="იგივე სეტის დამატება">+</button></div>
+        <div class="tr-sets">${g.sets.map(x => `<button class="tr-set" data-sid="${esc(x.id)}">${esc(setTxt(ex, x))}</button>`).join('')}</div></div>`;
+    }).join('') : '<div class="empty">ამ დღეს ვარჯიში ჯერ არ არის.<br>ზემოთ აირჩიე, რა გააკეთე.</div>';
+  }
+  // set sheet
+  let tsState = null; // { exId, setId }
+  function trField(id, label, val, step) {
+    return `<div class="tr-field"><label for="${id}">${label}</label><button type="button" data-step="-${step}" data-for="${id}">−</button>
+      <input id="${id}" type="number" inputmode="decimal" min="0" step="any" value="${val}"><button type="button" data-step="${step}" data-for="${id}">+</button></div>`;
+  }
+  function openSetSheet(exId, setId) {
+    const ex = exById(exId); if (!ex) return;
+    const key = dayKey(trDate);
+    const cur = setId ? (train[key] || []).find(x => x.id === setId) : null;
+    const base = cur || lastSet(exId) || { reps: 10, kg: 20, sec: ex.type === 'dist' ? 600 : 60, km: 1 };
+    tsState = { exId, setId: cur ? cur.id : null };
+    $('#tsTitle').textContent = ex.name;
+    const prev = lastSet(exId);
+    $('#tsSub').textContent = cur ? 'სეტის შეცვლა' : prev ? `ბოლოს: ${setTxt(ex, prev)}` : TR_TYPES.find(t => t[0] === ex.type)[1];
+    let f = '';
+    if (ex.type === 'wreps') f += trField('tsKg', 'წონა, კგ', r1(base.kg ?? 20), 2.5);
+    if (ex.type === 'reps' || ex.type === 'wreps') f += trField('tsReps', 'გამეორება', base.reps ?? 10, 1);
+    if (ex.type === 'dist') f += trField('tsKm', 'მანძილი, კმ', r1(base.km ?? 1), 0.5);
+    if (ex.type === 'time' || ex.type === 'dist') {
+      const s2 = Math.round(base.sec ?? 60);
+      f += trField('tsMin', 'წუთი', Math.floor(s2 / 60), 1);
+      if (ex.type === 'time') f += trField('tsSec', 'წამი', s2 % 60, 5);
+    }
+    $('#tsFields').innerHTML = f;
+    $('#tsSave').textContent = cur ? 'შენახვა' : 'დამატება';
+    $('#tsDel').hidden = !cur;
+    openSheet('#trSetSheet');
+  }
+  $('#tsFields').addEventListener('click', e => {
+    const b = e.target.closest('button[data-step]'); if (!b) return;
+    const inp = $('#' + b.dataset.for), v = Math.max(0, (num(inp.value) || 0) + parseFloat(b.dataset.step));
+    inp.value = Math.round(v * 100) / 100;
+  });
+  $('#tsSave').onclick = () => {
+    const ex = exById(tsState.exId); if (!ex) return;
+    const g = id => $('#' + id) ? Math.max(0, num($('#' + id).value) || 0) : 0;
+    const vals = {};
+    if (ex.type === 'reps' || ex.type === 'wreps') vals.reps = Math.round(g('tsReps'));
+    if (ex.type === 'wreps') vals.kg = g('tsKg');
+    if (ex.type === 'time') vals.sec = Math.round(g('tsMin') * 60 + g('tsSec'));
+    if (ex.type === 'dist') { vals.km = g('tsKm'); vals.sec = Math.round(g('tsMin') * 60); }
+    if ((ex.type === 'reps' || ex.type === 'wreps') && !vals.reps) return toast('გამეორების რაოდენობა ჩაწერე');
+    if (ex.type === 'time' && !vals.sec) return toast('დრო ჩაწერე');
+    if (ex.type === 'dist' && !vals.km) return toast('მანძილი ჩაწერე');
+    const key = dayKey(trDate); train[key] = train[key] || [];
+    if (tsState.setId) Object.assign(train[key].find(x => x.id === tsState.setId) || {}, vals);
+    else train[key].push(Object.assign({ id: newId(), ex: ex.id, t: isToday(trDate) ? Date.now() : new Date(trDate.getFullYear(), trDate.getMonth(), trDate.getDate(), 12).getTime() }, vals));
+    saveTrain(); closeSheet('#trSetSheet'); renderTrain();
+    toast(tsState.setId ? 'შეიცვალა' : `დაემატა: ${ex.name}, ${setTxt(ex, vals)}`);
+  };
+  $('#tsDel').onclick = () => {
+    const key = dayKey(trDate);
+    train[key] = (train[key] || []).filter(x => x.id !== tsState.setId);
+    if (!train[key].length) delete train[key];
+    saveTrain(); closeSheet('#trSetSheet'); renderTrain(); toast('სეტი წაიშალა');
+  };
+  function addExercise(name, type) {
+    const ex = { id: newId(), name, type }; exercises.push(ex); saveTrain(); return ex;
+  }
+  $('#trQuick').addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    if (b.dataset.new) return openExEdit(null);
+    if (b.dataset.pi != null) { const p = TR_PRESETS[+b.dataset.pi]; const ex = addExercise(p[0], p[1]); renderTrain(); return openSetSheet(ex.id); }
+    openSetSheet(b.dataset.ex);
+  });
+  $('#trList').addEventListener('click', e => {
+    const n = e.target.closest('.tr-name'), p = e.target.closest('.tr-plus'), st = e.target.closest('.tr-set');
+    if (n) return openSetSheet(n.dataset.ex);
+    if (st) { const x = (train[dayKey(trDate)] || []).find(y => y.id === st.dataset.sid); if (x) openSetSheet(x.ex, x.id); return; }
+    if (p) {
+      const key = dayKey(trDate), mine = (train[key] || []).filter(x => x.ex === p.dataset.rep).sort((a, b) => b.t - a.t)[0];
+      const ex = exById(p.dataset.rep); if (!mine || !ex) return openSetSheet(p.dataset.rep);
+      const copy = Object.assign({}, mine, { id: newId(), t: Math.max(Date.now(), mine.t + 1) });
+      if (!isToday(trDate)) copy.t = mine.t + 1;
+      train[key].push(copy); saveTrain(); renderTrain(); toast(`დაემატა: ${ex.name}, ${setTxt(ex, copy)}`);
+    }
+  });
+  $('#trPrev').onclick = () => { trDate = addDays(trDate, -1); renderTrain(); };
+  $('#trNext').onclick = () => { if (!isToday(trDate)) { trDate = addDays(trDate, 1); renderTrain(); } };
+  // exercise list & edit
+  function renderExList() {
+    $('#trExList').innerHTML = exercises.length ? exercises.map(x => `<li><button class="item" data-eid="${esc(x.id)}"><div class="main"><div class="nm">${esc(x.name)}</div>
+      <div class="sub">${TR_TYPES.find(t => t[0] === x.type)[1]}</div></div><span class="arr" style="color:var(--muted)">›</span></button></li>`).join('')
+      : '<li class="empty">ჯერ ცარიელია. დაამატე ახალი ან აირჩიე ქვემოთ.</li>';
+    const have = new Set(exercises.map(x => x.name));
+    $('#trPresets').innerHTML = TR_PRESETS.map((p, i) => have.has(p[0]) ? '' : `<button data-pi="${i}">${esc(p[0])}</button>`).join('');
+  }
+  $('#trManage').onclick = () => { renderExList(); openSheet('#trExSheet'); };
+  $('#trExNew').onclick = () => openExEdit(null);
+  $('#trPresets').addEventListener('click', e => {
+    const b = e.target.closest('button[data-pi]'); if (!b) return;
+    const p = TR_PRESETS[+b.dataset.pi]; addExercise(p[0], p[1]); renderExList(); renderTrain(); toast(`დაემატა: ${p[0]}`);
+  });
+  $('#trExList').addEventListener('click', e => { const b = e.target.closest('[data-eid]'); if (b) openExEdit(b.dataset.eid); });
+  let teId = null, teType = 'reps';
+  function openExEdit(id) {
+    const ex = id ? exById(id) : null; teId = ex ? ex.id : null; teType = ex ? ex.type : 'reps';
+    $('#teTitle').textContent = ex ? 'ვარჯიშის შეცვლა' : 'ახალი ვარჯიში';
+    $('#teName').value = ex ? ex.name : '';
+    $('#teType').innerHTML = TR_TYPES.map(([k, l]) => `<button data-t="${k}" class="${k === teType ? 'on' : ''}">${l}</button>`).join('');
+    $('#teDel').hidden = !ex;
+    openSheet('#trExEdit'); if (!ex) setTimeout(() => $('#teName').focus(), 50);
+  }
+  $('#teType').addEventListener('click', e => {
+    const b = e.target.closest('button[data-t]'); if (!b) return;
+    teType = b.dataset.t; $('#teType').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+  });
+  $('#teSave').onclick = () => {
+    const name = $('#teName').value.trim(); if (!name) return toast('სახელი ჩაწერე');
+    if (teId) Object.assign(exById(teId), { name, type: teType }); else addExercise(name, teType);
+    saveTrain(); closeSheet('#trExEdit'); renderExList(); renderTrain(); toast('შენახულია');
+  };
+  $('#teDel').onclick = () => {
+    const ex = exById(teId); if (!ex) return;
+    const used = Object.values(train).some(arr => (arr || []).some(x => x.ex === teId));
+    if (!confirm(used ? `წავშალო „${ex.name}“? უკვე ჩაწერილი სეტებიც წაიშლება.` : `წავშალო „${ex.name}“?`)) return;
+    exercises = exercises.filter(x => x.id !== teId);
+    Object.keys(train).forEach(k => { train[k] = train[k].filter(x => x.ex !== teId); if (!train[k].length) delete train[k]; });
+    saveTrain(); closeSheet('#trExEdit'); renderExList(); renderTrain(); toast('წაიშალა');
+  };
+
+
+  // ---------- Training statistics ----------
+  let tsN = store.get('mt_trstats_n', 7), tsDays = [];
+  const TR_METRIC = { reps: ['გამეორება', x => +x.reps || 0], wreps: ['კგ აწეული', x => (+x.kg || 0) * (+x.reps || 0)], time: ['დრო', x => +x.sec || 0], dist: ['კმ', x => +x.km || 0] };
+  const metricTxt = (type, v) => type === 'time' ? durTxt(v) : type === 'dist' ? r1(v) + ' კმ' : type === 'wreps' ? Math.round(v) + ' კგ' : Math.round(v) + ' გამეორება';
+  function bestSet(type, sets) {
+    let b = null;
+    const k = x => type === 'wreps' ? (+x.kg || 0) * 1000 + (+x.reps || 0) : type === 'time' ? +x.sec || 0 : type === 'dist' ? +x.km || 0 : +x.reps || 0;
+    sets.forEach(x => { if (!b || k(x) > k(b)) b = x; });
+    return b;
+  }
+  function trSpan(n, offset) {
+    const out = [], today = new Date();
+    for (let i = n - 1 + offset; i >= offset; i--) {
+      const d = addDays(today, -i), key = dayKey(d);
+      out.push({ d, key, sets: train[key] || [] });
+    }
+    return out;
+  }
+  function drawBars(box, days, val, color, tipFmt, tipEl) {
+    const W = box.clientWidth || 340, H = box.clientHeight || 160;
+    const padL = 30, padR = 6, padT = 10, padB = 22;
+    const vals = days.map(val), maxV = Math.max(...vals, 1);
+    const raw = maxV / 3, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const step = [1, 2, 5, 10].map(m => m * mag).find(st => st >= raw) || mag * 10;
+    const top = Math.ceil(maxV / step) * step || step;
+    const y = v => padT + (H - padT - padB) * (1 - v / top);
+    const slot = (W - padL - padR) / days.length, bw = Math.max(2, Math.min(22, slot * 0.7));
+    let g = '', bars = '', hits = '', labels = '';
+    const fmtT = t => t >= 10000 ? Math.round(t / 1000) + 'k' : t >= 1000 ? (t / 1000) + 'k' : String(Math.round(t * 10) / 10);
+    for (let t = 0; t <= top + 1e-9; t += step) {
+      g += `<line x1="${padL}" x2="${W - padR}" y1="${y(t)}" y2="${y(t)}" stroke="#e8edeb" stroke-width="1"/>`;
+      g += `<text x="${padL - 6}" y="${y(t) + 4}" text-anchor="end" font-size="10" fill="#7a8682">${fmtT(t)}</text>`;
+    }
+    days.forEach((x, i) => {
+      const cx = padL + slot * i + slot / 2, v = vals[i];
+      if (v > 0) {
+        const t0 = y(v), bot = y(0), r = Math.min(4, bw / 2, bot - t0), xl = cx - bw / 2, xr = cx + bw / 2;
+        bars += `<path d="M${xl},${bot} L${xl},${t0 + r} Q${xl},${t0} ${xl + r},${t0} L${xr - r},${t0} Q${xr},${t0} ${xr},${t0 + r} L${xr},${bot} Z" fill="${x.key === dayKey(new Date()) ? color : color + 'b3'}"/>`;
+      }
+      hits += `<rect x="${padL + slot * i}" y="${padT}" width="${slot}" height="${H - padT - padB}" fill="transparent" data-i="${i}" style="cursor:pointer"/>`;
+      const every = days.length <= 7 ? 1 : days.length <= 31 ? 5 : 15;
+      if ((days.length - 1 - i) % every === 0)
+        labels += `<text x="${cx}" y="${H - 6}" text-anchor="middle" font-size="10" fill="#7a8682">${days.length <= 7 ? WD[x.d.getDay()] : x.d.getDate()}</text>`;
+    });
+    box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img">${g}${bars}${labels}${hits}</svg>`;
+    box.onclick = e => {
+      const el = e.target.closest('[data-i]'); if (!el) return;
+      const x = days[+el.dataset.i]; tipEl.innerHTML = `${DAYS[x.d.getDay()]}, ${x.d.getDate()} ${MONTHS[x.d.getMonth()]}: ${tipFmt(x)}`;
+    };
+    tipEl.textContent = 'შეეხე სვეტს დეტალებისთვის';
+  }
+  function trStreak() {
+    let d = new Date(), n = 0;
+    if (!(train[dayKey(d)] || []).length) d = addDays(d, -1);
+    while ((train[dayKey(d)] || []).length) { n++; d = addDays(d, -1); }
+    return n;
+  }
+  function renderTrStats() {
+    document.querySelectorAll('#tsPeriod button').forEach(b => b.classList.toggle('on', +b.dataset.n === tsN));
+    tsDays = trSpan(tsN, 0);
+    const prev = trSpan(tsN, tsN);
+    const all = tsDays.flatMap(x => x.sets), allPrev = prev.flatMap(x => x.sets);
+    $('#tsEmpty').hidden = !!all.length; $('#tsBody').hidden = !all.length;
+    if (!all.length) return;
+    const active = tsDays.filter(x => x.sets.length).length;
+    const reps = all.reduce((a, x) => a + (+x.reps || 0), 0), vol = all.reduce((a, x) => a + (+x.kg || 0) * (+x.reps || 0), 0);
+    const sec = all.reduce((a, x) => a + (+x.sec || 0), 0), km = all.reduce((a, x) => a + (+x.km || 0), 0);
+    const chg = (a, b) => b ? `${a >= b ? '↑' : '↓'} ${Math.abs(Math.round((a - b) / b * 100))}% წინასთან` : 'წინა პერიოდში არ იყო';
+    const pReps = allPrev.reduce((a, x) => a + (+x.reps || 0), 0);
+    const tiles = [
+      ['ვარჯიშის დღეები', `${active} / ${tsN}`, `ზედიზედ: ${trStreak()} დღე`],
+      ['სეტები', all.length, `საშუალოდ ${r1(all.length / active)} ვარჯიშის დღეს`],
+    ];
+    if (reps) tiles.push(['გამეორებები', reps, chg(reps, pReps)]);
+    if (vol) tiles.push(['აწეული წონა', Math.round(vol) + ' კგ', chg(vol, allPrev.reduce((a, x) => a + (+x.kg || 0) * (+x.reps || 0), 0))]);
+    if (sec) tiles.push(['დრო', durTxt(sec), chg(sec, allPrev.reduce((a, x) => a + (+x.sec || 0), 0))]);
+    if (km) tiles.push(['მანძილი', r1(km) + ' კმ', chg(km, allPrev.reduce((a, x) => a + (+x.km || 0), 0))]);
+    $('#tsTiles').innerHTML = tiles.slice(0, 4).map(([l, v, sub]) => `<div class="tile"><span>${l}</span><b>${v}</b><small>${sub}</small></div>`).join('');
+    drawBars($('#tsChart'), tsDays, x => x.sets.length, '#2b4a43', x => {
+      if (!x.sets.length) return 'ვარჯიში არ არის';
+      const by = {}; x.sets.forEach(st => { by[st.ex] = (by[st.ex] || 0) + 1; });
+      return `<b>${x.sets.length} სეტი</b> · ` + Object.entries(by).map(([id, n]) => `${esc((exById(id) || { name: '?' }).name)} ${n}`).join(', ');
+    }, $('#tsTip'));
+    // per exercise
+    const exIds = [...new Set(all.map(x => x.ex))];
+    const weekAgo = dayKey(addDays(new Date(), -6));
+    const rows = exIds.map(id => {
+      const ex = exById(id) || { id, name: 'წაშლილი ვარჯიში', type: 'reps' };
+      const [, f] = TR_METRIC[ex.type] || TR_METRIC.reps;
+      const sets = all.filter(x => x.ex === id), tot = sets.reduce((a, x) => a + f(x), 0);
+      const ptot = allPrev.filter(x => x.ex === id).reduce((a, x) => a + f(x), 0);
+      const allSets = Object.entries(train).flatMap(([k, arr]) => (arr || []).filter(x => x.ex === id).map(x => Object.assign({ day: k }, x)));
+      const best = bestSet(ex.type, allSets), isNew = best && best.day >= weekAgo && allSets.length > 1 && bestSet(ex.type, allSets.filter(x => x.day < weekAgo)) !== null
+        && setTxt(ex, bestSet(ex.type, allSets.filter(x => x.day < weekAgo))) !== setTxt(ex, best);
+      const c = ptot ? Math.round((tot - ptot) / ptot * 100) : null;
+      return { ex, sets: sets.length, tot, best, isNew, c };
+    }).sort((a, b) => b.sets - a.sets);
+    $('#tsExList').innerHTML = rows.map(r => `<button class="ts-ex" data-ex="${esc(r.ex.id)}"><span class="t"><b>${esc(r.ex.name)}</b>
+      <span>${r.sets} სეტი · ${metricTxt(r.ex.type, r.tot)}${r.best ? ` · რეკორდი ${esc(setTxt(r.ex, r.best))}` : ''}${r.isNew ? '<em class="ts-new">ახალი</em>' : ''}</span></span>
+      <span class="chg ${r.c == null ? 'eq' : r.c > 0 ? 'up' : r.c < 0 ? 'dn' : 'eq'}">${r.c == null ? 'ახალი' : (r.c > 0 ? '↑ ' : r.c < 0 ? '↓ ' : '') + Math.abs(r.c) + '%'}</span></button>`).join('');
+  }
+  $('#tsPeriod').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    tsN = +b.dataset.n; store.set('mt_trstats_n', tsN); renderTrStats();
+  });
+  $('#tsExList').addEventListener('click', e => { const b = e.target.closest('[data-ex]'); if (b) openTrDetail(b.dataset.ex); });
+  function openTrDetail(id) {
+    const ex = exById(id) || { id, name: 'წაშლილი ვარჯიში', type: 'reps' };
+    const [mLabel, f] = TR_METRIC[ex.type] || TR_METRIC.reps;
+    const allSets = Object.entries(train).flatMap(([k, arr]) => (arr || []).filter(x => x.ex === id).map(x => Object.assign({ day: k }, x)));
+    const days = tsDays.map(x => ({ d: x.d, key: x.key, sets: x.sets.filter(s2 => s2.ex === id) }));
+    $('#tdTitle').textContent = ex.name;
+    $('#tdSub').textContent = `${mLabel} დღეების მიხედვით, ბოლო ${tsN} დღე`;
+    openSheet('#trDetSheet');
+    drawBars($('#tdChart'), days, x => x.sets.reduce((a, s2) => a + f(s2), 0), '#4f6f9a',
+      x => x.sets.length ? `<b>${metricTxt(ex.type, x.sets.reduce((a, s2) => a + f(s2), 0))}</b> · ${x.sets.length} სეტი: ${x.sets.map(s2 => esc(setTxt(ex, s2))).join(', ')}` : 'არ გაკეთებულა', $('#tdTip'));
+    const fmtDay = k => { const [yy, mm, dd] = k.split('-').map(Number); return `${dd} ${MONTHS[mm - 1]}`; };
+    const best = bestSet(ex.type, allSets);
+    const byDay = {}; allSets.forEach(x => { byDay[x.day] = (byDay[x.day] || 0) + f(x); });
+    const bestDay = Object.entries(byDay).sort((a, b) => b[1] - a[1])[0];
+    const per = days.filter(x => x.sets.length);
+    const ptot = per.reduce((a, x) => a + x.sets.reduce((b, s2) => b + f(s2), 0), 0);
+    const last = allSets.slice().sort((a, b) => b.t - a.t)[0];
+    const rows = [
+      ['პერიოდში სულ', `${metricTxt(ex.type, ptot)} · ${per.reduce((a, x) => a + x.sets.length, 0)} სეტი`],
+      ['საშუალოდ ვარჯიშის დღეს', per.length ? metricTxt(ex.type, ptot / per.length) : '—'],
+      ['საუკეთესო სეტი', best ? `${setTxt(ex, best)} · ${fmtDay(best.day)}` : '—'],
+      ['საუკეთესო დღე', bestDay ? `${metricTxt(ex.type, bestDay[1])} · ${fmtDay(bestDay[0])}` : '—'],
+      ['ბოლოს', last ? `${fmtDay(last.day)} · ${setTxt(ex, last)}` : '—'],
+    ];
+    $('#tdRows').innerHTML = rows.map(([l, v]) => `<div class="st-row"><span>${l}</span><span class="v">${esc(v)}</span></div>`).join('');
+  }
+
+  const PAGES = { log: ['#pageLog', 'დღის კონტროლი'], plan: ['#pagePlan', 'კვების ცხრილი'], recipes: ['#pageRecipes', 'რეცეპტები'], shop: ['#pageShop', 'სავაჭრო სია'], stats: ['#pageStats', 'სტატისტიკა'], train: ['#pageTrain', 'დღის ვარჯიში'], trstats: ['#pageTrStats', 'ვარჯიშის სტატისტიკა'] };
   let curTab = 'log';
   function openMenu() {
     $('#menu').classList.add('open'); $('#drawerBg').classList.add('open');
@@ -2392,6 +2840,8 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
     render(); window.scrollTo(0, 0);
     if (t === 'stats') renderStats();
     if (t === 'shop') renderShop();
+    if (t === 'train') renderTrain();
+    if (t === 'trstats') renderTrStats();
   }
   $('#menuBtn').onclick = () => { $('#menu').classList.contains('open') ? closeMenu() : openMenu(); };
   $('#drawerClose').onclick = closeMenu;
@@ -2631,8 +3081,8 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
     for (let t = Math.ceil(lo / step) * step; t <= hi; t += step) {
       g += `<line x1="${padL}" x2="${W - padR}" y1="${y(t)}" y2="${y(t)}" stroke="#e8edeb"/><text x="${padL - 6}" y="${y(t) + 4}" text-anchor="end" font-size="10" fill="#7a8682">${t}</text>`;
     }
-    const line = pts.length > 1 ? `<polyline points="${pts.map(p => `${x(p.i)},${y(p.v)}`).join(' ')}" fill="none" stroke="#0f766e" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>` : '';
-    const dots = pts.map((p, k) => `<circle cx="${x(p.i)}" cy="${y(p.v)}" r="4" fill="#0f766e" stroke="#fff" stroke-width="2"/><circle cx="${x(p.i)}" cy="${y(p.v)}" r="14" fill="transparent" data-k="${k}" style="cursor:pointer"/>`).join('');
+    const line = pts.length > 1 ? `<polyline points="${pts.map(p => `${x(p.i)},${y(p.v)}`).join(' ')}" fill="none" stroke="#2b4a43" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>` : '';
+    const dots = pts.map((p, k) => `<circle cx="${x(p.i)}" cy="${y(p.v)}" r="4" fill="#2b4a43" stroke="#fff" stroke-width="2"/><circle cx="${x(p.i)}" cy="${y(p.v)}" r="14" fill="transparent" data-k="${k}" style="cursor:pointer"/>`).join('');
     const every = days.length <= 7 ? 1 : days.length <= 31 ? 5 : 15;
     const labels = days.map((d, i) => (days.length - 1 - i) % every === 0
       ? `<text x="${x(i)}" y="${H - 5}" text-anchor="middle" font-size="10" fill="#7a8682">${days.length <= 7 ? WD[d.getDay()] : d.getDate()}</text>` : '').join('');
@@ -2758,7 +3208,7 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
       if (v > 0) {
         const top_ = y(v), bot = y(0), r = Math.min(4, bw / 2, bot - top_);
         const xl = cx - bw / 2, xr = cx + bw / 2;
-        bars += `<path d="M${xl},${bot} L${xl},${top_ + r} Q${xl},${top_} ${xl + r},${top_} L${xr - r},${top_} Q${xr},${top_} ${xr},${top_ + r} L${xr},${bot} Z" fill="${x.key === dayKey(new Date()) ? '#0f766e' : '#5fa8a0'}" data-i="${i}"/>`;
+        bars += `<path d="M${xl},${bot} L${xl},${top_ + r} Q${xl},${top_} ${xl + r},${top_} L${xr - r},${top_} Q${xr},${top_} ${xr},${top_ + r} L${xr},${bot} Z" fill="${x.key === dayKey(new Date()) ? '#2b4a43' : '#2b4a43b3'}" data-i="${i}"/>`;
       }
       hits += `<rect x="${padL + slot * i}" y="${padT}" width="${slot}" height="${H - padT - padB}" fill="transparent" data-i="${i}" style="cursor:pointer"/>`;
       const every = stDays.length <= 7 ? 1 : stDays.length <= 31 ? 5 : 15;
@@ -2787,7 +3237,7 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
     const b = e.target.closest('button'); if (!b) return;
     stN = +b.dataset.n; store.set('mt_stats_n', stN); renderStats();
   });
-  let rsT; window.addEventListener('resize', () => { clearTimeout(rsT); rsT = setTimeout(() => { if (curTab === 'stats') { drawKcalChart(); renderWeight(); } }, 150); });
+  let rsT; window.addEventListener('resize', () => { clearTimeout(rsT); rsT = setTimeout(() => { if (curTab === 'stats') { drawKcalChart(); renderWeight(); } if (curTab === 'trstats') renderTrStats(); }, 150); });
 
   ['#openScan', '#openFoods', '#openCode', '#openCustom'].forEach(id => $(id).addEventListener('click', () => { addTarget = 'log'; }, true));
   $('#entries').addEventListener('click', e => {
@@ -2941,13 +3391,14 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
   function showProductSheet(code, product, grams, entryId, target, meal) {
     target = target || (entryId ? 'log' : addTarget);
     pending = { code, product, entryId, target, meal: meal || lastMeal || 'b' };
+    $('#pBack').hidden = !prodFromList; prodFromList = false;
     $('#pMealWrap').hidden = target !== 'plan';
     $('#pMeal').innerHTML = MEALS.map(([k, l]) => `<button data-meal="${k}" class="${k === pending.meal ? 'on' : ''}">${l}</button>`).join('');
     $('#pImg').src = product.img || '';
     $('#pName').textContent = product.name;
     $('#pBrand').textContent = product.brand || '';
     $('#pCode').textContent = code.startsWith('custom-') ? 'ბარკოდის გარეშე'
-      : code.startsWith('food-') ? (product.cat === 'ge' ? 'ქართული კერძი · ტიპური რეცეპტით, შეიძლება ±25%-ით განსხვავდებოდეს' : product.cat === 'ad' ? 'დამატებული პროდუქტი · ეტიკეტის მიხედვით' : 'მზა პროდუქტი · საშუალო მნიშვნელობები')
+      : code.startsWith('food-') ? (product.cat === 'ge' ? 'ქართული კერძი · ტიპური რეცეპტით, შეიძლება ±25%-ით განსხვავდებოდეს' : product.cat === 'ad' ? (AD_APPROX.has(code.slice(5)) ? 'დამატებული პროდუქტი · ეტიკეტზე ცხრილი არ არის, მნიშვნელობები საშუალოა' : 'დამატებული პროდუქტი · ეტიკეტის მიხედვით') : 'მზა პროდუქტი · საშუალო მნიშვნელობები')
       : code.startsWith('recipe-') ? 'ჩემი რეცეპტი' : 'ბარკოდი: ' + code;
     const x = product.per100;
     $('#p100').textContent = `100 გ: ${Math.round(x.kcal)} კკალ · ც ${x.p} · ნ ${x.c} · ცხ ${x.f}`;
@@ -3100,8 +3551,14 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
   });
   $('#foodList').addEventListener('click', e => {
     const b = e.target.closest('.fitem'); if (!b) return;
+    prodFromList = true; listScroll = $('#foodSheet .sheet-card').scrollTop;
     closeSheet('#foodSheet'); openProduct(b.dataset.code);
   });
+  let prodFromList = false, listScroll = 0;
+  $('#pBack').onclick = () => {
+    closeSheet('#prodSheet'); openSheet('#foodSheet');
+    $('#foodSheet .sheet-card').scrollTop = listScroll;
+  };
 
   // ---------- Manual product ----------
   let manCode = null;
@@ -3218,7 +3675,7 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
   };
   $('#exportBtn').onclick = () => {
     try {
-      const blob = new Blob([JSON.stringify({ app: 'makro-skaneri', v: 5, log, products, goals, water, plans, recipes, supps, suppTaken, weights, shopExtra }, null, 1)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify({ app: 'makro-skaneri', v: 6, log, products, goals, water, plans, recipes, supps, suppTaken, weights, shopExtra, exercises, train }, null, 1)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob); a.download = `makro-backup-${dayKey(new Date())}.json`;
       document.body.appendChild(a); a.click(); a.remove();
@@ -3242,6 +3699,12 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
       saveSupps();
       if (d.weights && typeof d.weights === 'object') { weights = Object.assign({}, d.weights, weights); store.set('mt_weights_v1', weights); }
       if (Array.isArray(d.shopExtra)) { const ids = new Set(shopExtra.map(x => x.id)); shopExtra = shopExtra.concat(d.shopExtra.filter(x => !ids.has(x.id))); store.set('mt_shopextra_v1', shopExtra); }
+      if (Array.isArray(d.exercises)) { const ids = new Set(exercises.map(x => x.id)); exercises = exercises.concat(d.exercises.filter(x => !ids.has(x.id))); }
+      if (d.train && typeof d.train === 'object') Object.keys(d.train).forEach(day => {
+        const ids = new Set((train[day] || []).map(i => i.id));
+        train[day] = (train[day] || []).concat((d.train[day] || []).filter(i => !ids.has(i.id)));
+      });
+      saveTrain();
       if (d.plans && typeof d.plans === 'object') {
         Object.keys(d.plans).forEach(day => {
           const ids = new Set((plans[day] || []).map(i => i.id));
@@ -3425,7 +3888,7 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
   try {
     const cv = document.createElement('canvas'); cv.width = cv.height = 180;
     const x = cv.getContext('2d');
-    x.fillStyle = '#0f766e'; x.fillRect(0, 0, 180, 180);
+    x.fillStyle = '#2b4a43'; x.fillRect(0, 0, 180, 180);
     x.fillStyle = '#fff';
     [[40, 10], [58, 5], [72, 14], [94, 5], [108, 11], [127, 7]].forEach(([px, w]) => x.fillRect(px, 50, w, 80));
     $('#touchIcon').href = cv.toDataURL('image/png');
@@ -3437,7 +3900,7 @@ pita:2.2,1.3,0.17,536,86,2.62,26,120,0.84,0,0.6,0.33,4.63,0.4,0.03,107,0,0,0,0.3
   showTab(store.get('mt_tab', 'log'));
 
   // ---------- Update check (home-screen apps on iPhone keep the old page cached) ----------
-  const APP_VERSION = '2026.11.16-8';
+  const APP_VERSION = '2026.11.17-4';
   let newVer = null;
   async function checkUpdate() {
     if (!/^https?:/.test(location.protocol)) return;
