@@ -519,7 +519,7 @@
   .tr-field label{font-size:13px;color:var(--muted)}
   .tr-field button{height:40px;border-radius:8px;background:#f1f3f1;font-size:18px}
   .tr-field input{height:40px;text-align:center;font-size:17px;font-weight:600;border:1px solid var(--line);border-radius:8px;background:#fafbfb;min-width:0}
-  #teType button.on,#trPresets button:active{background:var(--brand);color:#fff}
+  #teType button.on,#teInt button.on,#trPresets button:active{background:var(--brand);color:#fff}
 </style>
 </head>
 <body>
@@ -774,7 +774,7 @@
     <div class="chips" id="trQuick"></div>
     <h2>დღის ვარჯიშები</h2>
     <div id="trList"></div>
-    <div class="nnote">ვარჯიშის სახელს შეეხე და სეტს დაამატებ, „+“ კი ბოლო სეტს იმეორებს. სეტზე დაჭერით შეცვლი ან წაშლი.</div>
+    <div class="nnote">ვარჯიშის სახელს შეეხე და სეტს დაამატებ, „+“ კი ბოლო სეტს იმეორებს. სეტზე დაჭერით შეცვლი ან წაშლი.<br><span id="trKcalNote"></span></div>
   </div><!-- /pageTrain -->
 
   <div id="pageTrStats" hidden>
@@ -1032,6 +1032,8 @@
     <div class="field"><label>სახელი</label><input id="teName" placeholder="მაგ. ბიძგები" autocomplete="off"></div>
     <div class="field"><label>რას ითვლი</label></div>
     <div class="quick" id="teType"></div>
+    <div class="field"><label>დატვირთვა (კალორიის დასათვლელად)</label></div>
+    <div class="quick" id="teInt"></div>
     <button class="primary" id="teSave">შენახვა</button>
     <button class="ghost danger" id="teDel" hidden>ვარჯიშის წაშლა</button>
     <button class="ghost" data-close>გაუქმება</button>
@@ -2669,6 +2671,29 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
     ['ლანჯები', 'reps'], ['პლანკა', 'time'], ['სირბილი', 'dist'], ['სიარული', 'dist'], ['ველოსიპედი', 'time'], ['კარდიო ტრენაჟორი', 'time'],
     ['ჟიმი წოლით', 'wreps'], ['ჩაჯდომა შტანგით', 'wreps'], ['მკვდარი აწევა', 'wreps'], ['ბიცეფსი ჰანტელით', 'wreps'], ['მხრები ჰანტელით', 'wreps'], ['გაჭიმვა', 'time']];
   const exById = id => exercises.find(x => x.id === id);
+  // ---- calorie estimate (approximate, ±25%) — works for any exercise, incl. ones the user creates ----
+  const TR_INT = [['l', 'მსუბუქი'], ['m', 'საშუალო'], ['h', 'მძიმე']];
+  const KCAL_KW = [ // name keyword → known rate (reference body weight 79 kg for per-rep values)
+    [/აზიდ|ტურნიკ|pull.?up|chin/i, { rep: 1.0 }], [/ბრუს|dip/i, { rep: 0.8 }], [/ბერპი|burpee/i, { rep: 1.4 }],
+    [/ბიძგ|აჯიმან|push.?up/i, { rep: 0.4 }], [/ლანჯ|lunge|გადადგმ/i, { rep: 0.45 }], [/პრესი|პრეს |crunch|sit.?up/i, { rep: 0.25 }],
+    [/ჩაჯდომ|ბუქნ|squat|ჩაცუცქ/i, { rep: 0.35, met: 5 }], [/ხტუნ|სკაკალ|jump/i, { rep: 0.3, met: 10 }],
+    [/პლანკ|plank/i, { met: 4 }], [/გაჭიმ|stretch|იოგა|yoga/i, { met: 2.5 }], [/ველოსიპ|bike|cycl/i, { met: 7, km: 0.3 }],
+    [/კარდიო|ელიფს|cardio/i, { met: 7 }], [/სირბ|run|ჯოგ/i, { km: 1.0, met: 9.8 }], [/სიარ|walk|ფეხით/i, { km: 0.65, met: 3.5 }],
+    [/ცურვ|swim/i, { met: 7 }], [/ფეხბურთ|კალათ|ფრენბურთ|football|basket/i, { met: 7 }], [/კრივ|box/i, { met: 8 }]];
+  function bodyKg() {
+    const ks = Object.keys(weights).sort(); return ks.length ? +weights[ks[ks.length - 1]] : 75;
+  }
+  function setKcal(ex, x) {
+    if (!ex) return 0;
+    const kg = bodyKg(), it = ex.int || 'm', kw = (KCAL_KW.find(k => k[0].test(ex.name)) || [, {}])[1];
+    const mul = { l: 0.75, m: 1, h: 1.35 }[it];
+    if (ex.type === 'reps') return (kw.rep ? kw.rep * mul : { l: 0.25, m: 0.4, h: 0.8 }[it]) * (+x.reps || 0) * kg / 79;
+    if (ex.type === 'wreps') { const met = { l: 3.5, m: 5, h: 6 }[it]; return met * kg * 2 / 60 + 0.005 * (+x.kg || 0) * (+x.reps || 0); } // ≈2 min per set incl. rest
+    if (ex.type === 'time') { const met = kw.met ? kw.met * mul : { l: 3.5, m: 6, h: 9 }[it]; return met * kg * (+x.sec || 0) / 3600; }
+    if (ex.type === 'dist') { const f = kw.km ? kw.km * (it === 'h' ? 1.15 : it === 'l' ? 0.9 : 1) : { l: 0.65, m: 0.8, h: 1.0 }[it]; return f * kg * (+x.km || 0); }
+    return 0;
+  }
+  const kcalOf = sets => sets.reduce((a, x) => a + setKcal(exById(x.ex), x), 0);
   const mmss = sec => { sec = Math.round(sec || 0); const m = Math.floor(sec / 60), s2 = sec % 60; return m + ':' + String(s2).padStart(2, '0'); };
   const durTxt = sec => sec >= 3600 ? `${Math.floor(sec / 3600)} სთ ${Math.round(sec % 3600 / 60)} წთ` : sec >= 600 ? `${Math.round(sec / 60)} წთ` : sec >= 60 ? mmss(sec) + ' წთ' : `${Math.round(sec)} წმ`;
   function setTxt(ex, x) {
@@ -2692,13 +2717,15 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
     let reps = 0, vol = 0, sec = 0, km = 0;
     items.forEach(x => { reps += +x.reps || 0; vol += (+x.kg || 0) * (+x.reps || 0); sec += +x.sec || 0; km += +x.km || 0; });
     const exCount = new Set(items.map(x => x.ex)).size;
+    const kcal = kcalOf(items);
     const tiles = [[items.length, 'სეტი'], [exCount, 'ვარჯიში']];
+    if (kcal) tiles.push(['≈' + Math.round(kcal), 'კკალ დახარჯული']);
     if (reps) tiles.push([reps, 'გამეორება']);
     if (vol) tiles.push([Math.round(vol), 'კგ აწეული']);
     if (sec) tiles.push([durTxt(sec), 'დრო']);
     if (km) tiles.push([r1(km), 'კმ']);
     if (tiles.length < 3) tiles.push(['—', 'გამეორება']);
-    $('#trSum').innerHTML = tiles.map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('');
+    $('#trSum').innerHTML = tiles.slice(0, 6).map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('');
     // quick chips: my exercises, most used first
     const use = {}; Object.values(train).forEach(arr => (arr || []).forEach(x => { use[x.ex] = (use[x.ex] || 0) + 1; }));
     $('#trQuick').innerHTML = exercises.length
@@ -2708,6 +2735,7 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
     // groups
     const groups = [];
     items.forEach(x => { let g = groups.find(g => g.ex === x.ex); if (!g) groups.push(g = { ex: x.ex, sets: [] }); g.sets.push(x); });
+    $('#trKcalNote').textContent = `კალორია მიახლოებითია (±25%), ითვლება შენი წონით (${r1(bodyKg())} კგ${Object.keys(weights).length ? '' : ' — წონა სტატისტიკაში ჩაწერე'}). დღის კალორიის მიზანი ვარჯიშს უკვე ითვალისწინებს — საკვებს ზემოდან ნუ დაუმატებ.`;
     $('#trList').innerHTML = groups.length ? groups.map(g => {
       const ex = exById(g.ex) || { name: 'წაშლილი ვარჯიში', type: 'reps' };
       let sub = `${g.sets.length} სეტი`;
@@ -2716,6 +2744,7 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
       if (ex.type === 'wreps') sub += ` · ${gr} გამ. · ${Math.round(g.sets.reduce((a, x) => a + (+x.kg || 0) * (+x.reps || 0), 0))} კგ`;
       if (ex.type === 'time') sub += ` · ${durTxt(gs)}`;
       if (ex.type === 'dist') sub += ` · ${r1(gk)} კმ` + (gs ? ` · ${durTxt(gs)}` : '');
+      const gkc = kcalOf(g.sets); if (gkc >= 0.5) sub += ` · ≈${Math.round(gkc)} კკალ`;
       return `<div class="tr-group"><div class="tr-gh"><button class="tr-name" data-ex="${esc(g.ex)}"><b>${esc(ex.name)}</b><span>${sub}</span></button>
         <button class="tr-plus" data-rep="${esc(g.ex)}" aria-label="იგივე სეტის დამატება">+</button></div>
         <div class="tr-sets">${g.sets.map(x => `<button class="tr-set" data-sid="${esc(x.id)}">${esc(setTxt(ex, x))}</button>`).join('')}</div></div>`;
@@ -2804,7 +2833,7 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
   // exercise list & edit
   function renderExList() {
     $('#trExList').innerHTML = exercises.length ? exercises.map(x => `<li><button class="item" data-eid="${esc(x.id)}"><div class="main"><div class="nm">${esc(x.name)}</div>
-      <div class="sub">${TR_TYPES.find(t => t[0] === x.type)[1]}</div></div><span class="arr" style="color:var(--muted)">›</span></button></li>`).join('')
+      <div class="sub">${TR_TYPES.find(t => t[0] === x.type)[1]} · ${TR_INT.find(t => t[0] === (x.int || 'm'))[1]} დატვირთვა</div></div><span class="arr" style="color:var(--muted)">›</span></button></li>`).join('')
       : '<li class="empty">ჯერ ცარიელია. დაამატე ახალი ან აირჩიე ქვემოთ.</li>';
     const have = new Set(exercises.map(x => x.name));
     $('#trPresets').innerHTML = TR_PRESETS.map((p, i) => have.has(p[0]) ? '' : `<button data-pi="${i}">${esc(p[0])}</button>`).join('');
@@ -2816,12 +2845,13 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
     const p = TR_PRESETS[+b.dataset.pi]; addExercise(p[0], p[1]); renderExList(); renderTrain(); toast(`დაემატა: ${p[0]}`);
   });
   $('#trExList').addEventListener('click', e => { const b = e.target.closest('[data-eid]'); if (b) openExEdit(b.dataset.eid); });
-  let teId = null, teType = 'reps';
+  let teId = null, teType = 'reps', teInt = 'm';
   function openExEdit(id) {
-    const ex = id ? exById(id) : null; teId = ex ? ex.id : null; teType = ex ? ex.type : 'reps';
+    const ex = id ? exById(id) : null; teId = ex ? ex.id : null; teType = ex ? ex.type : 'reps'; teInt = ex && ex.int || 'm';
     $('#teTitle').textContent = ex ? 'ვარჯიშის შეცვლა' : 'ახალი ვარჯიში';
     $('#teName').value = ex ? ex.name : '';
     $('#teType').innerHTML = TR_TYPES.map(([k, l]) => `<button data-t="${k}" class="${k === teType ? 'on' : ''}">${l}</button>`).join('');
+    $('#teInt').innerHTML = TR_INT.map(([k, l]) => `<button data-i="${k}" class="${k === teInt ? 'on' : ''}">${l}</button>`).join('');
     $('#teDel').hidden = !ex;
     openSheet('#trExEdit'); if (!ex) setTimeout(() => $('#teName').focus(), 50);
   }
@@ -2829,9 +2859,13 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
     const b = e.target.closest('button[data-t]'); if (!b) return;
     teType = b.dataset.t; $('#teType').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
   });
+  $('#teInt').addEventListener('click', e => {
+    const b = e.target.closest('button[data-i]'); if (!b) return;
+    teInt = b.dataset.i; $('#teInt').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+  });
   $('#teSave').onclick = () => {
     const name = $('#teName').value.trim(); if (!name) return toast('სახელი ჩაწერე');
-    if (teId) Object.assign(exById(teId), { name, type: teType }); else addExercise(name, teType);
+    if (teId) Object.assign(exById(teId), { name, type: teType, int: teInt }); else Object.assign(addExercise(name, teType), { int: teInt });
     saveTrain(); closeSheet('#trExEdit'); renderExList(); renderTrain(); toast('შენახულია');
   };
   $('#teDel').onclick = () => {
@@ -2917,6 +2951,8 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
       ['ვარჯიშის დღეები', `${active} / ${tsN}`, `ზედიზედ: ${trStreak()} დღე`],
       ['სეტები', all.length, `საშუალოდ ${r1(all.length / active)} ვარჯიშის დღეს`],
     ];
+    const kAll = kcalOf(all), kPrev = kcalOf(allPrev);
+    if (kAll) tiles.push(['დახარჯული', '≈' + Math.round(kAll) + ' კკალ', `≈${Math.round(kAll / active)} კკალ ვარჯიშის დღეს`]);
     if (reps) tiles.push(['გამეორებები', reps, chg(reps, pReps)]);
     if (vol) tiles.push(['აწეული წონა', Math.round(vol) + ' კგ', chg(vol, allPrev.reduce((a, x) => a + (+x.kg || 0) * (+x.reps || 0), 0))]);
     if (sec) tiles.push(['დრო', durTxt(sec), chg(sec, allPrev.reduce((a, x) => a + (+x.sec || 0), 0))]);
@@ -2925,7 +2961,7 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
     drawBars($('#tsChart'), tsDays, x => x.sets.length, '#2b4a43', x => {
       if (!x.sets.length) return 'ვარჯიში არ არის';
       const by = {}; x.sets.forEach(st => { by[st.ex] = (by[st.ex] || 0) + 1; });
-      return `<b>${x.sets.length} სეტი</b> · ` + Object.entries(by).map(([id, n]) => `${esc((exById(id) || { name: '?' }).name)} ${n}`).join(', ');
+      return `<b>${x.sets.length} სეტი</b>, ≈${Math.round(kcalOf(x.sets))} კკალ · ` + Object.entries(by).map(([id, n]) => `${esc((exById(id) || { name: '?' }).name)} ${n}`).join(', ');
     }, $('#tsTip'));
     // per exercise
     const exIds = [...new Set(all.map(x => x.ex))];
@@ -2939,10 +2975,10 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
       const best = bestSet(ex.type, allSets), isNew = best && best.day >= weekAgo && allSets.length > 1 && bestSet(ex.type, allSets.filter(x => x.day < weekAgo)) !== null
         && setTxt(ex, bestSet(ex.type, allSets.filter(x => x.day < weekAgo))) !== setTxt(ex, best);
       const c = ptot ? Math.round((tot - ptot) / ptot * 100) : null;
-      return { ex, sets: sets.length, tot, best, isNew, c };
+      return { ex, sets: sets.length, tot, best, isNew, c, kc: kcalOf(sets) };
     }).sort((a, b) => b.sets - a.sets);
     $('#tsExList').innerHTML = rows.map(r => `<button class="ts-ex" data-ex="${esc(r.ex.id)}"><span class="t"><b>${esc(r.ex.name)}</b>
-      <span>${r.sets} სეტი · ${metricTxt(r.ex.type, r.tot)}${r.best ? ` · რეკორდი ${esc(setTxt(r.ex, r.best))}` : ''}${r.isNew ? '<em class="ts-new">ახალი</em>' : ''}</span></span>
+      <span>${r.sets} სეტი · ${metricTxt(r.ex.type, r.tot)}${r.kc >= 1 ? ` · ≈${Math.round(r.kc)} კკალ` : ''}${r.best ? ` · რეკორდი ${esc(setTxt(r.ex, r.best))}` : ''}${r.isNew ? '<em class="ts-new">ახალი</em>' : ''}</span></span>
       <span class="chg ${r.c == null ? 'eq' : r.c > 0 ? 'up' : r.c < 0 ? 'dn' : 'eq'}">${r.c == null ? 'ახალი' : (r.c > 0 ? '↑ ' : r.c < 0 ? '↓ ' : '') + Math.abs(r.c) + '%'}</span></button>`).join('');
   }
   $('#tsPeriod').addEventListener('click', e => {
@@ -2970,6 +3006,7 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
     const rows = [
       ['პერიოდში სულ', `${metricTxt(ex.type, ptot)} · ${per.reduce((a, x) => a + x.sets.length, 0)} სეტი`],
       ['საშუალოდ ვარჯიშის დღეს', per.length ? metricTxt(ex.type, ptot / per.length) : '—'],
+      ['დახარჯული კალორია', '≈' + Math.round(per.reduce((a, x) => a + kcalOf(x.sets), 0)) + ' კკალ'],
       ['საუკეთესო სეტი', best ? `${setTxt(ex, best)} · ${fmtDay(best.day)}` : '—'],
       ['საუკეთესო დღე', bestDay ? `${metricTxt(ex.type, bestDay[1])} · ${fmtDay(bestDay[0])}` : '—'],
       ['ბოლოს', last ? `${fmtDay(last.day)} · ${setTxt(ex, last)}` : '—'],
@@ -4059,7 +4096,7 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
   showTab(store.get('mt_tab', 'log'));
 
   // ---------- Update check (home-screen apps on iPhone keep the old page cached) ----------
-  const APP_VERSION = '2026.11.17-6';
+  const APP_VERSION = '2026.11.17-7';
   let newVer = null;
   async function checkUpdate() {
     if (!/^https?:/.test(location.protocol)) return;
