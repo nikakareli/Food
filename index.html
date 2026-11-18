@@ -102,6 +102,7 @@
   .bk-head h3{margin:0}
   .bk-src{flex:0 0 auto;font-size:12px;font-weight:500;color:var(--brand);border:1px solid var(--line);border-radius:8px;padding:5px 9px;background:#fff}
   .bk-sort{margin:4px 0 6px}
+  .bk-sort[hidden]{display:none}
   .bk-sort button{font-size:12px;padding:5px 0}
   .bk-pick{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;width:100%;text-align:left;padding:8px 0;border-bottom:1px solid #f0f3f2;font-size:14px}
   .bk-pick:last-child{border-bottom:0}
@@ -1129,6 +1130,7 @@
       <div class="nnote" id="bkNote"></div>
     </div>
     <div id="bkSrcView" hidden>
+      <div class="seg bk-sort" id="bkDir"><button data-d="hi" class="on">ყველაზე მეტი</button><button data-d="lo">ყველაზე ნაკლები</button></div>
       <div class="seg bk-sort" id="bkSort"><button data-s="k" class="on">100 კკალ-ზე</button><button data-s="g">100 გ-ზე</button></div>
       <div id="bkSrcList"></div>
       <div class="nnote" id="bkSrcNote"></div>
@@ -1654,6 +1656,8 @@ ad_olympus_feta|Olympus ფეტა ლაქტოზის გარეშე
 ad_castello_chickpeas|Castello კონსერვის მუხუდო|ad|108|5.8|12|2.6|240|1 ქილა (გადაწურული)|მუხუდო ნუტი castello chickpeas კონსერვი
 ad_mioliva_green|miOliva მწვანე ზეთისხილი, უკურკო|ad|145|1|3.8|15.3|170|1 ქილა (გადაწურული)|ზეთისხილი ოლივა mioliva
 ad_laexpl_anchovy|La Explanada ზეთისხილი ანჩოუსის პასტით|ad|155|1.3|0|16|||ზეთისხილი ოლივა ანჩოუსი თევზი la explanada
+ad_ecofrost_fries|Ecofrost კარტოფილი ფრი (გაყინული)|ad|128|2.4|21.2|3.2|150|1 პორცია|ფრი კარტოფილი ecofrost გაყინული
+ad_chirina_nuggets|Chirina ქათმის ნაგეტსი (გაყინული)|ad|140|17.2|3.3|6.5|100|5 ცალი|ნაგეტსი ქათამი chirina biubiu გაყინული
 egg_boiled|მოხარშული კვერცხი|ck|155|12.6|1.1|10.6|50||კვერცხი
 egg_fried|შემწვარი კვერცხი (ერბოკვერცხი)|ck|196|13.6|0.8|14.8|46||კვერცხი ერბო გლაზუნია
 omelet|ომლეტი (უბრალო)|ck|154|10.6|0.6|11.7|||კვერცხი
@@ -2089,6 +2093,8 @@ tomato_g:1.5,3.25,0.037,6.25,12.5,0.338,13.8,296,0.213,52.5,0.032,0.024,0.742,0.
 onion_g:2.21,5.46,0.052,5.2,29.9,0.273,13,190,0.221,0,0.042,0.035,0.151,0.16,0.156,17.3,0,6.73,0,0.026,0.52,0,0
 corn_g:2.3,7.24,0.38,17.2,2.3,0.598,42.5,310,0.529,10.3,0.125,0.063,2.04,0.825,0.107,33.8,0,5.47,0,0.081,0.345,0,0
 potato_g:2.62,1,0.037,7.5,15,1.01,28.8,531,0.375,0,0.071,0.04,1.33,0.369,0.372,13.1,0,17.2,0,0.013,2.5,0,0
+ad_ecofrost_fries:2.5,0.5,0.3,24,14,0.5,,,0.28,3,0.11,,,,,,,,0.3,,,,5
+ad_chirina_nuggets:,2.2,1,704,,,,,,,,,,,,,,,,,,,
 `;
   MICRO_DATA.trim().split('\n').forEach(line => {
     const [id, vals] = line.split(':');
@@ -2166,33 +2172,36 @@ potato_g:2.62,1,0.037,7.5,15,1.01,28.8,531,0.375,0,0.071,0.04,1.33,0.369,0.372,1
     $('#bkNote').textContent = missing ? `${missing} პროდუქტზე ამ მაჩვენებლის მონაცემი არ არის, ამიტომ აქ არ ჩანს.` : '';
     bkState = { k, isMac, nut, label, unit, scope };
     const lim = !isMac && nut[4] === 'max';
-    $('#bkSrc').hidden = k === 'kcal';
-    $('#bkSrc').textContent = lim ? 'სად არის ბევრი' : 'რისგან მივიღო';
-    showBkView(false);
+    $('#bkSrc').hidden = false;
+    $('#bkSrc').textContent = srcLabel();
+    bkDir = 'hi'; showBkView(false);
     openSheet('#brkSheet');
   }
-  let bkState = null, bkSort = 'k';
+  let bkState = null, bkSort = 'k', bkDir = 'hi';
+  const srcLabel = () => bkState && bkState.k === 'kcal' ? 'მეტი / ნაკლები' : bkState && !bkState.isMac && bkState.nut[4] === 'max' ? 'სად არის ბევრი / ცოტა' : 'რისგან მივიღო';
   function showBkView(src) {
     $('#bkDay').hidden = src; $('#bkSrcView').hidden = !src; $('#bkSub').hidden = src;
     const lim = bkState && !bkState.isMac && bkState.nut[4] === 'max';
-    $('#bkSrc').textContent = src ? '‹ ჩემი დღე' : lim ? 'სად არის ბევრი' : 'რისგან მივიღო';
+    $('#bkSrc').textContent = src ? '‹ ჩემი დღე' : srcLabel();
     if (src) renderBkSources();
   }
   function renderBkSources() {
     const { k, isMac, nut, unit } = bkState, lim = !isMac && nut[4] === 'max';
-    $('#bkSort').hidden = lim; const sort = lim ? 'g' : bkSort;
+    const isK = k === 'kcal';
+    $('#bkSort').hidden = lim || isK; const sort = lim || isK ? 'g' : bkSort, lo = bkDir === 'lo';
+    $('#bkDir').querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.d === bkDir));
     $('#bkSort').querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.s === sort));
     const ref = isMac ? +goals[k] : nut[3];
     const val = per => isMac ? +per[k] : (per.m && per.m[k] != null && per.m[k] !== '' ? +per.m[k] : null);
     const cand = [];
-    Object.values(FOODS).forEach(x => { if (x.cat !== 'sc') cand.push({ code: 'food-' + x.id, name: x.name, per: x.per100, piece: x.piece, pl: x.pieceLabel }); });
+    Object.values(FOODS).forEach(x => { if (x.cat !== 'sc' && !((isK || lo) && x.cat === 'dr')) cand.push({ code: 'food-' + x.id, name: x.name, per: x.per100, piece: x.piece, pl: x.pieceLabel }); });
     Object.entries(products).forEach(([code, p]) => { if (p && p.per100 && !String(code).startsWith('recipe-')) cand.push({ code, name: p.name, per: p.per100, piece: p.piece || (p.serving && p.serving.g) || null, pl: p.pieceLabel || '1 პორცია' }); });
     const ranked = cand.map(x => {
-      const v = val(x.per); if (v == null || !(v > 0)) return null;
+      const v = val(x.per); if (v == null || !(v >= 0) || (!lo && !(v > 0))) return null;
       const kc = +x.per.kcal || 0;
       if (sort === 'k' && kc < 15) return null;
-      return Object.assign(x, { v, score: sort === 'k' ? v / kc * 100 : v });
-    }).filter(Boolean).sort((a, b) => b.score - a.score);
+      return Object.assign({}, x, { v, score: sort === 'k' ? v / kc * 100 : v });
+    }).filter(Boolean).sort((a, b) => lo ? a.score - b.score : b.score - a.score);
     // one row per product: raw / boiled / fried variants collapse into the best one
     const seen = new Set(), list = [];
     for (const x of ranked) { const base = x.name.replace(/\s*\([^)]*\)\s*$/, ''); if (seen.has(base)) continue; seen.add(base); list.push(x); if (list.length >= 15) break; }
@@ -2203,10 +2212,17 @@ potato_g:2.62,1,0.037,7.5,15,1.01,28.8,531,0.375,0,0.071,0.04,1.33,0.369,0.372,1
         <small>${pc}</small><small style="text-align:right">${pct != null ? pct + '% ' + (isMac ? 'მიზნის' : lim ? 'ლიმიტის' : 'ნორმის') : ''}</small></button>`;
     }).join('') : '<div class="nnote">ამ მაჩვენებლის მონაცემი პროდუქტებზე არ არის.</div>';
     $('#bkSrcNote').textContent = (sort === 'k'
-      ? 'დალაგებულია 100 კკალ-ზე: ზემოთაა ის, რაც ცოტა კალორიით ბევრს გაძლევს. დაკლებისას ასე ჯობია.'
-      : 'დალაგებულია 100 გ-ზე.') + (lim ? ' ეს ის პროდუქტებია, რისი ბევრი ჭამაც ჯობია მოერიდო.' : ' პროდუქტს შეეხე და დაამატებ.') + ' სანელებლები და სოუსები არ ჩანს.';
+      ? (lo ? 'დალაგებულია 100 კკალ-ზე: ზემოთაა ის, რაშიც კალორიასთან შედარებით ყველაზე ცოტაა.' : 'დალაგებულია 100 კკალ-ზე: ზემოთაა ის, რაც ცოტა კალორიით ბევრს გაძლევს. დაკლებისას ასე ჯობია.')
+      : 'დალაგებულია 100 გ-ზე.')
+      + (isK ? (lo ? ' ყველაზე მსუბუქი საკვები — დაკლებისას მოცულობით ბევრი შეგიძლია ჭამო.' : ' ყველაზე კალორიული საკვები — დაკლებისას პორციას მიხედე.') + ' სასმელები არ ჩანს.'
+        : lim ? (lo ? ' ამათში ყველაზე ცოტაა — უსაფრთხო არჩევანი.' : ' ეს ის პროდუქტებია, რისი ბევრი ჭამაც ჯობია მოერიდო.') : lo ? ' ამ ნივთიერების წყაროდ ეს არ გამოდგება.' : ' პროდუქტს შეეხე და დაამატებ.')
+      + ' სანელებლები და სოუსები არ ჩანს.';
   }
   $('#bkSrc').onclick = () => showBkView($('#bkSrcView').hidden);
+  $('#bkDir').addEventListener('click', e => {
+    const b = e.target.closest('button[data-d]'); if (!b) return;
+    bkDir = b.dataset.d; renderBkSources();
+  });
   $('#bkSort').addEventListener('click', e => {
     const b = e.target.closest('button[data-s]'); if (!b) return;
     bkSort = b.dataset.s; $('#bkSort').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); renderBkSources();
@@ -2409,6 +2425,8 @@ potato_g:2.62,1,0.037,7.5,15,1.01,28.8,531,0.375,0,0.071,0.04,1.33,0.369,0.372,1
     if (has(/საქონ|ღორ|ცხვრ|ხბო|ბატკ|ქაბაბ|კუპატ|აფხაზურ|ოჯახურ|beef|pork|lamb/) && !has(/ქათ|ინდაურ|ბულიონ/))
       return L('კვირაში ≤3-ჯერ (ჯამში 350–500 გ მომზადებული).', 'წითელი ხორცის ბევრი ჭამა ნაწლავის კიბოს რისკს ზრდის (WCRF).');
     // 2) by kind
+    if (has(/ნაგეტს|nugget|наггетс/)) return L('კვირაში 2–3-ჯერ.', 'გადამუშავებული და საფანელში ამოვლებული ხორცია; მარილიანია' + (salt > 1.2 ? ` (${r1(salt)} გ/100 გ)` : '') + '. აეროგრილში მოამზადე, არა ზეთში.');
+    if (has(/ფრი|fries|фри/) && cat !== 'vg') return L('კვირაში 2–3-ჯერ, აეროგრილში ან ღუმელში.', 'წინასწარ ზეთშია შემწვარი; ზეთში ხელახლა თუ შეწვავ, კალორია თითქმის ორმაგდება. დაკლებისას ცოტა ცილით ბევრ კალორიას იძლევა.');
     if (cat === 'pr') return L('კვირაში 1-ჯერ.', shortReasons(prod).join('; ') || 'ბევრი კალორია, მარილი და ცხიმი, ცუდად აკმაყოფილებს.', 'r');
     if (has(/^მარილი|^salt/)) return D('მაგრამ ჯამში ≤5 გ (1 ჩ/კ) — ყველა საკვებში არსებული მარილის ჩათვლით.', null);
     if (has(/^შაქარი|თაფლ|მურაბ|ჯემ|სიროფ|honey|sugar|jam/) && cat !== 'sw') return L('ყოველდღე შეიძლება, მაგრამ ცოტა: დღეში ≤2–3 ჩ/კ.', 'დამატებული შაქარი — WHO: დღეში ≤25–50 გ ყველა წყაროდან ერთად.', 'd');
@@ -2483,8 +2501,8 @@ potato_g:2.62,1,0.037,7.5,15,1.01,28.8,531,0.375,0,0.071,0.04,1.33,0.369,0.372,1
       ${r.notes.map(n => `<div class="nnote">${esc(n)}</div>`).join('')}`;
   }
 
-  const FOOD_INGR = {"ad_olympus_feta": "ცხვრის რძე (მინ. 70%), თხის რძე (მაქს. 30%), მარილი, ფერმენტული კულტურები, მიკრობული რენეტი", "ad_agro_satsebeli": "პომიდორი 93.9%, ნიორი, მარილი, შაქარი, წითელი წიწაკა დაფქული, ხმელი ქინძი, უცხო სუნელი", "ad_agro_tkemali": "მწვანე ტყემალი 92.5%, ნიორი, შაქარი, მარილი, ნედლი ქინძი, წითელი წიწაკა დაღერღილი, ომბალო, კამა", "ad_castello_beans": "კანელინის მარცვლები, წყალი, მარილი", "ad_vici_mussels": "ჩილიური მიდიის ხორცი (მოხარშული), რაფსის ზეთი, მარილი, მჟავიანობის რეგულატორი: ლიმონმჟავა; გემოსა და არომატის გამაძლიერებელი: ნატრიუმის გლუტამატი; კონსერვანტები: ნატრიუმის ბენზოატი, კალიუმის სორბატი; ანტიოქსიდანტი: ასკორბინის მჟავა; დამატკბობელი: საქარინი", "ad_castello_chickpeas": "რეჰიდრირებული მუხუდო 60%, წყალი, მარილი, ანტიოქსიდანტი: ასკორბინის მჟავა (E300)", "ad_mioliva_green": "წყალი, მწვანე ზეთისხილი 42.5%, მარილი, მჟავიანობის რეგულატორები: რძემჟავა (E270), ლიმონმჟავა (E330); ანტიოქსიდანტი: ასკორბინის მჟავა (E300)"};
-  const FOOD_ADD = { ad_vici_mussels: ['E330', 'E621', 'E211', 'E202', 'E300', 'E954'], ad_castello_chickpeas: ['E300'], ad_mioliva_green: ['E270', 'E330', 'E300'] };
+  const FOOD_INGR = {"ad_olympus_feta": "ცხვრის რძე (მინ. 70%), თხის რძე (მაქს. 30%), მარილი, ფერმენტული კულტურები, მიკრობული რენეტი", "ad_agro_satsebeli": "პომიდორი 93.9%, ნიორი, მარილი, შაქარი, წითელი წიწაკა დაფქული, ხმელი ქინძი, უცხო სუნელი", "ad_agro_tkemali": "მწვანე ტყემალი 92.5%, ნიორი, შაქარი, მარილი, ნედლი ქინძი, წითელი წიწაკა დაღერღილი, ომბალო, კამა", "ad_castello_beans": "კანელინის მარცვლები, წყალი, მარილი", "ad_vici_mussels": "ჩილიური მიდიის ხორცი (მოხარშული), რაფსის ზეთი, მარილი, მჟავიანობის რეგულატორი: ლიმონმჟავა; გემოსა და არომატის გამაძლიერებელი: ნატრიუმის გლუტამატი; კონსერვანტები: ნატრიუმის ბენზოატი, კალიუმის სორბატი; ანტიოქსიდანტი: ასკორბინის მჟავა; დამატკბობელი: საქარინი", "ad_castello_chickpeas": "რეჰიდრირებული მუხუდო 60%, წყალი, მარილი, ანტიოქსიდანტი: ასკორბინის მჟავა (E300)", "ad_mioliva_green": "წყალი, მწვანე ზეთისხილი 42.5%, მარილი, მჟავიანობის რეგულატორები: რძემჟავა (E270), ლიმონმჟავა (E330); ანტიოქსიდანტი: ასკორბინის მჟავა (E300)", "ad_ecofrost_fries": "კარტოფილი, მზესუმზირის ზეთი (წინასწარ შემწვარი)", "ad_chirina_nuggets": "ქათმის მკერდის ფილე 55.4%, სასმელი წყალი 16.3%, საფანელი 14.3% (ხორბლის ფქვილი, საფუარი, სუფრის მარილი, სანელებელი შეფერილობისთვის), ხორბლის ფქვილი 5.3%, რაფინირებული მზესუმზირის ზეთი 4%, ბარდის ბოჭკო, ბარდის სახამებელი, ბოსტნეულის სახამებელი, სუფრის მარილი, საფუარის ექსტრაქტი"};
+  const FOOD_ADD = { ad_ecofrost_fries: [], ad_chirina_nuggets: [], ad_vici_mussels: ['E330', 'E621', 'E211', 'E202', 'E300', 'E954'], ad_castello_chickpeas: ['E300'], ad_mioliva_green: ['E270', 'E330', 'E300'] };
   const AD_APPROX = new Set(['ad_mioliva_green']); // no nutrition table on the label — typical values
   function getProduct(code) {
     if (products[code]) return products[code];
@@ -4444,7 +4462,7 @@ potato_g:2.62,1,0.037,7.5,15,1.01,28.8,531,0.375,0,0.071,0.04,1.33,0.369,0.372,1
   showTab(store.get('mt_tab', 'log'));
 
   // ---------- Update check (home-screen apps on iPhone keep the old page cached) ----------
-  const APP_VERSION = '2026.11.18-3';
+  const APP_VERSION = '2026.11.18-5';
   let newVer = null;
   async function checkUpdate() {
     if (!/^https?:/.test(location.protocol)) return;
