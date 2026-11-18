@@ -492,6 +492,19 @@
   .toast{font-size:13px}
   .pback{flex:0 0 32px;height:32px;border-radius:8px;border:1px solid var(--line);font-size:20px;line-height:1;color:var(--ink);display:grid;place-items:center;align-self:flex-start}
   .pback[hidden]{display:none}
+  .pwarn{border:1px solid #e7dcc4;background:#fbf8f1;border-radius:10px;padding:10px 11px;margin-top:8px;font-size:12.5px;line-height:1.45}
+  .pwarn[hidden]{display:none}
+  .pfreq{border-radius:10px;padding:9px 11px;margin-top:8px;font-size:12.5px;line-height:1.45;border:1px solid #cfdcd3;background:#f3f7f4}
+  .pfreq.lv-w{border-color:#e7dcc4;background:#fbf8f1}
+  .pfreq.lv-r{border-color:#e6cfcc;background:#fbf4f3}
+  .pfreq b{font-weight:600}
+  .pf-why{color:var(--muted)}
+  div.pf-why{margin-top:3px}
+  .pw-item+.pw-item{margin-top:9px;padding-top:9px;border-top:1px solid #efe6d3}
+  .pw-item b{display:block;font-size:13px;font-weight:600;color:#7a5a22;margin-bottom:2px}
+  .pw-item p{margin:2px 0;color:var(--ink)}
+  .pw-item .fq span{font-weight:600}
+  .pw-note{margin-top:8px;font-size:11px;color:var(--muted)}
   .ts-ex{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 0;border-bottom:1px solid #f0f3f2}
   .ts-ex:last-child{border-bottom:0}
   .ts-ex .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
@@ -506,7 +519,20 @@
   .tr-tiles span{font-size:11.5px;color:var(--muted)}
   .tr-h{display:flex;justify-content:space-between;align-items:center}
   .tr-h .link{font-size:12px;padding:0 2px}
-  #trQuick .chip.new{color:var(--brand);border-style:dashed}
+  .tr-chips{flex-wrap:wrap;overflow:visible;gap:6px}
+  .tr-chips .chip{padding:8px 12px;font-size:13px}
+  .tr-chips .chip.new{color:var(--brand);border-style:dashed}
+  .wp-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0f3f2}
+  .wp-row:last-child{border-bottom:0}
+  .wp-row .tr-name{padding:0}
+  .wp-prog{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .wp-row.done .tr-name b{color:var(--muted);text-decoration:line-through}
+  .wp-do{flex:0 0 36px;height:32px;border-radius:8px;background:var(--brand);color:#fff;font-size:15px}
+  .wp-row.done .wp-do{background:#eef3ef;color:#3f7d58}
+  .wp-actions{display:flex;gap:8px;margin-top:10px}
+  .wp-actions .btn2{flex:1;font-size:13px}
+  .wp-date{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
+  #wpList .tr-group{padding:4px 12px}
   .tr-group{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 10px 10px 12px;margin-bottom:8px}
   .tr-gh{display:flex;align-items:center;gap:10px}
   .tr-name{flex:1;min-width:0;text-align:left;display:flex;flex-direction:column;gap:1px}
@@ -542,6 +568,7 @@
     <button data-tab="stats">სტატისტიკა</button>
     <div class="dr-group">ვარჯიში</div>
     <button data-tab="train">დღის ვარჯიში</button>
+    <button data-tab="trplan">ვარჯიშის გეგმა</button>
     <button data-tab="trstats">ვარჯიშის სტატისტიკა</button>
   </aside>
 
@@ -770,12 +797,37 @@
       </div>
     </header>
     <section class="card"><div class="tr-tiles" id="trSum"></div></section>
+    <div id="trPlanBox" hidden>
+      <h2>დღის გეგმა</h2>
+      <div class="tr-group" id="trPlanList"></div>
+    </div>
     <h2 class="tr-h"><span>დაამატე</span><button class="link" id="trManage">ვარჯიშების სია</button></h2>
-    <div class="chips" id="trQuick"></div>
+    <div class="chips tr-chips" id="trQuick"></div>
     <h2>დღის ვარჯიშები</h2>
     <div id="trList"></div>
     <div class="nnote">ვარჯიშის სახელს შეეხე და სეტს დაამატებ, „+“ კი ბოლო სეტს იმეორებს. სეტზე დაჭერით შეცვლი ან წაშლი.<br><span id="trKcalNote"></span></div>
   </div><!-- /pageTrain -->
+
+  <div id="pageTrPlan" hidden>
+    <header>
+      <div class="daynav">
+        <button class="iconbtn" id="wpPrev" aria-label="წინა დღე">‹</button>
+        <div class="datebox"><b id="wpDateLabel">ხვალ</b><span id="wpDateSub"></span></div>
+        <button class="iconbtn" id="wpNext" aria-label="შემდეგი დღე">›</button>
+      </div>
+    </header>
+    <section class="card"><div class="tr-tiles" id="wpSum"></div></section>
+    <h2 class="tr-h"><span>დაამატე გეგმაში</span><button class="link" id="wpManage">ვარჯიშების სია</button></h2>
+    <div class="chips tr-chips" id="wpQuick"></div>
+    <h2>გეგმა</h2>
+    <div id="wpList"></div>
+    <div class="wp-actions">
+      <button class="btn2" id="wpCopy">სხვა დღეზე კოპირება</button>
+      <input type="date" id="wpCopyDate" class="wp-date" aria-label="რომელ დღეზე დავაკოპირო">
+      <button class="btn2" id="wpClear">გასუფთავება</button>
+    </div>
+    <div class="nnote">გეგმა იმ დღის „დღის ვარჯიშზე“ გამოჩნდება. იქ ✓ ღილაკი დაგეგმილ სეტს ერთი დაჭერით ჩაწერს.</div>
+  </div><!-- /pageTrPlan -->
 
   <div id="pageTrStats" hidden>
     <div class="seg st-period" id="tsPeriod">
@@ -916,6 +968,9 @@
       </div>
     </div>
     <div class="score" id="pScore"></div>
+    <div class="nnote" id="pOilNote" hidden>ზეთი არ შედის: გრილზე ან უცხიმო ტაფაზე ზუსტად ასეა. თუ ზეთში შეწვავ, გამოყენებული ზეთი ცალკე დაამატე (1 ს/კ ≈ 14 გ, 120 კკალ).</div>
+    <div class="pfreq" id="pFreq"></div>
+    <div class="pwarn" id="pWarn" hidden></div>
     <div class="per100"><span id="p100"></span><button class="link" id="pEdit">შესწორება</button></div>
     <div class="field">
       <label>რამდენი მიირთვი (გრამი / მლ)</label>
@@ -1008,6 +1063,18 @@
     <div id="tsFields"></div>
     <button class="primary" id="tsSave">დამატება</button>
     <button class="ghost danger" id="tsDel" hidden>სეტის წაშლა</button>
+    <button class="ghost" data-close>გაუქმება</button>
+  </div>
+</div>
+
+<!-- Training plan: item -->
+<div class="sheet" id="wpSheet">
+  <div class="sheet-card">
+    <h3 id="wpsTitle"></h3>
+    <div class="muted" id="wpsSub"></div>
+    <div id="wpFields"></div>
+    <button class="primary" id="wpsSave">გეგმაში დამატება</button>
+    <button class="ghost danger" id="wpsDel" hidden>გეგმიდან ამოღება</button>
     <button class="ghost" data-close>გაუქმება</button>
   </div>
 </div>
@@ -1284,6 +1351,13 @@ tarragon|ტარხუნა (ახალი)|vg|49|3.4|6.3|1.1|||ტარ�
 pickle|მჟავე კიტრი|vg|12|0.5|2|0.2|60|1 ცალი|მწნილი კიტრი
 sauerkraut|მჟავე კომბოსტო|vg|19|0.91|4.28|0.14|||მწნილი კომბოსტო
 jonjoli|ჯონჯოლი|vg|28|2|4|0.4|||მწნილი
+eggplant_g|ბადრიჯანი (გრილზე)|vg|34|1.35|7.97|0.27|||ბადრიჯანი გრილზე
+zucchini_g|ყაბაყი (გრილზე)|vg|22|1.56|4.03|0.39|||ყაბაყი გრილზე
+mushroom_g|სოკო (გრილზე)|vg|31|4.34|4.62|0.42|||სოკო გრილზე
+tomato_g|პომიდორი (გრილზე)|vg|22|1.12|4.88|0.25|||პომიდორი გრილზე
+onion_g|ხახვი (გრილზე)|vg|52|1.43|12.1|0.13|||ხახვი გრილზე
+corn_g|სიმინდი ტაროს (გრილზე)|vg|99|3.79|21.5|1.61|||სიმინდი გრილზე
+potato_g|კარტოფილი (გრილზე, ზეთის გარეშე)|vg|96|2.5|21.9|0.125|||კარტოფილი გრილზე
 buckwheat|წიწიბურა (მშრალი)|gr|343|13.3|71.5|3.4|||
 buckwheatc|წიწიბურა (მოხარშული)|gr|92|3.4|19.9|0.6|||
 rice|ბრინჯი (მშრალი)|gr|365|7.1|80|0.7|||
@@ -1313,87 +1387,87 @@ chickpea|მუხუდო (მშრალი)|lg|378|20.5|63|6.0|||ნუტ�
 chickpeac|მუხუდო (მოხარშული)|lg|164|8.9|27.4|2.6|||ნუტი
 chbreast|ქათმის მკერდი (უმი)|mt|120|22.5|0|2.6|||ფილე ქათამი
 chbreast_b|ქათმის მკერდი (მოხარშული)|mt|143|29|0|3|||ფილე ქათამი
-chbreast_f|ქათმის მკერდი (შემწვარი)|mt|166|31.5|0|4.5|||ფილე ქათამი
+chbreast_f|ქათმის მკერდი (გრილზე / შემწვარი)|mt|166|31.5|0|4.5|||ფილე ქათამი გრილზე შემწვარი
 chbreastc|ქათმის მკერდი (ღუმელში / გრილზე)|mt|165|31|0|3.6|||ფილე ქათამი მომზადებული
 chthighs|ქათმის ბარკალი უტყავოდ (უმი)|mt|119|19.7|0|3.9|||ქათამი
 chthighs_b|ქათმის ბარკალი უტყავოდ (მოხარშული)|mt|154|26|0|5.5|||ქათამი
-chthighs_f|ქათმის ბარკალი უტყავოდ (შემწვარი)|mt|166|27|0|6.5|||ქათამი
+chthighs_f|ქათმის ბარკალი უტყავოდ (გრილზე / შემწვარი)|mt|166|27|0|6.5|||ქათამი გრილზე შემწვარი
 chthigh|ქათმის ბარკალი ტყავით (უმი)|mt|221|15.5|0|17|||ქათამი
 chthigh_b|ქათმის ბარკალი ტყავით (მოხარშული)|mt|219|23.3|0|14|||ქათამი
 chthighr|ქათმის ბარკალი ტყავით (ღუმელში)|mt|229|23.3|0|14.7|||ქათამი
 chdrum|ქათმის წვივი ტყავით (ღუმელში)|mt|216|27|0|11.2|||ქათამი დრამსტიკი
 chwing|ქათმის ფრთები (უმი)|mt|222|18.3|0|16|||ქათამი ფრთა
 chwing_b|ქათმის ფრთები (მოხარშული)|mt|242|22.8|0|16.8|||ქათამი ფრთა
-chwing_f|ქათმის ფრთები (შემწვარი)|mt|284|27|0|19.5|||ქათამი ფრთა
+chwing_f|ქათმის ფრთები (გრილზე / შემწვარი)|mt|284|27|0|19.5|||ქათამი ფრთა გრილზე შემწვარი
 chwhole|ქათამი მთლიანი, ტყავით (უმი)|mt|215|18.6|0|15.1|||ქათამი
 chwhole_b|ქათამი მთლიანი, ტყავით (მოხარშული)|mt|211|24.5|0|12.6|||ქათამი
-chwhole_f|ქათამი მთლიანი, ტყავით (შემწვარი)|mt|232|27.3|0|13.6|||ქათამი
+chwhole_f|ქათამი მთლიანი, ტყავით (გრილზე / შემწვარი)|mt|232|27.3|0|13.6|||ქათამი გრილზე შემწვარი
 chgiz|ქათმის კუჭები (უმი)|mt|94|17.7|0|2.1|||ქათამი კუჭი
 chgiz_b|ქათმის კუჭები (მოხარშული)|mt|146|30.4|0|2.7|||ქათამი კუჭი
-chgiz_f|ქათმის კუჭები (შემწვარი)|mt|156|30|0|4|||ქათამი კუჭი
+chgiz_f|ქათმის კუჭები (გრილზე / შემწვარი)|mt|156|30|0|4|||ქათამი კუჭი გრილზე შემწვარი
 chheart|ქათმის გული (უმი)|mt|153|15.6|0.7|9.3|||ქათამი გულები
 chheart_b|ქათმის გული (მოხარშული)|mt|177|26.4|0.1|7.9|||ქათამი გულები
-chheart_f|ქათმის გული (შემწვარი)|mt|187|26|0.5|9|||ქათამი გულები
+chheart_f|ქათმის გული (გრილზე / შემწვარი)|mt|187|26|0.5|9|||ქათამი გულები გრილზე შემწვარი
 chliver|ქათმის ღვიძლი (უმი)|mt|119|16.9|0.7|4.8|||
 chliverb|ქათმის ღვიძლი (მოხარშული)|mt|167|24.5|0.9|6.5|||ღვიძლი
-chliverf|ქათმის ღვიძლი (შემწვარი)|mt|172|25.8|1.1|6.4|||ღვიძლი
+chliverf|ქათმის ღვიძლი (გრილზე / შემწვარი)|mt|172|25.8|1.1|6.4|||ღვიძლი გრილზე შემწვარი
 turkey|ინდაურის მკერდი (უმი)|mt|114|23.7|0|1.5|||ინდაური
 turkey_b|ინდაურის მკერდი (მოხარშული)|mt|137|29.5|0|2.1|||ინდაური
-turkey_f|ინდაურის მკერდი (შემწვარი)|mt|151|31|0|3|||ინდაური
+turkey_f|ინდაურის მკერდი (გრილზე / შემწვარი)|mt|151|31|0|3|||ინდაური გრილზე შემწვარი
 turkeymince|ინდაურის ფარში (უმი)|mt|150|18.7|0|8.3|||ინდაური ფარში
 turkeymince_b|ინდაურის ფარში (მოხარშული)|mt|194|25|0|10.5|||ინდაური ფარში
-turkeymince_f|ინდაურის ფარში (შემწვარი)|mt|213|27.1|0|11.6|||ინდაური ფარში
+turkeymince_f|ინდაურის ფარში (გრილზე / შემწვარი)|mt|213|27.1|0|11.6|||ინდაური ფარში გრილზე შემწვარი
 duck|იხვი, ტყავით (უმი)|mt|404|11.5|0|39.3|||იხვი
 duck_b|იხვი, ტყავით (მოხარშული)|mt|320|17|0|28|||იხვი
-duck_f|იხვი, ტყავით (შემწვარი)|mt|332|19|0|28.4|||იხვი
+duck_f|იხვი, ტყავით (გრილზე / შემწვარი)|mt|332|19|0|28.4|||იხვი გრილზე შემწვარი
 quail|მწყერი (უმი)|mt|192|19.6|0|12|||მწყერი
 quail_b|მწყერი (მოხარშული)|mt|215|24.5|0|13|||მწყერი
-quail_f|მწყერი (შემწვარი)|mt|227|25.1|0|14.1|||მწყერი
+quail_f|მწყერი (გრილზე / შემწვარი)|mt|227|25.1|0|14.1|||მწყერი გრილზე შემწვარი
 beef|საქონლის ხორცი, უცხიმო (უმი)|mt|137|21.4|0|5|||ძროხა სტეიკი
 beef_b|საქონლის ხორცი, უცხიმო (მოხარშული)|mt|190|31|0|7.3|||ძროხა სტეიკი
-beef_f|საქონლის ხორცი, უცხიმო (შემწვარი)|mt|188|30|0|7.5|||ძროხა სტეიკი
+beef_f|საქონლის ხორცი, უცხიმო (გრილზე / შემწვარი)|mt|188|30|0|7.5|||ძროხა სტეიკი გრილზე შემწვარი
 beefmince|საქონლის ფარში 20% (უმი)|mt|254|17.2|0|20|||ფარში
 beefmince_b|საქონლის ფარში 20% (მოხარშული)|mt|246|25.5|0|16|||ფარში
-beefpatty|საქონლის ფარში 20% (შემწვარი)|mt|271|25.8|0|17.8|||ფარში ძროხა
+beefpatty|საქონლის ფარში 20% (გრილზე / შემწვარი)|mt|271|25.8|0|17.8|||ფარში ძროხა გრილზე შემწვარი
 veal|ხბოს ხორცი (უმი)|mt|112|20.2|0|2.9|||ხბო
 veal_b|ხბოს ხორცი (მოხარშული)|mt|186|33|0|6|||ხბო
-veal_f|ხბოს ხორცი (შემწვარი)|mt|176|31.5|0|5.5|||ხბო
+veal_f|ხბოს ხორცი (გრილზე / შემწვარი)|mt|176|31.5|0|5.5|||ხბო გრილზე შემწვარი
 bliver|საქონლის ღვიძლი (უმი)|mt|135|20.4|3.9|3.6|||ღვიძლი
 bliver_b|საქონლის ღვიძლი (მოხარშული)|mt|184|29.1|5.1|5.3|||ღვიძლი
-bliverf|საქონლის ღვიძლი (შემწვარი)|mt|175|26.5|5.2|4.7|||ღვიძლი ძროხა
+bliverf|საქონლის ღვიძლი (გრილზე / შემწვარი)|mt|175|26.5|5.2|4.7|||ღვიძლი ძროხა გრილზე შემწვარი
 btongue|საქონლის ენა (უმი)|mt|224|14.9|3.7|16.1|||ენა
 btongue_b|საქონლის ენა (მოხარშული)|mt|278|19.3|0|22.3|||ენა
-btongue_f|საქონლის ენა (შემწვარი)|mt|282|20|0|22.5|||ენა
+btongue_f|საქონლის ენა (გრილზე / შემწვარი)|mt|282|20|0|22.5|||ენა გრილზე შემწვარი
 bheart|საქონლის გული (უმი)|mt|112|17.7|0.1|3.9|||გული
 bheart_b|საქონლის გული (მოხარშული)|mt|157|28.5|0.2|4.7|||გული
-bheart_f|საქონლის გული (შემწვარი)|mt|167|28|0.2|6|||გული
+bheart_f|საქონლის გული (გრილზე / შემწვარი)|mt|167|28|0.2|6|||გული გრილზე შემწვარი
 porklean|ღორის ხორცი, უცხიმო (უმი)|mt|137|21|0|5.9|||ღორი
 porklean_b|ღორის ხორცი, უცხიმო (მოხარშული)|mt|188|30|0|7.5|||ღორი
-porklean_f|ღორის ხორცი, უცხიმო (შემწვარი)|mt|192|30|0|8|||ღორი
+porklean_f|ღორის ხორცი, უცხიმო (გრილზე / შემწვარი)|mt|192|30|0|8|||ღორი გრილზე შემწვარი
 pork|ღორის ხორცი, საშუალო (უმი)|mt|216|19|0|15|||ღორი
 pork_b|ღორის ხორცი, საშუალო (მოხარშული)|mt|276|27.5|0|18.5|||ღორი
-pork_f|ღორის ხორცი, საშუალო (შემწვარი)|mt|279|27|0|19|||ღორი
+pork_f|ღორის ხორცი, საშუალო (გრილზე / შემწვარი)|mt|279|27|0|19|||ღორი გრილზე შემწვარი
 porkfat|ღორის ხორცი, ცხიმიანი (უმი)|mt|235|17|0|18.5|||ღორი კისერი
 porkfat_b|ღორის ხორცი, ცხიმიანი (მოხარშული)|mt|300|25.5|0|22|||ღორი კისერი
-porkfat_f|ღორის ხორცი, ცხიმიანი (შემწვარი)|mt|302|25|0|22.5|||ღორი კისერი
+porkfat_f|ღორის ხორცი, ცხიმიანი (გრილზე / შემწვარი)|mt|302|25|0|22.5|||ღორი კისერი გრილზე შემწვარი
 porktender|ღორის ფილე, ჩალაღაჯი (უმი)|mt|120|21|0|3.5|||ღორი ფილე
 porktender_b|ღორის ფილე, ჩალაღაჯი (მოხარშული)|mt|136|26|0|3.5|||ღორი ფილე
-porktender_f|ღორის ფილე, ჩალაღაჯი (შემწვარი)|mt|148|27|0|4.5|||ღორი ფილე
+porktender_f|ღორის ფილე, ჩალაღაჯი (გრილზე / შემწვარი)|mt|148|27|0|4.5|||ღორი ფილე გრილზე შემწვარი
 porkmince|ღორის ფარში (უმი)|mt|263|16.9|0|21.2|||ღორი ფარში
 porkmince_b|ღორის ფარში (მოხარშული)|mt|276|24|0|20|||ღორი ფარში
-porkmince_f|ღორის ფარში (შემწვარი)|mt|290|25.7|0|20.8|||ღორი ფარში
+porkmince_f|ღორის ფარში (გრილზე / შემწვარი)|mt|290|25.7|0|20.8|||ღორი ფარში გრილზე შემწვარი
 mixmince|ღორ-საქონლის ფარში (უმი)|mt|258|17|0|20.6|||ფარში ღორი ძროხა
 mixmince_b|ღორ-საქონლის ფარში (მოხარშული)|mt|260|24.5|0|18|||ფარში ღორი ძროხა
-mixmince_f|ღორ-საქონლის ფარში (შემწვარი)|mt|278|25.8|0|19.4|||ფარში ღორი ძროხა
+mixmince_f|ღორ-საქონლის ფარში (გრილზე / შემწვარი)|mt|278|25.8|0|19.4|||ფარში ღორი ძროხა გრილზე შემწვარი
 porkribs|ღორის ნეკნები (უმი)|mt|277|15.5|0|23.4|||ღორი ნეკნი
 porkribs_b|ღორის ნეკნები (მოხარშული)|mt|369|27|0|29|||ღორი ნეკნი
-porkribs_f|ღორის ნეკნები (შემწვარი)|mt|360|26|0|28.5|||ღორი ნეკნი
+porkribs_f|ღორის ნეკნები (გრილზე / შემწვარი)|mt|360|26|0|28.5|||ღორი ნეკნი გრილზე შემწვარი
 lamb|ცხვრის ხორცი (უმი)|mt|282|16.6|0|23.4|||ცხვარი ბატკანი
 lamb_b|ცხვრის ხორცი (მოხარშული)|mt|330|24|0|26|||ცხვარი ბატკანი
-lamb_f|ცხვრის ხორცი (შემწვარი)|mt|339|24|0|27|||ცხვარი ბატკანი
+lamb_f|ცხვრის ხორცი (გრილზე / შემწვარი)|mt|339|24|0|27|||ცხვარი ბატკანი გრილზე შემწვარი
 rabbit|კურდღელი (უმი)|mt|136|20|0|5.6|||კურდღლის ხორცი
 rabbit_b|კურდღელი (მოხარშული)|mt|197|30.4|0|8.4|||კურდღლის ხორცი
-rabbit_f|კურდღელი (შემწვარი)|mt|188|29|0|8|||კურდღლის ხორცი
+rabbit_f|კურდღელი (გრილზე / შემწვარი)|mt|188|29|0|8|||კურდღლის ხორცი გრილზე შემწვარი
 salmon|ორაგული (უმი)|mt|208|20.4|0|13.4|||სალმონი თევზი
 salmonb|ორაგული (ღუმელში / გრილზე)|mt|206|22.1|0|12.4|||სალმონი თევზი
 trout|კალმახი (უმი)|mt|141|19.9|0|6.2|||თევზი
@@ -1403,15 +1477,15 @@ tuna|ტუნა (კონსერვი წყალში)|mt|116|25.5|0|0.
 shrimp|კრევეტი (უმი)|mt|85|20.1|0|0.5|||
 hake|ხეკი (უმი)|mt|88|18|0|1.5|||ხეკი თევზი
 hake_b|ხეკი (მოხარშული)|mt|111|23.4|0|1.9|||ხეკი თევზი
-hake_f|ხეკი (შემწვარი)|mt|118|24.3|0|2.3|||ხეკი თევზი
+hake_f|ხეკი (გრილზე / შემწვარი)|mt|118|24.3|0|2.3|||ხეკი თევზი გრილზე შემწვარი
 cod|ვირთევზა (უმი)|mt|82|17.8|0|0.67|||ვირთევზა თევზი ტრესკა
 cod_b|ვირთევზა (მოხარშული)|mt|98|22.5|0|0.85|||ვირთევზა თევზი ტრესკა
-cod_f|ვირთევზა (შემწვარი)|mt|99|22.8|0|0.86|||ვირთევზა თევზი ტრესკა
+cod_f|ვირთევზა (გრილზე / შემწვარი)|mt|99|22.8|0|0.86|||ვირთევზა თევზი ტრესკა გრილზე შემწვარი
 squid|კალმარი (უმი)|mt|92|15.6|3.1|1.4|||კალმარი ზღვის
 squid_b|კალმარი (მოხარშული)|mt|118|21|4.2|1.9|||კალმარი ზღვის
 carp|კობრი (უმი)|mt|127|17.8|0|5.6|||კობრი თევზი
 carp_b|კობრი (მოხარშული)|mt|153|22.5|0|7|||კობრი თევზი
-carp_f|კობრი (შემწვარი)|mt|156|22.9|0|7.2|||კობრი თევზი
+carp_f|კობრი (გრილზე / შემწვარი)|mt|156|22.9|0|7.2|||კობრი თევზი გრილზე შემწვარი
 herring_s|ქაშაყი (მარილიანი)|mt|217|19.8|0|15.4|||ქაშაყი სელიოდკა თევზი
 sprats|შპროტი ზეთში|mt|363|17.4|0.4|32.4|160|1 ქილა|შპროტი კონსერვი
 sardines_oil|სარდინი ზეთში (გადაწურული)|mt|208|24.6|0|11.4|90|1 ქილა|სარდინი კონსერვი
@@ -1630,8 +1704,7 @@ spinachb|ისპანახი (მოხარშული)|ck|23|3|3.8|0.3|
   // Approximate USDA-based averages per 100 g. Order:
   // fib,sug,sfa,na,ca,fe,mg,k,zn,a,b1,b2,b3,b5,b6,b9,b12,c,d,e,k1,k2,chol  (blank = unknown)
   const MICRO_ORDER = ['fib','sug','sfa','na','ca','fe','mg','k','zn','a','b1','b2','b3','b5','b6','b9','b12','c','d','e','k1','k2','chol'];
-  const MICRO_DATA = `
-apple:2.4,10.4,0.03,1,6,0.12,5,107,0.04,3,0.017,0.026,0.091,0.061,0.041,3,0,4.6,0,0.18,2.2,0,0
+  const MICRO_DATA = `apple:2.4,10.4,0.03,1,6,0.12,5,107,0.04,3,0.017,0.026,0.091,0.061,0.041,3,0,4.6,0,0.18,2.2,0,0
 banana:2.6,12.2,0.11,1,5,0.26,27,358,0.15,3,0.031,0.073,0.665,0.334,0.367,20,0,8.7,0,0.1,0.5,0,0
 orange:2.4,9.4,0.02,0,40,0.1,10,181,0.07,11,0.087,0.04,0.282,0.25,0.06,30,0,53.2,0,0.18,0,0,0
 mandarin:1.8,10.6,0.04,2,37,0.15,12,166,0.07,34,0.058,0.036,0.376,0.216,0.078,16,0,26.7,0,0.2,0,0,0
@@ -2009,6 +2082,13 @@ salt:0,0,0,38758,24,0.33,1,8,0.1,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 borjomi:0,0,0,150,10,0,5,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 energy:0,11,0,40,0,0,0,0,0,0,0,0,8,2,2,0,2,0,0,0,0,0,0
 popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0,0
+eggplant_g:4.05,4.73,0.041,2.7,12.2,0.311,18.9,309,0.216,1.35,0.037,0.05,0.876,0.379,0.113,20.8,0,2.08,0,0.405,4.73,0,0
+zucchini_g:1.3,3.25,0.104,10.4,20.8,0.481,23.4,339,0.416,13,0.041,0.122,0.586,0.265,0.212,21.8,0,16.3,0,0.156,5.59,0,0
+mushroom_g:1.4,2.8,0.07,7,4.2,0.7,12.6,445,0.728,0,0.079,0.563,5.05,2.1,0.146,16.7,0.056,2.06,0.28,0.014,0,0,0
+tomato_g:1.5,3.25,0.037,6.25,12.5,0.338,13.8,296,0.213,52.5,0.032,0.024,0.742,0.111,0.1,13.1,0,12,0,0.675,9.88,0,0
+onion_g:2.21,5.46,0.052,5.2,29.9,0.273,13,190,0.221,0,0.042,0.035,0.151,0.16,0.156,17.3,0,6.73,0,0.026,0.52,0,0
+corn_g:2.3,7.24,0.38,17.2,2.3,0.598,42.5,310,0.529,10.3,0.125,0.063,2.04,0.825,0.107,33.8,0,5.47,0,0.081,0.345,0,0
+potato_g:2.62,1,0.037,7.5,15,1.01,28.8,531,0.375,0,0.071,0.04,1.33,0.369,0.372,13.1,0,17.2,0,0.013,2.5,0,0
 `;
   MICRO_DATA.trim().split('\n').forEach(line => {
     const [id, vals] = line.split(':');
@@ -2257,6 +2337,142 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
       : sc >= 5 ? ['საშუალო — ზომიერად', '#a7862f'] : sc >= 3 ? ['ცუდი — იშვიათად', '#b06a35'] : ['ჯობია მოერიდო', '#a9473f'];
     return { sc, label, color, pros, cons, notes };
   }
+  // ---------- Health warnings (oxalates, vitamin A, mercury, purines, caffeine…) ----------
+  function productWarnings(prod) {
+    if (!prod) return [];
+    const nm = ((prod.name || '') + ' ' + (prod.brand || '')).toLowerCase(), m = (prod.per100 && prod.per100.m) || {}, meta = prod.meta || {};
+    const has = re => re.test(nm), W = [];
+    const raw = /უმი|მშრალი/.test(nm), cooked = /მოხარშ|ფხალი/.test(nm);
+    // oxalates
+    let ox = null;
+    if (has(/ისპანახ|spinach|шпинат/)) ox = cooked ? 'ისპანახი: მოხარშვამ ოქსალატის ნაწილი უკვე მოაშორა. ჯანმრთელისთვის კვირაში 3–4-ჯერ 100–150 გ ნორმალურია.' : 'ისპანახი: ჯანმრთელისთვის კვირაში 3–4-ჯერ 100–150 გ ნორმალურია. ყოველდღე დიდი რაოდენობით ნედლი (მაგ. სმუზში 200 გ-ზე მეტი) — არ ღირს.';
+    else if (has(/ჭარხალ|ჭარხლ|beet|свекл/)) ox = 'ჭარხალი: კვირაში 3–4-ჯერ 100–150 გ ნორმალურია. ჭარხლის ფოთოლში ოქსალატი ბევრად მეტია.';
+    else if (has(/ნუში|almond|миндал/)) ox = 'ნუში: დღეში ≈30 გ (ერთი მუჭა) ნორმალურია, ყოველდღე ბევრი — არა.';
+    else if (has(/შავი შოკოლად|dark choc|горьк|კაკაო|cocoa|какао/)) ox = 'შავი შოკოლადი / კაკაო: დღეში 20–30 გ.';
+    else if (has(/მჟაუნ|sorrel|щавел|რევან|rhubarb|ревен/)) ox = 'კვირაში 1–2-ჯერ მცირე პორცია.';
+    if (ox) W.push({ t: 'ბევრი ოქსალატი', why: 'ოქსალატი კალციუმს უკავშირდება და თირკმლის კენჭის რისკს ზრდის. ჯანმრთელისთვის ჩვეულებრივი პორციები უსაფრთხოა. თუ კენჭი გქონია ან ექიმმა შეზღუდვა გირჩია — ერიდე. მოხარშვა (წყალი გადაღვარე) ოქსალატს 30–80%-ით ამცირებს; ჭამე კალციუმიან საკვებთან (ყველი, იოგურტი) და ბევრი წყალი დალიე.' });
+    // vitamin A (liver etc.)
+    const a = +m.a || 0;
+    if (a >= 1500) W.push({ t: 'ძალიან ბევრი ვიტამინი A', why: `100 გ-ში ${Math.round(a)} მკგ — ზრდასრულისთვის დღის ზედა უსაფრთხო ზღვრის (3000 მკგ) ${Math.round(a / 30)}%. ხშირად და ბევრი ჭარბი ვიტამინი A ღვიძლს და ძვლებს ავნებს.` });
+    // mercury
+    if (has(/ტუნა|თინუს|tuna|тунец/)) W.push({ t: 'ვერცხლისწყალი', why: 'დიდ თევზში ვერცხლისწყალი ბუნებრივად გროვდება. ტუნაში — საშუალოდ.' });
+    // purines
+    if (!has(/ზეთისხილ/) && has(/ღვიძლ|კუჭმაჭ|კუჭებ | გული|საქონლის ენა|სარდინ|შპროტ|ქაშაყ|ანჩოუს|ქაფშია|მიდი|ლუდი|sardin|anchov|herring|sprat|mussel|beer/)) W.push({ t: 'ბევრი პურინი', why: 'პურინი შარდმჟავად იქცევა. ჯანმრთელ ადამიანს არ აწუხებს.', fq: 'თუ პოდაგრა ან შარდმჟავას მაღალი დონე გაქვს — კვირაში 1-ჯერ მცირე პორცია და ბევრი წყალი.' });
+    // caffeine
+    if (has(/ენერგეტიკ|energy|red ?bull|энергет/)) W.push({ t: 'კოფეინი და შაქარი', why: '≈32 მგ კოფეინი 100 მლ-ში (ქილაში ≈80 მგ) და ≈11 გ შაქარი.' });
+    else if (has(/ყავა|კაპუჩინ|ესპრეს|coffee|кофе|espresso|latte/)) W.push({ t: 'კოფეინი', why: 'ფინჯანში ≈80–100 მგ კოფეინი.' });
+    // raw dry beans
+    if (has(/ლობიო \(მშრალი\)|kidney bean|красная фасоль/)) W.push({ t: 'უმი ლობიო ტოქსიკურია', why: 'უმი ან ნახევრად მოხარშული ლობიო შეიცავს ლექტინს (ფიტოჰემაგლუტინინს) — იწვევს გულისრევას და ღებინებას.', fq: 'როგორ: ჩაალბე 8–12 სთ, წყალი გადაღვარე, ძლიერად ადუღე მინიმუმ 10 წუთი, მერე მოხარშე რბილობამდე. ნელ ქვაბში წინასწარი ადუღების გარეშე — არა.' });
+    // potato
+    if (has(/კარტოფილი \(უმი\)/)) W.push({ t: 'სოლანინი', why: 'მწვანე ან აღმოცენებულ კარტოფილში სოლანინია.', fq: 'მწვანე ადგილები და „თვალები“ მოაჭერი; ძლიერ გამწვანებული ან მწარე — გადააგდე.' });
+    // grapefruit
+    if (has(/გრეიფრუტ|grapefruit|грейпфрут/)) W.push({ t: 'წამლებთან ურთიერთქმედება', why: 'გრეიფრუტი ზოგი წამლის (ქოლესტერინის, წნევის, ზოგი ფსიქიატრიული) მოქმედებას აძლიერებს.', fq: 'თუ წამალს იღებ — ექიმს ან ფარმაცევტს ჰკითხე.' });
+    // processed meat
+    if (meta.pmeat || has(/სოსის|ლორი|სალიამ|ძეხვ|ბეკონ|ბასტურმ|sausage|salami|bacon|колбас|сосиск|бекон/)) W.push({ t: 'გადამუშავებული ხორცი', why: 'WHO გადამუშავებულ ხორცს ნაწლავის კიბოს რისკის ფაქტორად აღიარებს; ბევრი მარილი აქვს.' });
+    // red meat
+    else if (has(/საქონ|ღორ|ცხვრ|ხბო|ბატკ|ქაბაბ|კუპატ|აფხაზურ|ოჯახურ|beef|pork|lamb/) && !has(/ქათ|ინდაურ|ბულიონ|ღვიძლ/)) W.push({ t: 'წითელი ხორცი', why: 'კარგი ცილა და რკინაა, მაგრამ ბევრის ჭამა ნაწლავის კიბოს რისკს ზრდის.' });
+    // alcohol
+    if ((meta.alcohol || has(/ღვინ|ლუდ|ჭაჭ|არაყ|wine|beer|vodka|пиво|вино|водка/)) && !has(/ძმარ|vinegar|уксус/)) W.push({ t: 'ალკოჰოლი', why: 'WHO: უსაფრთხო დოზა არ არსებობს. კალორიულია და ცხიმის წვასა და კუნთის აღდგენას ანელებს.' });
+    return W;
+  }
+  // ---------- How often (per week) ----------
+  function shortReasons(prod) {
+    const x = prod.per100 || {}, m = x.m || {}, R = [], drink = !!(prod.meta && prod.meta.drink) || prod.cat === 'dr';
+    const salt = m.na != null ? m.na * 2.5 / 1000 : null;
+    if (m.sug != null && m.sug > (drink ? 5 : 15)) R.push(`ბევრი შაქარი (${r1(m.sug)} გ/100${drink ? 'მლ' : 'გ'})`);
+    if (m.sfa != null && m.sfa > 5) R.push(`ბევრი ნაჯერი ცხიმი (${r1(m.sfa)} გ)`);
+    if (salt != null && salt > 1.5) R.push(`ბევრი მარილი (${r1(salt)} გ)`);
+    if (!drink && x.kcal > 400) R.push(`ძალიან კალორიული (${Math.round(x.kcal)} კკალ)`);
+    if (!drink && m.fib != null && x.c >= 20 && m.fib / x.c < 0.06 && !(m.sug != null && m.sug >= x.c * 0.5) && !/ყავისფერ|მთლიანმარცვ|ჭვავ|whole|цельнозерн/i.test(prod.name || '')) R.push('რაფინირებული ნახშირწყალი — სწრაფად შეიწოვება, ცუდად აკმაყოფილებს');
+    if (prod.meta && prod.meta.nova === 4) R.push('ძლიერ გადამუშავებული');
+    return R;
+  }
+  function freqAdvice(prod) {
+    const nm = ((prod.name || '') + ' ' + (prod.brand || '')).toLowerCase(), has = re => re.test(nm);
+    const x = prod.per100 || {}, m = x.m || {}, cat = prod.cat || '', meta = prod.meta || {};
+    const salt = m.na != null ? m.na * 2.5 / 1000 : 0, why = shortReasons(prod).join('; ');
+    const D = (txt, w) => ({ lvl: 'd', txt: 'ყოველდღე შეიძლება.' + (txt ? ' ' + txt : ''), why: w || null });
+    const L = (txt, w, lvl) => ({ lvl: lvl || 'w', txt, why: w });
+    // 1) specific limits
+    if ((meta.alcohol || has(/ღვინ|ლუდ|ჭაჭ|არაყ|wine|beer|vodka|пиво|вино|водка/)) && !has(/ძმარ|vinegar|уксус/))
+      return L('რაც შეიძლება იშვიათად. თუ სვამ — კვირაში ≤14 ერთეული (≈6 ჭიქა ღვინო ან 6 ლუდი), რამდენიმე დღეზე გადანაწილებული.', 'ალკოჰოლისთვის უსაფრთხო დოზა არ არსებობს (WHO); კალორიულია, ანელებს ცხიმის წვას და კუნთის აღდგენას.', 'r');
+    if (meta.pmeat || has(/სოსის|ლორი|სალიამ|ძეხვ|ბეკონ|ბასტურმ|sausage|salami|bacon|колбас|сосиск|бекон/))
+      return L('კვირაში 1–2-ჯერ, მცირე პორცია.', 'გადამუშავებული ხორცი ნაწლავის კიბოს რისკს ზრდის (WHO) და ძალიან მარილიანია.', 'r');
+    if ((+m.a || 0) >= 4000) return L('კვირაში 1-ჯერ, ≈100 გ.', 'ძალიან ბევრი ვიტამინი A — ხშირად ჭამისას ჭარბდება და ღვიძლს და ძვლებს ავნებს.');
+    if ((+m.a || 0) >= 1500) return L('კვირაში 1–2-ჯერ, ≈100 გ.', 'ბევრი ვიტამინი A — ხშირად ჭამისას ჭარბდება.');
+    if (has(/ტუნა|თინუს|tuna|тунец/)) return L('კვირაში 2–3-ჯერ (1 პორცია ≈115 გ).', 'ვერცხლისწყალი — დიდ თევზში გროვდება (FDA/EPA-ს რეკომენდაცია „ლაით“ ტუნაზე).');
+    if (has(/ენერგეტიკ|energy|red ?bull|энергет/)) return L('სჯობს არა ყოველდღე; მაქსიმუმ 1 ქილა დღეში.', 'კოფეინი (≈80 მგ ქილაში) და შაქარი; ძილს აფუჭებს.', 'r');
+    if (has(/ყავა|კაპუჩინ|ესპრეს|coffee|кофе|espresso|latte/)) return D('დღეში 3–4 ფინჯნამდე.', 'ძილამდე 6 საათით ადრე — აღარ (კოფეინი).');
+    if (has(/ისპანახ|spinach|шпинат|ჭარხალ|ჭარხლ|beet|свекл/)) return L('კვირაში 3–4-ჯერ, 100–150 გ.', 'ოქსალატი — ყოველდღე დიდი რაოდენობით თირკმლის კენჭის რისკს ზრდის.');
+    if (has(/ნუში|almond|миндал/)) return D('ერთი მუჭა (≈30 გ).', 'ოქსალატი და კალორია — დიდი რაოდენობით არა.');
+    if (has(/შავი შოკოლად|dark choc|горьк|კაკაო|cocoa|какао/)) return D('20–30 გ.', 'კალორიულია და ოქსალატი აქვს.');
+    if (has(/საქონ|ღორ|ცხვრ|ხბო|ბატკ|ქაბაბ|კუპატ|აფხაზურ|ოჯახურ|beef|pork|lamb/) && !has(/ქათ|ინდაურ|ბულიონ/))
+      return L('კვირაში ≤3-ჯერ (ჯამში 350–500 გ მომზადებული).', 'წითელი ხორცის ბევრი ჭამა ნაწლავის კიბოს რისკს ზრდის (WCRF).');
+    // 2) by kind
+    if (cat === 'pr') return L('კვირაში 1-ჯერ.', shortReasons(prod).join('; ') || 'ბევრი კალორია, მარილი და ცხიმი, ცუდად აკმაყოფილებს.', 'r');
+    if (has(/^მარილი|^salt/)) return D('მაგრამ ჯამში ≤5 გ (1 ჩ/კ) — ყველა საკვებში არსებული მარილის ჩათვლით.', null);
+    if (has(/^შაქარი|თაფლ|მურაბ|ჯემ|სიროფ|honey|sugar|jam/) && cat !== 'sw') return L('ყოველდღე შეიძლება, მაგრამ ცოტა: დღეში ≤2–3 ჩ/კ.', 'დამატებული შაქარი — WHO: დღეში ≤25–50 გ ყველა წყაროდან ერთად.', 'd');
+    if ((cat === 'ot' && has(/ზეთი/)) || has(/olive oil|sunflower oil|подсолнечное масло|оливковое масло/)) return D('2–3 ს/კ დღეში.', 'ძალიან კალორიულია (1 ს/კ ≈120 კკალ).');
+    if (has(/სუნელ|სანელებ|პილპილ|spice|специ/)) return D('სანელებლად, მცირე რაოდენობით.', null);
+    if (has(/^კარაქ|^ერბო |^ერბო$|butter|сливочное масло/) && !has(/არაქისის|peanut/)) return D('≤1 ს/კ (≈10–15 გ).', 'ბევრი ნაჯერი ცხიმი.');
+    if (has(/ზეთისხილ|olive|маслин|оливк/) && !has(/ზეთი$|oil/)) return D('5–10 ცალი (≈30 გ).', 'მარილიანია — ქილით ნუ შეჭამ.');
+    if (cat === 'ch' || has(/ყველ|ფეტა|feta|cheese|сыр|სულგუნ|მოცარელ|ბრინზ/)) {
+      if ((m.sfa || 0) > 8 || salt > 1.5) return D('≈30–50 გ.', [m.sfa > 8 ? 'ბევრი ნაჯერი ცხიმი' : '', salt > 1.5 ? 'ბევრი მარილი' : ''].filter(Boolean).join(' და ') + '.');
+      return D(null, null);
+    }
+    if (has(/არაქისის კარაქ|peanut butter/)) return D('1–2 ს/კ.', 'კალორიულია.');
+    if (has(/მაიონეზ|mayo/)) return D('≤1 ს/კ.', 'ძალიან კალორიულია.');
+    if (cat === 'dr' || (meta.drink)) {
+      if ((x.kcal || 0) < 5 && salt < 0.3) return D('შეზღუდვის გარეშე.', null);
+      if (has(/წვენ|juice|сок/)) return L('დღეში ≤1 ჭიქა (150 მლ).', 'შაქარი ბოჭკოს გარეშე — მთლიანი ხილი სჯობს.', 'd');
+      if ((m.sug || 0) > 5) return L('იშვიათად — კვირაში 1–2 ჭიქა.', 'ბევრი შაქარი, კალორია და არაფერი სასარგებლო.', 'r');
+      if (salt >= 0.3) return D('1–2 ჭიქა დღეში.', 'მინერალური წყალი ნატრიუმს შეიცავს.');
+    }
+    if (has(/ძმარ|vinegar|уксус|ლიმონის წვენ/)) return D(null, null);
+    if (cat === 'sc' || has(/სოუს|sauce|кетчуп|ketchup|აჯიკა|ტყემალ|საწებელ|მდოგვ|соус/)) {
+      if (salt > 1.5) return D('მცირე რაოდენობით — 1–2 ს/კ.', `ბევრი მარილი (${r1(salt)} გ/100 გ).`);
+      if ((m.sug || 0) > 15) return D('1–2 ს/კ.', 'ბევრი შაქარი.');
+      if ((x.kcal || 0) > 250) return D('1–2 ს/კ.', 'კალორიულია.');
+      return D(null, null);
+    }
+    if (cat === 'vg' || cat === 'fr' || cat === 'lg' || cat === 'nt') {
+      if (salt > 1.2) return D('მცირე პორცია (1–2 ცალი / 50–100 გ).', `მარილიანია (${r1(salt)} გ/100 გ).`);
+      if (cat === 'nt') return D('ერთი მუჭა (≈30 გ).', 'კალორიულია — დიდი რაოდენობით დაკლებას შეგიშლის.');
+      if (cat === 'fr' && (x.kcal || 0) > 200) return D('მცირე მუჭა (30–40 გ).', 'ჩირში შაქარი და კალორია კონცენტრირებულია.');
+      if (cat === 'fr' && has(/ავოკადო|avocado/)) return D('½–1 ცალი.', 'კალორიულია (სასარგებლო ცხიმი).');
+      if (cat === 'fr') return D('2–3 ცალი / პორცია დღეში.', null);
+      if (has(/ფრი|fries/)) return L('კვირაში 1-ჯერ.', 'ზეთში შემწვარი — ბევრი ცხიმი და კალორია.', 'r');
+      return D(cat === 'vg' ? 'რაც მეტი, მით უკეთესი.' : null, null);
+    }
+    if (has(/კვერცხ|egg|яйц/) && !has(/ცილა/)) return D('1–3 ცალი.', null);
+    if (cat === 'mt') {
+      if (salt > 2) return L('კვირაში 1–2-ჯერ.', `ძალიან მარილიანია (${r1(salt)} გ/100 გ).`);
+      if (has(/ორაგ|კალმახ|სკუმბრ|სარდინ|ქაფშია|ქაშაყ|შპროტ|თევზ|ხეკ|ვირთევზ|კობრ|კრევეტ|კალმარ|fish|salmon/)) return D('თევზი კვირაში მინიმუმ 2-ჯერ რეკომენდებულია (ომეგა-3).', null);
+      return D(null, null);
+    }
+    if (cat === 'dy') {
+      if ((x.f || 0) >= 15) return D('1–2 ს/კ.', 'ცხიმიანი და კალორიულია.');
+      return D(null, null);
+    }
+    // 3) generic, by score (scanned products, sweets, fast food, Georgian dishes, grains…)
+    const sc = scoreProduct(prod).sc;
+    const refined = /რაფინირებული/.test(why);
+    if (cat === 'sw' || has(/ჩიფს|chips|чипс|ნამცხვ|ტორტ|cake|печенье|კანფეტ|candy|ვაფლ|wafer/)) return sc >= 6 ? L('კვირაში 2–3-ჯერ, მცირე პორცია.', why || 'ტკბილეული / სნეკი.') : L('კვირაში 1-ჯერ ან უფრო იშვიათად, მცირე პორცია.', why || 'ტკბილეული / სნეკი.', 'r');
+    if (sc >= 7.5) return D(refined ? 'ზომიერი პორციით; მთლიანმარცვლოვანთან მონაცვლეობა სჯობს.' : null, refined ? why : null);
+    if (sc >= 5) return D('ზომიერი პორციით' + (refined ? '; მთლიანმარცვლოვანთან მონაცვლეობა სჯობს.' : '.'), why || null);
+    if (sc >= 3) return L('კვირაში 2–3-ჯერ.', why || 'შემადგენლობით საშუალოა.');
+    return L('კვირაში 1-ჯერ ან უფრო იშვიათად.', why || 'შემადგენლობით სუსტია.', 'r');
+  }
+  function freqHTML(prod) {
+    const f = freqAdvice(prod);
+    return `<b>რამდენჯერ:</b> ${esc(f.txt)}${f.why ? `<div class="pf-why">${f.lvl === 'd' ? 'რატომ ზომიერად' : 'რატომ არა უფრო ხშირად'}: ${esc(f.why)}</div>` : ''}`;
+  }
+  function warnHTML(prod) {
+    const W = productWarnings(prod); if (!W.length) return '';
+    return W.map(w => `<div class="pw-item"><b>${w.t}</b><p>${w.why}</p>${w.fq ? `<p class="fq"><span>რამდენჯერ:</span> ${w.fq}</p>` : ''}</div>`).join('')
+      + '<div class="pw-note">ზოგადი რჩევაა. თუ ექიმმა სხვა რამ გირჩია, ის გაითვალისწინე.</div>';
+  }
+
   function scoreHTML(prod) {
     const r = scoreProduct(prod);
     const li = (arr, cls, ic) => arr.map(t => `<li class="${cls}"><b>${ic}</b><span>${esc(t)}</span></li>`).join('');
@@ -2726,6 +2942,7 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
     if (km) tiles.push([r1(km), 'კმ']);
     if (tiles.length < 3) tiles.push(['—', 'გამეორება']);
     $('#trSum').innerHTML = tiles.slice(0, 6).map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('');
+    renderTrPlanCard();
     // quick chips: my exercises, most used first
     const use = {}; Object.values(train).forEach(arr => (arr || []).forEach(x => { use[x.ex] = (use[x.ex] || 0) + 1; }));
     $('#trQuick').innerHTML = exercises.length
@@ -2842,7 +3059,7 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
   $('#trExNew').onclick = () => openExEdit(null);
   $('#trPresets').addEventListener('click', e => {
     const b = e.target.closest('button[data-pi]'); if (!b) return;
-    const p = TR_PRESETS[+b.dataset.pi]; addExercise(p[0], p[1]); renderExList(); renderTrain(); toast(`დაემატა: ${p[0]}`);
+    const p = TR_PRESETS[+b.dataset.pi]; addExercise(p[0], p[1]); renderExList(); renderTrain(); renderTrPlan(); toast(`დაემატა: ${p[0]}`);
   });
   $('#trExList').addEventListener('click', e => { const b = e.target.closest('[data-eid]'); if (b) openExEdit(b.dataset.eid); });
   let teId = null, teType = 'reps', teInt = 'm';
@@ -2866,7 +3083,7 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
   $('#teSave').onclick = () => {
     const name = $('#teName').value.trim(); if (!name) return toast('სახელი ჩაწერე');
     if (teId) Object.assign(exById(teId), { name, type: teType, int: teInt }); else Object.assign(addExercise(name, teType), { int: teInt });
-    saveTrain(); closeSheet('#trExEdit'); renderExList(); renderTrain(); toast('შენახულია');
+    saveTrain(); closeSheet('#trExEdit'); renderExList(); renderTrain(); renderTrPlan(); toast('შენახულია');
   };
   $('#teDel').onclick = () => {
     const ex = exById(teId); if (!ex) return;
@@ -2874,9 +3091,132 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
     if (!confirm(used ? `წავშალო „${ex.name}“? უკვე ჩაწერილი სეტებიც წაიშლება.` : `წავშალო „${ex.name}“?`)) return;
     exercises = exercises.filter(x => x.id !== teId);
     Object.keys(train).forEach(k => { train[k] = train[k].filter(x => x.ex !== teId); if (!train[k].length) delete train[k]; });
-    saveTrain(); closeSheet('#trExEdit'); renderExList(); renderTrain(); toast('წაიშალა');
+    Object.keys(trplan).forEach(k => { trplan[k] = trplan[k].filter(x => x.ex !== teId); if (!trplan[k].length) delete trplan[k]; }); saveTrPlan();
+    saveTrain(); closeSheet('#trExEdit'); renderExList(); renderTrain(); renderTrPlan(); toast('წაიშალა');
   };
 
+
+
+  // ---------- Training plan ----------
+  let trplan = store.get('mt_trplan_v1', {});   // { 'YYYY-MM-DD': [{ id, ex, sets, reps, kg, sec, km }] }
+  let tpDate = addDays(new Date(), 1);
+  const saveTrPlan = () => store.set('mt_trplan_v1', trplan);
+  const planTxt = (ex, x) => `${x.sets} × ${setTxt(ex, x)}`;
+  function planDone(key, item) { return (train[key] || []).filter(x => x.ex === item.ex).length; }
+  function renderTrPlanCard() { // on "დღის ვარჯიში"
+    const key = dayKey(trDate), plan = trplan[key] || [];
+    $('#trPlanBox').hidden = !plan.length;
+    if (!plan.length) return;
+    // the same exercise may appear twice in a plan: share done sets in order
+    const used = {};
+    $('#trPlanList').innerHTML = plan.map(p => {
+      const ex = exById(p.ex) || { name: 'წაშლილი ვარჯიში', type: 'reps' };
+      const all = planDone(key, p), before = used[p.ex] || 0, done = Math.max(0, Math.min(p.sets, all - before)); used[p.ex] = before + p.sets;
+      const ok = done >= p.sets;
+      return `<div class="wp-row${ok ? ' done' : ''}"><button class="tr-name" data-ex="${esc(p.ex)}"><b>${esc(ex.name)}</b><span>${esc(planTxt(ex, p))}</span></button>
+        <span class="wp-prog">${done}/${p.sets}</span><button class="wp-do" data-pid="${esc(p.id)}" aria-label="დაგეგმილი სეტის ჩაწერა">✓</button></div>`;
+    }).join('');
+  }
+  $('#trPlanList').addEventListener('click', e => {
+    const n = e.target.closest('.tr-name'); if (n) return openSetSheet(n.dataset.ex);
+    const b = e.target.closest('.wp-do'); if (!b) return;
+    const key = dayKey(trDate), p = (trplan[key] || []).find(x => x.id === b.dataset.pid), ex = p && exById(p.ex);
+    if (!ex) return;
+    const vals = {}; ['reps', 'kg', 'sec', 'km'].forEach(k => { if (p[k] != null) vals[k] = p[k]; });
+    train[key] = train[key] || [];
+    train[key].push(Object.assign({ id: newId(), ex: ex.id, t: isToday(trDate) ? Date.now() : new Date(trDate.getFullYear(), trDate.getMonth(), trDate.getDate(), 12).getTime() }, vals));
+    saveTrain(); renderTrain(); toast(`ჩაიწერა: ${ex.name}, ${setTxt(ex, vals)}`);
+  });
+  function renderTrPlan() {
+    const key = dayKey(tpDate), plan = trplan[key] || [];
+    $('#wpDateLabel').textContent = dayLabel(tpDate) || DAYS[tpDate.getDay()];
+    $('#wpDateSub').textContent = `${DAYS[tpDate.getDay()]}, ${tpDate.getDate()} ${MONTHS[tpDate.getMonth()]}`;
+    const sets = plan.reduce((a, p) => a + (+p.sets || 0), 0);
+    const kc = plan.reduce((a, p) => a + setKcal(exById(p.ex), p) * (+p.sets || 0), 0);
+    $('#wpSum').innerHTML = [[plan.length, 'ვარჯიში'], [sets, 'სეტი'], [kc ? '≈' + Math.round(kc) : '—', 'კკალ (გეგმით)']].map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('');
+    const use = {}; Object.values(train).forEach(arr => (arr || []).forEach(x => { use[x.ex] = (use[x.ex] || 0) + 1; }));
+    $('#wpQuick').innerHTML = exercises.slice().sort((a, b) => (use[b.id] || 0) - (use[a.id] || 0)).map(x => `<button class="chip" data-ex="${esc(x.id)}">${esc(x.name)}</button>`).join('')
+      + '<button class="chip new" data-new="1">+ ახალი</button>';
+    $('#wpList').innerHTML = plan.length ? `<div class="tr-group">${plan.map(p => {
+      const ex = exById(p.ex) || { name: 'წაშლილი ვარჯიში', type: 'reps' };
+      return `<div class="wp-row"><button class="tr-name" data-pid="${esc(p.id)}"><b>${esc(ex.name)}</b><span>${esc(planTxt(ex, p))}</span></button><span class="wp-prog">›</span></div>`;
+    }).join('')}</div>` : '<div class="empty">ამ დღისთვის გეგმა ჯერ არ არის.<br>ზემოთ აირჩიე ვარჯიშები.</div>';
+    $('#wpCopy').disabled = $('#wpClear').disabled = !plan.length;
+  }
+  let tpState = null; // { exId, pid }
+  function openPlanSheet(exId, pid) {
+    const key = dayKey(tpDate), cur = pid ? (trplan[key] || []).find(x => x.id === pid) : null;
+    const ex = exById(cur ? cur.ex : exId); if (!ex) return;
+    const base = cur || Object.assign({ sets: 3 }, lastSet(ex.id) || { reps: 10, kg: 20, sec: ex.type === 'dist' ? 600 : 60, km: 1 });
+    tpState = { exId: ex.id, pid: cur ? cur.id : null };
+    $('#wpsTitle').textContent = ex.name;
+    $('#wpsSub').textContent = cur ? 'გეგმის შეცვლა' : 'რამდენი სეტი და თითოეულში რამდენი';
+    let f = trField('wpSets', 'სეტები', base.sets || 3, 1);
+    if (ex.type === 'wreps') f += trField('wpKg', 'წონა, კგ', r1(base.kg ?? 20), 2.5);
+    if (ex.type === 'reps' || ex.type === 'wreps') f += trField('wpReps', 'გამეორება', base.reps ?? 10, 1);
+    if (ex.type === 'dist') f += trField('wpKm', 'მანძილი, კმ', r1(base.km ?? 1), 0.5);
+    if (ex.type === 'time' || ex.type === 'dist') {
+      const s2 = Math.round(base.sec ?? 60);
+      f += trField('wpMin', 'წუთი', Math.floor(s2 / 60), 1);
+      if (ex.type === 'time') f += trField('wpSec', 'წამი', s2 % 60, 5);
+    }
+    $('#wpFields').innerHTML = f;
+    $('#wpsSave').textContent = cur ? 'შენახვა' : 'გეგმაში დამატება';
+    $('#wpsDel').hidden = !cur;
+    openSheet('#wpSheet');
+  }
+  $('#wpFields').addEventListener('click', e => {
+    const b = e.target.closest('button[data-step]'); if (!b) return;
+    const inp = $('#' + b.dataset.for), v = Math.max(0, (num(inp.value) || 0) + parseFloat(b.dataset.step));
+    inp.value = Math.round(v * 100) / 100;
+  });
+  $('#wpsSave').onclick = () => {
+    const ex = exById(tpState.exId); if (!ex) return;
+    const g = id => $('#' + id) ? Math.max(0, num($('#' + id).value) || 0) : 0;
+    const vals = { sets: Math.max(1, Math.round(g('wpSets'))) };
+    if (ex.type === 'reps' || ex.type === 'wreps') vals.reps = Math.round(g('wpReps'));
+    if (ex.type === 'wreps') vals.kg = g('wpKg');
+    if (ex.type === 'time') vals.sec = Math.round(g('wpMin') * 60 + g('wpSec'));
+    if (ex.type === 'dist') { vals.km = g('wpKm'); vals.sec = Math.round(g('wpMin') * 60); }
+    if ((ex.type === 'reps' || ex.type === 'wreps') && !vals.reps) return toast('გამეორების რაოდენობა ჩაწერე');
+    if (ex.type === 'time' && !vals.sec) return toast('დრო ჩაწერე');
+    if (ex.type === 'dist' && !vals.km) return toast('მანძილი ჩაწერე');
+    const key = dayKey(tpDate); trplan[key] = trplan[key] || [];
+    if (tpState.pid) Object.assign(trplan[key].find(x => x.id === tpState.pid) || {}, vals);
+    else trplan[key].push(Object.assign({ id: newId(), ex: ex.id }, vals));
+    saveTrPlan(); closeSheet('#wpSheet'); renderTrPlan(); toast(tpState.pid ? 'შეიცვალა' : `გეგმაში: ${ex.name}, ${planTxt(ex, vals)}`);
+  };
+  $('#wpsDel').onclick = () => {
+    const key = dayKey(tpDate);
+    trplan[key] = (trplan[key] || []).filter(x => x.id !== tpState.pid); if (!trplan[key].length) delete trplan[key];
+    saveTrPlan(); closeSheet('#wpSheet'); renderTrPlan(); toast('გეგმიდან ამოიღო');
+  };
+  $('#wpQuick').addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    if (b.dataset.new) return openExEdit(null);
+    openPlanSheet(b.dataset.ex);
+  });
+  $('#wpList').addEventListener('click', e => { const b = e.target.closest('[data-pid]'); if (b) openPlanSheet(null, b.dataset.pid); });
+  $('#wpPrev').onclick = () => { tpDate = addDays(tpDate, -1); renderTrPlan(); };
+  $('#wpNext').onclick = () => { tpDate = addDays(tpDate, 1); renderTrPlan(); };
+  $('#wpManage').onclick = () => { renderExList(); openSheet('#trExSheet'); };
+  $('#wpCopy').onclick = () => {
+    const inp = $('#wpCopyDate'); inp.value = dayKey(addDays(tpDate, 7));
+    if (inp.showPicker) { try { inp.showPicker(); return; } catch (e) {} }
+    inp.style.pointerEvents = 'auto'; inp.focus(); inp.click();
+  };
+  $('#wpCopyDate').addEventListener('change', e => {
+    const to = e.target.value, from = dayKey(tpDate); if (!to || to === from) return;
+    const src = trplan[from] || []; if (!src.length) return;
+    trplan[to] = (trplan[to] || []).concat(src.map(x => Object.assign({}, x, { id: newId() })));
+    saveTrPlan(); const [yy, mm, dd] = to.split('-').map(Number);
+    toast(`დაკოპირდა: ${dd} ${MONTHS[mm - 1]}`);
+  });
+  $('#wpClear').onclick = () => {
+    const key = dayKey(tpDate); if (!(trplan[key] || []).length) return;
+    if (!confirm('ამ დღის გეგმა წავშალო?')) return;
+    delete trplan[key]; saveTrPlan(); renderTrPlan(); toast('გეგმა წაიშალა');
+  };
 
   // ---------- Training statistics ----------
   let tsN = store.get('mt_trstats_n', 7), tsDays = [];
@@ -3014,7 +3354,7 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
     $('#tdRows').innerHTML = rows.map(([l, v]) => `<div class="st-row"><span>${l}</span><span class="v">${esc(v)}</span></div>`).join('');
   }
 
-  const PAGES = { log: ['#pageLog', 'დღის კონტროლი'], plan: ['#pagePlan', 'კვების ცხრილი'], recipes: ['#pageRecipes', 'რეცეპტები'], shop: ['#pageShop', 'სავაჭრო სია'], stats: ['#pageStats', 'სტატისტიკა'], train: ['#pageTrain', 'დღის ვარჯიში'], trstats: ['#pageTrStats', 'ვარჯიშის სტატისტიკა'] };
+  const PAGES = { log: ['#pageLog', 'დღის კონტროლი'], plan: ['#pagePlan', 'კვების ცხრილი'], recipes: ['#pageRecipes', 'რეცეპტები'], shop: ['#pageShop', 'სავაჭრო სია'], stats: ['#pageStats', 'სტატისტიკა'], train: ['#pageTrain', 'დღის ვარჯიში'], trplan: ['#pageTrPlan', 'ვარჯიშის გეგმა'], trstats: ['#pageTrStats', 'ვარჯიშის სტატისტიკა'] };
   let curTab = 'log';
   function openMenu() {
     $('#menu').classList.add('open'); $('#drawerBg').classList.add('open');
@@ -3038,6 +3378,7 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
     if (t === 'shop') renderShop();
     if (t === 'train') renderTrain();
     if (t === 'trstats') renderTrStats();
+    if (t === 'trplan') renderTrPlan();
   }
   $('#menuBtn').onclick = () => { $('#menu').classList.contains('open') ? closeMenu() : openMenu(); };
   $('#drawerClose').onclick = closeMenu;
@@ -3609,6 +3950,9 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
     $('#pDelete').hidden = !entryId;
     $('#pDelete').textContent = target === 'plan' ? 'გეგმიდან ამოღება' : target === 'recipe' ? 'რეცეპტიდან ამოღება' : 'ჩანაწერის წაშლა';
     $('#pScore').innerHTML = scoreHTML(product);
+    $('#pOilNote') && ($('#pOilNote').hidden = !(/გრილზე|შემწვარი/.test(product.name || '') && product.source === 'builtin' && (product.cat === 'mt' || product.cat === 'vg')));
+    { const wh = warnHTML(product); $('#pWarn').innerHTML = wh; $('#pWarn').hidden = !wh;
+      const fa = freqAdvice(product); $('#pFreq').className = 'pfreq lv-' + fa.lvl; $('#pFreq').innerHTML = freqHTML(product); }
     const meta = product.meta || {};
     const ingrParts = [];
     if (meta.ingr) ingrParts.push(`<div class="nnote" style="color:var(--ink);font-size:13.5px">${esc(meta.ingr)}</div>`);
@@ -3871,7 +4215,7 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
   };
   $('#exportBtn').onclick = () => {
     try {
-      const blob = new Blob([JSON.stringify({ app: 'makro-skaneri', v: 6, log, products, goals, water, plans, recipes, supps, suppTaken, weights, shopExtra, exercises, train }, null, 1)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify({ app: 'makro-skaneri', v: 6, log, products, goals, water, plans, recipes, supps, suppTaken, weights, shopExtra, exercises, train, trplan }, null, 1)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob); a.download = `makro-backup-${dayKey(new Date())}.json`;
       document.body.appendChild(a); a.click(); a.remove();
@@ -3900,7 +4244,11 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
         const ids = new Set((train[day] || []).map(i => i.id));
         train[day] = (train[day] || []).concat((d.train[day] || []).filter(i => !ids.has(i.id)));
       });
-      saveTrain();
+      if (d.trplan && typeof d.trplan === 'object') Object.keys(d.trplan).forEach(day => {
+        const ids = new Set((trplan[day] || []).map(i => i.id));
+        trplan[day] = (trplan[day] || []).concat((d.trplan[day] || []).filter(i => !ids.has(i.id)));
+      });
+      saveTrain(); saveTrPlan();
       if (d.plans && typeof d.plans === 'object') {
         Object.keys(d.plans).forEach(day => {
           const ids = new Set((plans[day] || []).map(i => i.id));
@@ -4096,7 +4444,7 @@ popcorn:10,0.5,4.9,884,10,2.6,108,225,3,10,0.13,0.14,1.55,0.4,0.2,18,0,0,0,4,4,0
   showTab(store.get('mt_tab', 'log'));
 
   // ---------- Update check (home-screen apps on iPhone keep the old page cached) ----------
-  const APP_VERSION = '2026.11.17-7';
+  const APP_VERSION = '2026.11.18-3';
   let newVer = null;
   async function checkUpdate() {
     if (!/^https?:/.test(location.protocol)) return;
