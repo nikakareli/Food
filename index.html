@@ -493,6 +493,22 @@
   .toast{font-size:13px}
   .pback{flex:0 0 32px;height:32px;border-radius:8px;border:1px solid var(--line);font-size:20px;line-height:1;color:var(--ink);display:grid;place-items:center;align-self:flex-start}
   .pback[hidden]{display:none}
+  #sgMeal{margin-top:8px}
+  #sgMeal[hidden]{display:none}
+  .sg-need{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 4px}
+  .sg-need span{font-size:11.5px;padding:3px 8px;border-radius:6px;background:#f4f5f3;border:1px solid var(--line);color:var(--ink)}
+  .sg-ch{font-size:12px;font-weight:600;color:var(--muted);margin:12px 0 2px}
+  .sg-prio{width:100%;font-size:12px;color:var(--muted);margin-top:4px}
+  .sg-prio b{color:var(--ink);font-weight:600}
+  .sg-combo{border:1px solid #cfdcd3;background:#f3f7f4;border-radius:10px;padding:2px 10px;margin-top:10px}
+  .sg-combo .sg-ch{margin-top:8px;color:#3f7d58}
+  .sg-row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 0;border-bottom:1px solid #f0f3f2}
+  .sg-row:last-child{border-bottom:0}
+  .sg-row .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+  .sg-row .t b{font-size:14px;font-weight:600}
+  .sg-row .t small{font-size:11.5px;color:var(--muted)}
+  .sg-row .v{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .sg-row .v small{font-weight:500;color:var(--muted);font-size:11px}
   .pwarn{border:1px solid #e7dcc4;background:#fbf8f1;border-radius:10px;padding:10px 11px;margin-top:8px;font-size:12.5px;line-height:1.45}
   .pwarn[hidden]{display:none}
   .pfreq{border-radius:10px;padding:9px 11px;margin-top:8px;font-size:12.5px;line-height:1.45;border:1px solid #cfdcd3;background:#f3f7f4}
@@ -605,6 +621,11 @@
     </details>
   </section>
 
+  <button class="planbtn" id="sgOpen" hidden>
+    <span class="pb-t"><b>რა ვჭამო?</b><span id="sgBtnSub"></span></span>
+    <span class="arr">›</span>
+  </button>
+
   <button class="planbtn" id="todayPlan" hidden>
     <span class="pb-t"><b>დღის გეგმა</b><span id="tpBtnSub"></span></span>
     <span class="pb-prog"><i id="tpBtnBar"></i></span>
@@ -683,6 +704,11 @@
         <div class="nutbody" id="plNutBody"></div>
       </details>
     </section>
+
+    <button class="planbtn" id="sgPlanOpen">
+      <span class="pb-t"><b>რა დავგეგმო?</b><span id="sgPlanSub"></span></span>
+      <span class="arr">›</span>
+    </button>
 
   <div class="actions">
     <button class="act main" id="plScan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 8v8M10 8v8M13 8v8M16 8v8"/></svg><span>სკანირება</span></button>
@@ -1116,6 +1142,20 @@
     <div class="st-chart" id="tdChart" style="height:150px;margin-top:10px"></div>
     <div class="st-tip" id="tdTip"></div>
     <div id="tdRows"></div>
+    <button class="ghost" data-close>დახურვა</button>
+  </div>
+</div>
+
+<!-- What to eat now -->
+<div class="sheet" id="sgSheet">
+  <div class="sheet-card">
+    <h3 id="sgTitle">რას გირჩევ ახლა</h3>
+    <div class="muted" id="sgSub"></div>
+    <div class="seg bk-sort" id="sgMeal" hidden><button data-m="b">საუზმე</button><button data-m="l">სადილი</button><button data-m="s">წახემსება</button><button data-m="d">ვახშამი</button></div>
+    <div class="sg-need" id="sgNeed"></div>
+    <div id="sgCombo"></div>
+    <div id="sgList"></div>
+    <div class="nnote" id="sgNote">ითვალისწინებს დღის დროს, შენს მიზნებს (⚙), რაც დღეს უკვე შეჭამე, შაქრის, ნაჯერი ცხიმის და მარილის ლიმიტს და იმას, რაც კვირაში იშვიათად უნდა ჭამო. შეეხე და პორციით დაამატებ.</div>
     <button class="ghost" data-close>დახურვა</button>
   </div>
 </div>
@@ -2553,6 +2593,7 @@ ad_chirina_nuggets:,2.2,1,704,,,,,,,,,,,,,,,,,,,
     $('#dateSub').textContent = `${current.getDate()} ${MONTHS[current.getMonth()]}`;
     $('#nextDay').disabled = isToday(current);
 
+    renderSgBtn();
     $('#kcalVal').textContent = Math.round(tot.kcal);
     $('#kcalGoal').textContent = goals.kcal;
     const left = Math.round(goals.kcal - tot.kcal);
@@ -2682,6 +2723,7 @@ ad_chirina_nuggets:,2.2,1,704,,,,,,,,,,,,,,,,,,,
   // ---------- Page 2: meal plan ----------
   function renderPlan() {
     const key = dayKey(planDate), items = plans[key] || [];
+    renderSgPlanBtn();
     $('#plDateLabel').textContent = dayLabel(planDate) || DAYS[planDate.getDay()];
     $('#plDateSub').textContent = `${DAYS[planDate.getDay()]}, ${planDate.getDate()} ${MONTHS[planDate.getMonth()]}`;
     const { tot, sums, partial } = sumItems(items);
@@ -2894,6 +2936,210 @@ ad_chirina_nuggets:,2.2,1,704,,,,,,,,,,,,,,,,,,,
   };
 
   // ---------- Pages & menu ----------
+
+  // ---------- "რა ვჭამო?" — suggestions by time of day, what is still missing and the user's goals ----------
+  const SG_SLOTS = { b: 'საუზმე', s1: 'წახემსება', l: 'სადილი', s2: 'წახემსება', d: 'ვახშამი', late: 'გვიანი საღამო' };
+  const SG_FIT = { // category suitability by time slot (1 = neutral)
+    b: { dy: 1.4, ch: 1.2, fr: 1.2, gr: 1.15, nt: 1.1, ck: 1.1, ad: 1, mt: 0.85, ge: 0.7, lg: 0.8, vg: 0.9, sw: 0.6, pr: 0.5 },
+    s1: { fr: 1.3, dy: 1.3, nt: 1.2, ch: 1.1, vg: 1.1, ad: 1, gr: 0.9, mt: 0.8, ge: 0.6, lg: 0.8, ck: 0.9, sw: 0.6, pr: 0.5 },
+    l: { mt: 1.3, ge: 1.1, lg: 1.2, vg: 1.2, ck: 1.15, gr: 1.1, ad: 1, dy: 0.9, ch: 0.9, fr: 0.9, nt: 0.8, sw: 0.5, pr: 0.6 },
+    s2: { fr: 1.25, dy: 1.3, nt: 1.15, vg: 1.15, ch: 1.1, ad: 1, gr: 0.85, mt: 0.9, ge: 0.6, lg: 0.9, ck: 0.9, sw: 0.6, pr: 0.5 },
+    d: { mt: 1.3, vg: 1.3, lg: 1.15, ck: 1.15, dy: 1.05, ad: 1, ch: 0.9, ge: 0.9, gr: 0.85, fr: 0.8, nt: 0.8, sw: 0.4, pr: 0.5 },
+    late: { dy: 1.5, vg: 1.3, ck: 1.1, mt: 1, ad: 0.9, ch: 0.8, fr: 0.7, lg: 0.6, nt: 0.6, gr: 0.5, ge: 0.4, sw: 0.3, pr: 0.3 } };
+  const SG_BASE_G = { mt: 150, ge: 200, ck: 150, lg: 150, gr: 150, vg: 200, fr: 150, dy: 200, ch: 40, nt: 30, sw: 40, ad: 100, pr: 150, ot: 30 };
+  function sgSlot(d) {
+    const h = d.getHours() + d.getMinutes() / 60;
+    if (h < 5 || h >= 21.5) return ['late', 1];
+    if (h < 10.5) return ['b', 4];
+    if (h < 12) return ['s1', 3.4];
+    if (h < 15.5) return ['l', 2.5];
+    if (h < 18) return ['s2', 1.6];
+    return ['d', 1];
+  }
+  let sgMode = 'log', sgPlanMeal = 'l';
+  const SG_MEAL_SLOT = { b: 'b', l: 'l', s: 's2', d: 'd' }, SG_MEAL_W = { b: 1, l: 1.2, s: 0.5, d: 1 };
+  function sgState() {
+    const plan = sgMode === 'plan', now = plan ? planDate : new Date(), key = dayKey(now), items = (plan ? plans[key] : log[key]) || [];
+    const { tot, sums } = sumItems(items);
+    const ref = k => (NUTS.find(n => n[0] === k) || [])[3] || 0;
+    const rem = { k: goals.kcal - tot.kcal, p: goals.p - tot.p, c: goals.c - tot.c, f: goals.f - tot.f,
+      fib: ref('fib') - (sums.fib || 0), sug: ref('sug') - (sums.sug || 0), sfa: ref('sfa') - (sums.sfa || 0), na: ref('na') - (sums.na || 0) };
+    let [slot, left] = sgSlot(now);
+    let budget;
+    if (plan) { // planning: share what is left among this meal and the meals that are still empty
+      slot = SG_MEAL_SLOT[sgPlanMeal];
+      const used = new Set(items.map(i => i.meal)), open = Object.keys(SG_MEAL_W).filter(m => m === sgPlanMeal || !used.has(m));
+      const share = SG_MEAL_W[sgPlanMeal] / open.reduce((a, m) => a + SG_MEAL_W[m], 0);
+      budget = Math.min(rem.k, Math.max(150, Math.min(900, rem.k * share)));
+    } else budget = slot === 'late' ? Math.min(rem.k, 350) : Math.min(rem.k, Math.max(150, Math.min(900, rem.k / left)));
+    const frac = rem.k > 0 ? Math.min(1, budget / rem.k) : 0;
+    const tgt = { p: Math.max(0, rem.p) * frac, c: Math.max(0, rem.c) * frac, f: Math.max(0, rem.f) * frac, fib: Math.max(0, rem.fib) * frac };
+    // priorities: until 70% of the protein goal is reached protein leads; after that whatever is most behind leads
+    const goalOf = { p: goals.p, c: goals.c, f: goals.f, fib: ref('fib') || 30 };
+    const miss = {}; ['p', 'c', 'f', 'fib'].forEach(k => { miss[k] = goalOf[k] > 0 ? Math.max(0, Math.min(1, rem[k] / goalOf[k])) : 0; });
+    const pDone = goals.p > 0 ? tot.p / goals.p : 1;
+    let w, prio;
+    if (pDone < 0.7) { w = { p: 3, fib: 1.5, c: 0.8, f: 0.8 }; prio = 'p'; }
+    else {
+      const mx = Math.max(miss.p, miss.c, miss.f, miss.fib, 0.01);
+      w = {}; ['p', 'c', 'f', 'fib'].forEach(k => { w[k] = 0.6 + 3 * miss[k] / mx + (k === 'p' ? 0.3 : 0); });
+      prio = ['c', 'f', 'fib', 'p'].reduce((a, k) => w[k] > w[a] ? k : a, 'p');
+    }
+    return { now, key, items, tot, sums, rem, slot, budget, tgt, w, prio, pDone };
+  }
+  function sgCandidates(st) {
+    const out = [], hist = {};
+    for (let i = 1; i <= 6; i++) { const dk = dayKey(addDays(st.now, -i)); (log[dk] || []).concat(plans[dk] || []).forEach(x => { if (hist[x.code] == null) hist[x.code] = i; }); }
+    const today = new Set(st.items.map(x => x.code));
+    const push = (code, prod, cat, piece, pl) => {
+      if (!prod || !prod.per100 || !(prod.per100.kcal >= 5)) return;
+      const nm = prod.name || '';
+      if (cat === 'sc' || cat === 'dr' || cat === 'ot') return;
+      if (/\(უმი\)|\(მშრალი\)|მშრალი\)|გაყინული/.test(nm) && cat !== 'fr' && cat !== 'vg') return;
+      if (/კარტოფილი \(უმი\)|ლობიო \(მშრალი\)/.test(nm)) return;
+      if (/ტარხუნ|ოხრახუშ|ქინძ|კამა|რეჰან|პიტნ|მწვანე ხახვი|ნიორი|ლიმონი|ჯონჯოლ/.test(nm)) return; // herbs / garnish, not a meal
+      const fa = freqAdvice(prod);
+      if (fa.lvl === 'r') return;
+      if (fa.lvl === 'w' && hist[code] != null && hist[code] <= 2) return;
+      const vitA = +((prod.per100.m || {}).a) || 0;
+      out.push({ code, prod, cat: cat || 'ad', piece, pl, sc: scoreProduct(prod).sc, ateToday: today.has(code), weekly: fa.lvl === 'w', maxG: vitA >= 1500 ? 100 : fa.lvl === 'w' ? 150 : null });
+    };
+    Object.values(FOODS).forEach(x => push('food-' + x.id, getProduct('food-' + x.id), x.cat, x.piece, x.pieceLabel));
+    Object.entries(products).forEach(([code, p]) => push(code, p, p.cat || (String(code).startsWith('recipe-') ? 'ck' : 'ad'), p.piece || (p.serving && p.serving.g) || null, p.pieceLabel || '1 პორცია'));
+    return out;
+  }
+  function sgPortion(c, budget) {
+    const per = c.prod.per100, base = SG_BASE_G[c.cat] || 100;
+    let cap = base * (per.kcal > 150 ? 1 : c.cat === 'dy' ? 1.25 : 1.5);
+    if (c.maxG) cap = Math.min(cap, c.maxG);
+    let g = Math.min(cap, budget / (per.kcal / 100));
+    if (c.piece && c.piece >= 20 && c.piece <= 400) {
+      const n = Math.min(/პორცია|თასი|ქილა|შეფუთვა|ბოთლი/.test(c.pl || '') ? 1 : 3, Math.floor(g / c.piece + 0.25));
+      if (n < 1) return null;
+      const m1 = /^1 (.+)$/.exec(c.pl || '');
+      return { g: n * c.piece, label: n === 1 ? c.pl : m1 ? `${n} ${m1[1]}` : `${n} × ${c.pl}` };
+    }
+    if (g < Math.min(base, cap) * 0.5) return null;
+    g = Math.max(10, Math.round(g / 10) * 10);
+    return { g, label: `${g} გ` };
+  }
+  function sgEval(c, por, st, budget, tgt) {
+    const per = c.prod.per100, m = per.m || {}, f = por.g / 100;
+    const v = { k: per.kcal * f, p: per.p * f, c: per.c * f, f: per.f * f, fib: (m.fib || 0) * f, sug: (m.sug || 0) * f, sfa: (m.sfa || 0) * f, na: (m.na || 0) * f };
+    const gain = (x, t, min) => t > min ? Math.min(x, t) / t : 0;
+    const w = st.w;
+    let u = w.p * gain(v.p, tgt.p, 3) + w.fib * gain(v.fib, tgt.fib, 1) + w.c * gain(v.c, tgt.c, 5) + w.f * gain(v.f, tgt.f, 3);
+    u -= Math.max(0, v.c - Math.max(0, tgt.c) - 10) / 20 + Math.max(0, v.f - Math.max(0, tgt.f) - 5) / 10 + Math.max(0, v.k - budget) / budget * 3;
+    if (v.sug > Math.max(0, st.rem.sug) + 5) u -= 1; if (v.sfa > Math.max(0, st.rem.sfa) + 3) u -= 1; if (v.na > Math.max(0, st.rem.na) + 300) u -= 1;
+    u += c.sc / 10;
+    u *= (SG_FIT[st.slot][c.cat] || 1) * (c.ateToday ? 0.6 : 1) * (c.weekly ? 0.85 : 1);
+    if (/კვერცხ/.test(c.prod.name) && (st.slot === 'b' || st.slot === 'late')) u *= 1.2;
+    return { u, v };
+  }
+  function sgWhy(v, st, budget) {
+    const r = [];
+    if (v.p >= 20 || (v.p >= 10 && v.p * 4 / v.k >= 0.3)) r.push(`ცილა ${Math.round(v.p)} გ`);
+    if (st.prio === 'c' && v.c >= 15) r.push(`ნახშ. ${Math.round(v.c)} გ`);
+    if (st.prio === 'f' && v.f >= 8) r.push(`ცხიმი ${Math.round(v.f)} გ`);
+    if (v.fib >= 4) r.push(`ბოჭკო ${r1(v.fib)} გ`);
+    if (v.k <= budget * 0.5) r.push('მსუბუქი');
+    if (st.rem.c < 30 && v.c <= 8) r.push('ცოტა ნახშირწყალი');
+    if (st.rem.f < 15 && v.f <= 4) r.push('ცოტა ცხიმი');
+    return r.slice(0, 3).join(' · ');
+  }
+  function renderSuggest() {
+    const st = sgState(), { rem, slot } = st;
+    const hh = String(st.now.getHours()).padStart(2, '0') + ':' + String(st.now.getMinutes()).padStart(2, '0');
+    const plan = sgMode === 'plan';
+    $('#sgTitle').textContent = plan ? 'რა დავგეგმო' : 'რას გირჩევ ახლა';
+    $('#sgMeal').hidden = !plan;
+    if (plan) $('#sgMeal').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.m === sgPlanMeal));
+    $('#sgSub').textContent = plan
+      ? `${dayLabel(planDate) || DAYS[planDate.getDay()]}, ${planDate.getDate()} ${MONTHS[planDate.getMonth()]} · ${(MEALS.find(m => m[0] === sgPlanMeal) || [, ''])[1]} · ≈${Math.max(0, Math.round(st.budget))} კკალ`
+      : `${SG_SLOTS[slot]} · ${hh} · ამ კვებაზე ≈${Math.max(0, Math.round(st.budget))} კკალ`;
+    $('#sgNote').textContent = plan
+      ? 'ითვალისწინებს ამ დღისთვის უკვე დაგეგმილს, შენს მიზნებს (⚙), დარჩენილ კვებებს, შაქრის, ნაჯერი ცხიმის და მარილის ლიმიტს და იმას, რაც კვირაში იშვიათად უნდა ჭამო. შეეხე და გეგმაში დაამატებ.'
+      : 'ითვალისწინებს დღის დროს, შენს მიზნებს (⚙), რაც დღეს უკვე შეჭამე, შაქრის, ნაჯერი ცხიმის და მარილის ლიმიტს და იმას, რაც კვირაში იშვიათად უნდა ჭამო. შეეხე და პორციით დაამატებ.';
+    const need = [
+      rem.k >= 0 ? `კალორია: დარჩა ${Math.round(rem.k)}` : `კალორია: გადაჭარბება ${Math.round(-rem.k)}`,
+      rem.p > 0 ? `ცილა: აკლია ${Math.round(rem.p)} გ` : 'ცილა: შევსებულია',
+      rem.fib > 0 ? `ბოჭკო: აკლია ${Math.round(rem.fib)} გ` : 'ბოჭკო: შევსებულია',
+      rem.c > 0 ? `ნახშ.: დარჩა ${Math.round(rem.c)} გ` : `ნახშ.: ლიმიტი ამოწურულია`,
+      rem.f > 0 ? `ცხიმი: დარჩა ${Math.round(rem.f)} გ` : 'ცხიმი: ლიმიტი ამოწურულია'];
+    const PR = { p: 'ცილა', c: 'ნახშირწყალი', f: 'ცხიმი', fib: 'ბოჭკო' };
+    $('#sgNeed').innerHTML = need.map(t => `<span>${esc(t)}</span>`).join('')
+      + `<div class="sg-prio">ახლა უპირველესად: <b>${PR[st.prio]}</b>${st.pDone < 0.7 ? ' (ცილის 70% ჯერ არ არის შევსებული)' : ' — ყველაზე მეტად ეს გაკლია'}</div>`;
+    const cands = sgCandidates(st);
+    // day already full -> only very light vegetables
+    if (rem.k < 120) {
+      const light = cands.filter(c => c.cat === 'vg' && c.prod.per100.kcal <= 30).slice(0, 6).map(c => ({ c, por: { g: 200, label: '200 გ' } }));
+      $('#sgCombo').innerHTML = '';
+      $('#sgList').innerHTML = `<div class="nnote" style="margin:4px 0 6px">დღის კალორია ${plan ? 'გეგმაში ' : ''}${rem.k < 0 ? 'გადაჭარბებულია' : 'თითქმის შევსებულია'}. ${plan ? 'თუ კიდევ რამე გინდა, მხოლოდ ძალიან მსუბუქი ბოსტნეული:' : 'თუ მაინც გშია — წყალი, უშაქრო ჩაი ან ძალიან მსუბუქი ბოსტნეული:'}</div>`
+        + light.map(x => sgRow(x.c, x.por, x.c.prod.per100.kcal * 2, 'ძალიან მსუბუქი')).join('');
+      return;
+    }
+    const budget = st.budget, tgt = st.tgt;
+    const scored = cands.map(c => { const por = sgPortion(c, budget); if (!por) return null; const e = sgEval(c, por, st, budget, tgt); return { c, por, ...e }; }).filter(Boolean).sort((a, b) => b.u - a.u);
+    // best combination: a protein main + a vegetable / fibre side
+    let combo = '';
+    if (slot !== 'late' || rem.k > 250 || plan) {
+      const P100 = c => c.prod.per100, pr = st.prio;
+      const mainPool = cands.filter(c => pr === 'c' ? P100(c).c * 4 / P100(c).kcal >= 0.5 && ['gr', 'lg', 'fr', 'vg', 'ck', 'ge', 'ad'].includes(c.cat)
+        : pr === 'f' ? P100(c).f * 9 / P100(c).kcal >= 0.5 && !['sw', 'pr'].includes(c.cat)
+        : pr === 'fib' ? (P100(c).m || {}).fib >= 4 && P100(c).kcal >= 40
+        : P100(c).p * 4 / P100(c).kcal >= 0.3 && ['mt', 'dy', 'ck', 'ad', 'lg', 'ch'].includes(c.cat));
+      const sidePool = pr === 'p' || pr === 'c' ? cands.filter(c => ['vg', 'lg', 'fr', 'gr'].includes(c.cat) && (c.prod.per100.m || {}).fib >= 1.5)
+        : cands.filter(c => c.prod.per100.p * 4 / c.prod.per100.kcal >= 0.3 && ['mt', 'dy', 'ck', 'ad', 'lg'].includes(c.cat));
+      const pick = (pool, b, t) => pool.map(c => { const por = sgPortion(c, b); if (!por) return null; const e = sgEval(c, por, st, b, t); return { c, por, ...e }; }).filter(Boolean).sort((a, b2) => b2.u - a.u)[0];
+      const half = k => ({ p: tgt.p * k, c: tgt.c * k, f: tgt.f * k, fib: tgt.fib * k });
+      const mn = pick(mainPool, budget * 0.65, half(0.85));
+      const sd = pick(sidePool.filter(c => !mn || c.code !== mn.c.code), budget * (mn ? 0.35 : 0.6), half(0.5));
+      if (mn && sd) {
+        const k = mn.v.k + sd.v.k, p = mn.v.p + sd.v.p, cc = mn.v.c + sd.v.c, ff = mn.v.f + sd.v.f;
+        combo = `<div class="sg-combo"><div class="sg-ch">საუკეთესო კომბინაცია · ${Math.round(k)} კკალ · ც ${Math.round(p)} · ნ ${Math.round(cc)} · ცხ ${Math.round(ff)}</div>`
+          + sgRow(mn.c, mn.por, mn.v.k, sgWhy(mn.v, st, budget)) + sgRow(sd.c, sd.por, sd.v.k, sgWhy(sd.v, st, budget)) + '</div>';
+      }
+    }
+    $('#sgCombo').innerHTML = combo;
+    const perCat = {}, list = [], inCombo = new Set((combo.match(/data-code="([^"]+)"/g) || []).map(t => t.slice(11, -1)));
+    for (const x of scored) {
+      if (inCombo.has(x.c.code)) continue;
+      if ((perCat[x.c.cat] || 0) >= 2) continue;
+      const base = (x.c.prod.name || '').replace(/\s*\([^)]*\)\s*$/, '');
+      if (list.some(y => (y.c.prod.name || '').replace(/\s*\([^)]*\)\s*$/, '') === base)) continue;
+      perCat[x.c.cat] = (perCat[x.c.cat] || 0) + 1; list.push(x); if (list.length >= 6) break;
+    }
+    $('#sgList').innerHTML = '<div class="sg-ch">სხვა ვარიანტები</div>' + list.map(x => sgRow(x.c, x.por, x.v.k, sgWhy(x.v, st, budget))).join('');
+  }
+  function sgRow(c, por, k, why) {
+    return `<button class="sg-row" data-code="${esc(c.code)}" data-g="${por.g}"><span class="t"><b>${esc(c.prod.name)}</b><small>${esc(por.label)}${why ? ' · ' + esc(why) : ''}</small></span><span class="v">${Math.round(k)}<small> კკალ</small></span></button>`;
+  }
+  $('#sgOpen').onclick = () => { sgMode = 'log'; renderSuggest(); openSheet('#sgSheet'); };
+  $('#sgPlanOpen').onclick = () => {
+    sgMode = 'plan';
+    const used = new Set((plans[dayKey(planDate)] || []).map(i => i.meal));
+    sgPlanMeal = ['b', 'l', 's', 'd'].find(m => !used.has(m)) || 'l';
+    renderSuggest(); openSheet('#sgSheet');
+  };
+  $('#sgMeal').addEventListener('click', e => { const b = e.target.closest('button[data-m]'); if (!b) return; sgPlanMeal = b.dataset.m; renderSuggest(); });
+  $('#sgSheet').addEventListener('click', e => {
+    const b = e.target.closest('.sg-row'); if (!b) return;
+    closeSheet('#sgSheet');
+    const code = b.dataset.code, prod = getProduct(code); if (!prod) return;
+    if (sgMode === 'plan') { addTarget = 'plan'; lastMeal = sgPlanMeal; showProductSheet(code, prod, +b.dataset.g, null, 'plan', sgPlanMeal); }
+    else { addTarget = 'log'; showProductSheet(code, prod, +b.dataset.g); }
+  });
+  function renderSgPlanBtn() {
+    const items = plans[dayKey(planDate)] || [], kc = items.reduce((a, i) => a + (+i.kcal || 0), 0), p = items.reduce((a, i) => a + (+i.p || 0), 0);
+    const left = goals.kcal - kc;
+    $('#sgPlanSub').textContent = left < 120 ? 'გეგმის კალორია შევსებულია' : `დარჩა ≈${Math.round(left)} კკალ` + (goals.p - p > 10 ? ` · ცილა აკლია ${Math.round(goals.p - p)} გ` : '');
+  }
+  function renderSgBtn() {
+    const btn = $('#sgOpen'); if (!btn) return;
+    btn.hidden = !isToday(current); if (btn.hidden) return;
+    const st = sgState();
+    $('#sgBtnSub').textContent = st.rem.k < 120 ? 'დღის კალორია შევსებულია' : `${SG_SLOTS[st.slot]} · ≈${Math.round(st.budget)} კკალ` + (st.rem.p > 10 ? ` · ცილა აკლია ${Math.round(st.rem.p)} გ` : '');
+  }
 
   // ---------- Training ----------
   let exercises = store.get('mt_exercises_v1', []);   // [{ id, name, type }]
@@ -4462,7 +4708,7 @@ ad_chirina_nuggets:,2.2,1,704,,,,,,,,,,,,,,,,,,,
   showTab(store.get('mt_tab', 'log'));
 
   // ---------- Update check (home-screen apps on iPhone keep the old page cached) ----------
-  const APP_VERSION = '2026.11.18-5';
+  const APP_VERSION = '2026.11.24-2';
   let newVer = null;
   async function checkUpdate() {
     if (!/^https?:/.test(location.protocol)) return;
